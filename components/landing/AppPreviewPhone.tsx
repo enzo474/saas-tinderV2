@@ -28,7 +28,7 @@ function PlaceholderImg({ src, alt, className }: { src: string; alt: string; cla
 function TinderScreen() {
   const [idx, setIdx] = useState(0)
   const photos = [
-    '/resultats/night-style.jpg',
+    '/resultats/night-style.jpeg',
     '/resultats/urban-style.jpeg',
     '/resultats/fitness-style.jpeg',
     '/resultats/travel-style.jpeg',
@@ -85,9 +85,9 @@ function FruitzScreen() {
     '/resultats/summer-style.jpeg',
     '/resultats/tennis-style.jpeg',
     '/resultats/foot-style.jpeg',
-    '/resultats/basket-style.jpg',
-    '/resultats/boy-lifestyle.jpg',
-    '/resultats/man-lifestyle.jpg',
+    '/resultats/basket-style.jpeg',
+    '/resultats/boy-lifestyle.jpeg',
+    '/resultats/man-lifestyle.jpeg',
   ]
   return (
     <div className="w-full h-full overflow-y-auto bg-white" style={{ scrollbarWidth: 'none' }}>
@@ -120,7 +120,7 @@ function FruitzScreen() {
 // ── Hinge Screen ──────────────────────────────────────────────────────────
 function HingeScreen() {
   const photos = [
-    '/resultats/night-style.jpg',
+    '/resultats/night-style.jpeg',
     '/resultats/urban-style.jpeg',
     '/resultats/fitness-style.jpeg',
     '/resultats/travel-style.jpeg',

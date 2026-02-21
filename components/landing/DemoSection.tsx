@@ -10,7 +10,7 @@ type DemoStep = 'pick-face' | 'pick-style' | 'generating' | 'result'
 
 // ── Data ───────────────────────────────────────────────────────────────────
 const STYLES: { id: Style; label: string; img: string; result: string }[] = [
-  { id: 'night',         label: 'Night',         img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(56).jpeg',                        result: '/resultats/night-style.jpg'     },
+  { id: 'night',         label: 'Night',         img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(56).jpeg',                        result: '/resultats/night-style.jpeg'    },
   { id: 'urban',         label: 'Urban',         img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(3).jpeg',                         result: '/resultats/urban-style.jpeg'    },
   { id: 'sport',         label: 'Sport',         img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(54).jpeg',                        result: '/resultats/fitness-style.jpeg'  },
   { id: 'travel',        label: 'Travel',        img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(78).jpeg',                        result: '/resultats/travel-style.jpeg'   },
@@ -19,9 +19,9 @@ const STYLES: { id: Style; label: string; img: string; result: string }[] = [
   { id: 'beach',         label: 'Beach',         img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(28).jpeg',                        result: '/resultats/summer-style.jpeg'   },
   { id: 'tennis',        label: 'Tennis',        img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(33).jpeg',                        result: '/resultats/tennis-style.jpeg'   },
   { id: 'foot',          label: 'Foot',          img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(41).jpeg',                        result: '/resultats/foot-style.jpeg'     },
-  { id: 'basket',        label: 'Basket',        img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/Kansas%20High%20School%20Basketball.jpeg', result: '/resultats/basket-style.jpg' },
-  { id: 'lifestyle-boy', label: 'Lifestyle Boy', img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/cusbclo.jpeg',                         result: '/resultats/boy-lifestyle.jpg'   },
-  { id: 'lifestyle-man', label: 'Lifestyle Man', img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(18).jpeg',                        result: '/resultats/man-lifestyle.jpg'   },
+  { id: 'basket',        label: 'Basket',        img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/Kansas%20High%20School%20Basketball.jpeg', result: '/resultats/basket-style.jpeg' },
+  { id: 'lifestyle-boy', label: 'Lifestyle Boy', img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/cusbclo.jpeg',                         result: '/resultats/boy-lifestyle.jpeg'  },
+  { id: 'lifestyle-man', label: 'Lifestyle Man', img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/style-previews/_%20(18).jpeg',                        result: '/resultats/man-lifestyle.jpeg'  },
 ]
 
 // Placeholder gris si image absente
@@ -122,7 +122,7 @@ export function DemoSection({ onResult, styleImages = {} }: DemoSectionProps = {
                   >
                     <div className="aspect-[3/4]">
                       <ImgWithFallback
-                        src="/avant.jpeg"
+                        src="/avant.jpeg?v=2"
                         alt="Profil démo"
                         className="w-full h-full object-cover"
                       />

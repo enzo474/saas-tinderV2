@@ -131,7 +131,7 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               transform: 'translateY(40px)',
               animation: showBefore ? 'introSlideUp 0.8s ease-out forwards' : undefined,
             }}>
-              <Image src="/avant.jpeg" alt="Avant" width={280} height={373}
+              <Image src="/avant.jpeg?v=2" alt="Avant" width={280} height={373}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} priority />
             </div>
             <p style={{
@@ -178,7 +178,7 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               animation: showAfter ? 'introSlideFromRight 0.8s ease-out forwards' : undefined,
               boxShadow: showAfter ? '0 0 40px rgba(230,57,70,0.35), 0 0 80px rgba(230,57,70,0.15)' : undefined,
             }}>
-              <Image src="/apres.jpeg" alt="Après" width={280} height={373}
+              <Image src="/apres.jpeg?v=2" alt="Après" width={280} height={373}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} priority />
             </div>
             <p style={{
