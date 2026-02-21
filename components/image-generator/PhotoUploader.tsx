@@ -54,8 +54,8 @@ export function PhotoUploader({ onPhotosUploaded }: PhotoUploaderProps) {
   }
 
   const handleContinue = () => {
-    if (photos.length < 4) {
-      setError('Minimum 4 photos requises')
+    if (photos.length < 1) {
+      setError('Minimum 1 photo requise')
       return
     }
     onPhotosUploaded(photos)
@@ -80,7 +80,7 @@ export function PhotoUploader({ onPhotosUploaded }: PhotoUploaderProps) {
           {isDragActive ? 'Déposez vos photos ici...' : 'Cliquez ou glissez vos photos'}
         </p>
         <p className="text-text-tertiary text-xs">
-          4-6 photos • JPG, PNG, WEBP • Max 10MB par photo
+          1-6 photos • JPG, PNG, WEBP • Max 10MB par photo
         </p>
       </div>
 
@@ -98,8 +98,8 @@ export function PhotoUploader({ onPhotosUploaded }: PhotoUploaderProps) {
             <p className="text-white text-sm font-medium">
               {photos.length} photo{photos.length > 1 ? 's' : ''} uploadée{photos.length > 1 ? 's' : ''}
             </p>
-            {photos.length < 4 && (
-              <p className="text-text-tertiary text-xs">Minimum 4 photos</p>
+            {photos.length < 1 && (
+              <p className="text-text-tertiary text-xs">Minimum 1 photo</p>
             )}
           </div>
 
@@ -127,9 +127,9 @@ export function PhotoUploader({ onPhotosUploaded }: PhotoUploaderProps) {
       )}
 
       {/* Continue Button */}
-      {photos.length >= 4 && (
+      {photos.length >= 1 && (
         <Button onClick={handleContinue} className="w-full">
-          Continuer avec {photos.length} photos
+          Continuer avec {photos.length} photo{photos.length > 1 ? 's' : ''}
         </Button>
       )}
     </div>

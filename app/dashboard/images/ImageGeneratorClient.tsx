@@ -348,7 +348,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
               Créez une nouvelle image avec un style prédéfini. Plus de 1296 combinaisons possibles.
             </p>
             <ul className="text-text-tertiary text-xs space-y-1.5 mb-5">
-              <li className="flex items-center gap-2"><span className="text-red-primary">✓</span> Upload 4-6 photos de votre visage</li>
+              <li className="flex items-center gap-2"><span className="text-red-primary">✓</span> Upload 1 à 6 photos de votre visage</li>
               <li className="flex items-center gap-2"><span className="text-red-primary">✓</span> Choisissez un style</li>
               <li className="flex items-center gap-2"><span className="text-red-primary">✓</span> Génération automatique</li>
             </ul>
@@ -423,7 +423,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
         {newImageStep === 'upload' && (
           <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-8">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-montserrat font-bold text-white text-xl">Upload 4-6 photos de vous</h2>
+              <h2 className="font-montserrat font-bold text-white text-xl">Upload 1 à 6 photos de vous</h2>
               <Button variant="secondary" size="sm" onClick={() => (initialMode ? router.push('/dashboard/home') : setMode(null))}>
                 ← Retour
               </Button>
