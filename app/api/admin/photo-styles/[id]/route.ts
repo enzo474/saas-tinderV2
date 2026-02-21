@@ -9,8 +9,9 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
+
   try {
-    const { id } = await params
     const supabase = await createClient()
     const supabaseAdmin = createServiceRoleClient()
     
@@ -19,7 +20,6 @@ export async function PUT(
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
-    // Vérifier que l'utilisateur est admin
     const { data: userData } = await supabase
       .from('user_profiles')
       .select('role')
@@ -41,22 +41,6 @@ export async function PUT(
       display_order,
     } = body
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'app/api/admin/photo-styles/[id]/route.ts:PUT',
-        message: 'Update style input',
-        data: { paramsId: id, body },
-        hypothesisId: 'H-input',
-        runId: 'styles-update',
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
-
-    // Mettre à jour le style
     const { data: style, error } = await supabaseAdmin
       .from('photo_styles')
       .update({
@@ -72,40 +56,10 @@ export async function PUT(
       .select()
       .single()
 
-    if (error) {
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          location: 'app/api/admin/photo-styles/[id]/route.ts:PUT',
-          message: 'Update style DB error',
-          data: { paramsId: id, dbError: error.message },
-          hypothesisId: 'H-db',
-          runId: 'styles-update',
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {})
-      // #endregion
-      throw error
-    }
+    if (error) throw error
 
     return NextResponse.json({ style })
   } catch (error: any) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        location: 'app/api/admin/photo-styles/[id]/route.ts:PUT',
-        message: 'Update style catch error',
-        data: { paramsId: id, errorMessage: error?.message },
-        hypothesisId: 'H-catch',
-        runId: 'styles-update',
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
     console.error('Update style error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
@@ -129,7 +83,6 @@ export async function PATCH(
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
-    // Vérifier que l'utilisateur est admin
     const { data: userData } = await supabase
       .from('user_profiles')
       .select('role')
@@ -142,7 +95,6 @@ export async function PATCH(
 
     const body = await req.json()
 
-    // Mettre à jour avec les champs fournis seulement
     const { data: style, error } = await supabaseAdmin
       .from('photo_styles')
       .update(body)
@@ -150,9 +102,7 @@ export async function PATCH(
       .select()
       .single()
 
-    if (error) {
-      throw error
-    }
+    if (error) throw error
 
     return NextResponse.json({ style })
   } catch (error: any) {
@@ -179,7 +129,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
-    // Vérifier que l'utilisateur est admin
     const { data: userData } = await supabase
       .from('user_profiles')
       .select('role')
@@ -190,15 +139,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
 
-    // Supprimer le style
     const { error } = await supabaseAdmin
       .from('photo_styles')
       .delete()
       .eq('id', id)
 
-    if (error) {
-      throw error
-    }
+    if (error) throw error
 
     return NextResponse.json({ success: true })
   } catch (error: any) {

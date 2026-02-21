@@ -207,7 +207,7 @@ export async function POST(req: NextRequest) {
         // En cas d'échec, rembourser les crédits si pas admin
         if (!isAdmin) {
           try {
-            const { addCredits } = await import('@/lib/credits')
+            const { addCredits } = await import('@/lib/credits-server')
             await addCredits(user.id, totalCost)
             console.log(`Refunded ${totalCost} credits to user ${user.id} after generation failure`)
           } catch (refundError) {

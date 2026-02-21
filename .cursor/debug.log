@@ -1,3 +1,0 @@
-{"location":"DashboardHomeClient:mount","message":"Init loading","data":{"analysisId":"87aac119-c3d7-4dab-8b2e-bcd96c5ef35e","hasAnalysisId":true},"timestamp":1771624558036}
-{"location":"DashboardHomeClient:poll","message":"Poll #1","data":{"status":200,"hasFullPlan":false,"hasError":false},"timestamp":1771624561963}
-{"location":"DashboardHomeClient:generate","message":"Generate response","data":{"status":200,"ok":true,"hasFullPlan":true,"hasError":false},"timestamp":1771624581191}

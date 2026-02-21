@@ -7,7 +7,8 @@ export interface NanoBananaGenerateRequest {
   prompt: string
   imageUrls?: string[] // URLs publiques des photos sources (optionnel, seulement si type = IMAGETOIAMGE)
   callBackUrl: string // URL du webhook pour recevoir l'image générée
-  resolution?: '2K' | '4K' // D'après l'erreur 422, resolution ne peut pas être vide → valeur par défaut appliquée dans le service
+  resolution?: '2K' | '4K'
+  aspectRatio?: string
 }
 
 export interface NanoBananaGenerateResponse {

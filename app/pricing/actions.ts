@@ -39,7 +39,8 @@ export async function createCheckoutSession(analysisId: string) {
 
     // Ajouter les crédits pour l'admin
     try {
-      const { addCredits, CREDIT_COSTS } = await import('@/lib/credits')
+      const { CREDIT_COSTS } = await import('@/lib/credits')
+      const { addCredits } = await import('@/lib/credits-server')
       await addCredits(user.id, CREDIT_COSTS.INITIAL_PURCHASE)
       console.log(`[ADMIN] Added ${CREDIT_COSTS.INITIAL_PURCHASE} credits`)
     } catch (creditError) {
