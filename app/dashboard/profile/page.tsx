@@ -35,13 +35,35 @@ export default async function DashboardProfilePage() {
     ...(generatedImages?.map(img => img.image_url) || [])
   ].filter(url => url && !url.includes('placeholder.com'))
 
-  // Récupérer les bios générées
-  const { data: bios } = await supabase
+  // Récupérer les bios générées manuellement
+  const { data: generatedBios } = await supabase
     .from('generated_bios')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(10)
+    .limit(20)
+
+  // Récupérer les bios optimisées depuis le plan d'analyse
+  const { data: analysisForBios } = await supabase
+    .from('analyses')
+    .select('full_plan')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  const fullPlan = analysisForBios?.full_plan as { optimized_bios?: Array<{ type: string; text: string }> } | null
+  const optimizedBios = (fullPlan?.optimized_bios || []).map((bio, i) => ({
+    id: `plan-bio-${i}`,
+    bio_text: bio.text,
+    tone: bio.type ? `✦ ${bio.type}` : '✦ Optimisée',
+  }))
+
+  // Fusionner : bios optimisées en premier, puis bios manuelles
+  const bios = [
+    ...optimizedBios,
+    ...(generatedBios || []),
+  ]
 
   return (
     <div className="space-y-8">
