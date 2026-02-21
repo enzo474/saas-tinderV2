@@ -254,7 +254,7 @@ export default async function Home() {
             © 2026 Crushmaxxing. Tous droits réservés.
           </p>
           <div className="flex gap-6 text-text-tertiary text-sm">
-            <Link href="#" className="hover:text-white transition-colors">CGV</Link>
+            <Link href="/terms" className="hover:text-white transition-colors">CGU</Link>
             <Link href="/privacy" className="hover:text-white transition-colors">Confidentialité</Link>
             <Link href="mailto:contact@cruchmaxxing.fr" className="hover:text-white transition-colors">Contact</Link>
           </div>
