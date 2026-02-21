@@ -105,12 +105,8 @@ export async function POST(req: NextRequest) {
     const analysisId = analysis?.id || null
 
     // 7. Générer l'image via NanoBanana avec le prompt du style uniquement
-    const callbackUrl = process.env.NEXT_PUBLIC_CALLBACK_URL || `${process.env.NEXT_PUBLIC_SITE_URL}/api/nanobanana/callback`
-    
-    if (!callbackUrl) {
-      await addCredits(user.id, cost)
-      return NextResponse.json({ error: 'Callback URL non configurée' }, { status: 500 })
-    }
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crushmaxxing.com'
+    const callbackUrl = `${appUrl}/api/nanobanana/callback`
 
     try {
       // Utiliser UNIQUEMENT le prompt_template du style (pas de customPrompt)

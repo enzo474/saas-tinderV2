@@ -22,7 +22,7 @@ async function generateOnePhoto(
   
   const prompt = buildPhotoPrompt(photoType, userContext)
   
-  const callbackUrl = process.env.NEXT_PUBLIC_CALLBACK_URL || `${process.env.NEXT_PUBLIC_SITE_URL}/api/nanobanana/callback`
+  const callbackUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://crushmaxxing.com'}/api/nanobanana/callback`
   
   if (!callbackUrl) {
     throw new Error('Callback URL is not configured')
