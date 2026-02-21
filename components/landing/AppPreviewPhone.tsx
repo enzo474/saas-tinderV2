@@ -183,15 +183,15 @@ export function AppPreviewPhone() {
         {/* Header */}
         <div className="text-center mb-12">
           <span className="inline-flex items-center gap-2 bg-red-primary/10 border border-red-primary/30 text-red-light text-sm font-semibold px-4 py-2 rounded-full mb-5">
-            Toutes les apps
+            Multi-apps
           </span>
           <h2 className="font-montserrat font-black text-4xl md:text-5xl text-white mb-4">
-            Optimisé pour<br />
+            Domine sur toutes<br />
             <span style={{ background: 'linear-gradient(135deg,#E63946,#FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              chaque app
+              les apps en même temps
             </span>
           </h2>
-          <p className="text-text-secondary text-lg">Tinder, Fruitz, Hinge — tes photos fonctionnent partout</p>
+          <p className="text-text-secondary text-lg">Pendant que d&apos;autres galèrent sur une app,<br className="hidden md:block" /> toi tu cartonnes partout.</p>
         </div>
 
         <div className="flex flex-col items-center gap-10 md:flex-row md:items-start md:justify-center">
@@ -247,46 +247,18 @@ export function AppPreviewPhone() {
 
           {/* Description */}
           <div className="max-w-xs flex flex-col gap-4">
-            {activeTab === 'tinder' && (
-              <>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Photos optimisées Tinder</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Format portrait, éclairage parfait, fond travaillé. L&apos;algorithme Tinder favorise les photos IA.</p>
-                </div>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Carousel intelligente</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">L&apos;ordre de tes photos est optimisé. Photo de face en 1er, lifestyle en 2e.</p>
-                </div>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">+340 % de matchs</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Résultat moyen observé sur les 60 derniers jours chez nos utilisateurs.</p>
-                </div>
-              </>
-            )}
-            {activeTab === 'fruitz' && (
-              <>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Photos Fruitz = lifestyle</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Fruitz mise sur l&apos;ambiance et le mode de vie. Nos photos Food, Travel et Night sont parfaites.</p>
-                </div>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Scroll vertical natif</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Format 3:4 optimisé pour le scroll Fruitz, chaque photo accroche le regard.</p>
-                </div>
-              </>
-            )}
-            {activeTab === 'hinge' && (
-              <>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Hinge = authenticité</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Nos photos IA paraissent naturelles. Hinge récompense l&apos;authenticité.</p>
-                </div>
-                <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
-                  <p className="font-montserrat font-bold text-white text-sm mb-1">Format 4:5 natif</p>
-                  <p className="text-text-secondary text-xs leading-relaxed">Toutes tes photos générées sont au bon ratio pour Hinge.</p>
-                </div>
-              </>
-            )}
+            <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
+              <p className="font-montserrat font-bold text-white text-sm mb-1">Profil optimisé multi-plateformes</p>
+              <p className="text-text-secondary text-xs leading-relaxed">Tes photos sont calibrées pour Tinder, Fruitz et Hinge. Résultats partout.</p>
+            </div>
+            <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
+              <p className="font-montserrat font-bold text-white text-sm mb-1">Stratégie d&apos;ordre prouvée</p>
+              <p className="text-text-secondary text-xs leading-relaxed">Photo principale = face. Puis lifestyle. On sait ce qui marche.</p>
+            </div>
+            <div className="bg-bg-secondary border border-border-primary rounded-xl p-4">
+              <p className="font-montserrat font-bold text-white text-sm mb-1">x3 à x5 plus de matchs</p>
+              <p className="text-text-secondary text-xs leading-relaxed">Résultat moyen de nos utilisateurs. Ça peut être toi aussi.</p>
+            </div>
           </div>
         </div>
       </div>
