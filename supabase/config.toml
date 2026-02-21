@@ -1,0 +1,6 @@
+[functions.cleanup-storage]
+verify_jwt = false
+
+[functions.cleanup-storage.schedule]
+# Execute toutes les heures
+cron = "0 * * * *"

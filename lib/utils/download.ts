@@ -1,0 +1,30 @@
+import JSZip from 'jszip'
+
+export async function downloadImage(url: string, filename: string) {
+  const response = await fetch(url)
+  const blob = await response.blob()
+  const urlObject = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = urlObject
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(urlObject)
+}
+
+export async function downloadAllAsZip(urls: string[], zipName: string) {
+  const zip = new JSZip()
+  
+  for (let i = 0; i < urls.length; i++) {
+    const response = await fetch(urls[i])
+    const blob = await response.blob()
+    zip.file(`photo-${i + 1}.jpg`, blob)
+  }
+  
+  const content = await zip.generateAsync({ type: 'blob' })
+  const urlObject = URL.createObjectURL(content)
+  const a = document.createElement('a')
+  a.href = urlObject
+  a.download = zipName
+  a.click()
+  URL.revokeObjectURL(urlObject)
+}
