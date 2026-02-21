@@ -48,7 +48,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public routes
-  if (path === '/' || path === '/auth' || path.startsWith('/auth/callback')) {
+  if (path === '/' || path === '/auth' || path.startsWith('/auth/callback') || path === '/privacy' || path === '/terms') {
     return response
   }
 
