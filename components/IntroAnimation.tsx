@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import Image from 'next/image'
+// next/image non utilisé — images locales servies via <img> direct
 
 interface IntroAnimationProps {
   children: React.ReactNode
@@ -131,8 +131,9 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               transform: 'translateY(40px)',
               animation: showBefore ? 'introSlideUp 0.8s ease-out forwards' : undefined,
             }}>
-              <Image src="/avant.jpeg?v=2" alt="Avant" width={280} height={373}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} priority />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/avant.jpeg?v=2" alt="Avant"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <p style={{
               fontFamily: "'Montserrat', sans-serif", fontWeight: 700,
@@ -178,8 +179,9 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               animation: showAfter ? 'introSlideFromRight 0.8s ease-out forwards' : undefined,
               boxShadow: showAfter ? '0 0 40px rgba(230,57,70,0.35), 0 0 80px rgba(230,57,70,0.15)' : undefined,
             }}>
-              <Image src="/apres.jpeg?v=2" alt="Après" width={280} height={373}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} priority />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/apres.jpeg?v=2" alt="Après"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <p style={{
               fontFamily: "'Montserrat', sans-serif", fontWeight: 800,

@@ -12,7 +12,20 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '**.supabase.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'tempfile.aiquickdraw.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.aiquickdraw.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.nanobananaapi.ai',
+      },
     ],
+    unoptimized: true,
   },
 };
 

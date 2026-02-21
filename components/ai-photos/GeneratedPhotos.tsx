@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+// next/image non utilisé — URLs dynamiques (NanoBanana) servies via <img>
 import { downloadImage, downloadAllAsZip } from '@/lib/utils/download'
 
 interface GeneratedPhotosProps {
@@ -88,11 +88,11 @@ export default function GeneratedPhotos({ photos }: GeneratedPhotosProps) {
             className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl overflow-hidden hover:border-red-primary hover:-translate-y-1 hover:shadow-xl hover:shadow-red-primary/15 transition-all duration-300"
           >
             <div className="relative aspect-[3/4] bg-bg-primary">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={photo}
                 alt={photoTitles[index]}
-                fill
-                className="object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="p-4 flex items-center justify-between">

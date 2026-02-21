@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import Image from 'next/image'
+// next/image non utilisé — previews blob:// servies via <img>
 
 interface PhotoUploadProps {
   onGenerate: (files: File[]) => void
@@ -116,11 +116,11 @@ export default function PhotoUpload({ onGenerate, isGenerating }: PhotoUploadPro
           <div className="grid grid-cols-3 gap-4">
             {previews.map((preview, index) => (
               <div key={index} className="relative aspect-square rounded-lg overflow-hidden group">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src={preview}
                   alt={`Preview ${index + 1}`}
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
                 />
                 <button
                   onClick={() => removeFile(index)}
