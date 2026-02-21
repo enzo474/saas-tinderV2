@@ -255,7 +255,7 @@ export default async function Home() {
           </p>
           <div className="flex gap-6 text-text-tertiary text-sm">
             <Link href="#" className="hover:text-white transition-colors">CGV</Link>
-            <Link href="#" className="hover:text-white transition-colors">Confidentialité</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors">Confidentialité</Link>
             <Link href="mailto:contact@cruchmaxxing.fr" className="hover:text-white transition-colors">Contact</Link>
           </div>
         </div>
