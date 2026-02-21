@@ -5,7 +5,7 @@ import { DemoSection } from './DemoSection'
 import { StyleChangeSection } from './StyleChangeSection'
 
 type Face  = 'a' | 'b' | 'c'
-type Style = 'night' | 'urban' | 'sport' | 'travel' | 'food' | 'business' | 'beach' | 'tennis'
+type Style = 'night' | 'urban' | 'sport' | 'travel' | 'food' | 'business' | 'beach' | 'tennis' | 'foot' | 'basket' | 'lifestyle-boy' | 'lifestyle-man'
 
 interface Props {
   styleImages?: Record<string, string>
