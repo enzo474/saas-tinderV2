@@ -214,10 +214,10 @@ export function AppPreviewPhone() {
           </div>
 
           {/* Phone mockup */}
-          <div className="relative flex-shrink-0 w-[160px] md:w-[200px]">
+          <div className="relative flex-shrink-0 w-[184px] md:w-[230px]">
             {/* Phone shell */}
             <div
-              className="relative rounded-[32px] overflow-hidden shadow-2xl w-[160px] h-[336px] md:w-[200px] md:h-[420px]"
+              className="relative rounded-[32px] overflow-hidden shadow-2xl w-[184px] h-[387px] md:w-[230px] md:h-[483px]"
               style={{
                 border: '8px solid #1A1A1A',
                 boxShadow: '0 0 0 1px #333, 0 32px 64px rgba(0,0,0,0.8)',

@@ -129,20 +129,6 @@ export function SettingsContent({
           </p>
         </section>
 
-        {/* Se désabonner */}
-        <section className="bg-[#1f2128] border border-[#2a2d36] rounded-lg p-6">
-          <h2 className="font-sora font-bold text-white text-lg mb-4 flex items-center gap-2">
-            <LogOut className="w-5 h-5" />
-            Se désabonner
-          </h2>
-          <a
-            href="mailto:contact@crushmaxxing.com?subject=Résiliation abonnement Crushmaxxing"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm font-medium text-white border border-[#2a2d36] hover:border-white/30 hover:bg-white/5 transition-colors"
-          >
-            Contacter le support pour résilier
-          </a>
-        </section>
-
         {/* Supprimer le compte */}
         <section className="bg-[#1f2128] border border-red-primary/30 rounded-lg p-6">
           <h2 className="font-sora font-bold text-white text-lg mb-3 flex items-center gap-2">
