@@ -18,14 +18,29 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'taskId requis' }, { status: 400 })
     }
 
-    const { data: imageRecord, error } = await supabase
+    // Chercher par id d'abord (nouvelle méthode), puis par nanobanana_task_id (ancienne)
+    let imageRecord: { image_url: string } | null = null
+
+    const byId = await supabase
       .from('generated_images')
       .select('image_url')
-      .eq('nanobanana_task_id', taskId)
+      .eq('id', taskId)
       .eq('user_id', user.id)
       .single()
 
-    if (error || !imageRecord) {
+    if (byId.data) {
+      imageRecord = byId.data
+    } else {
+      const byTaskId = await supabase
+        .from('generated_images')
+        .select('image_url')
+        .eq('nanobanana_task_id', taskId)
+        .eq('user_id', user.id)
+        .single()
+      imageRecord = byTaskId.data || null
+    }
+
+    if (!imageRecord) {
       return NextResponse.json({ status: 'not_found' }, { status: 200 })
     }
 

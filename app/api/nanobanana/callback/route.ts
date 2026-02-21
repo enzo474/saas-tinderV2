@@ -21,7 +21,10 @@ import { createServiceRoleClient } from '@/lib/supabase/server'
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text()
-    
+
+    // Récupérer l'imageId passé en query param (nouvelle méthode fiable)
+    const imageId = req.nextUrl.searchParams.get('imageId')
+
     let payload: any
     try {
       payload = JSON.parse(rawBody)
@@ -30,59 +33,78 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
     }
 
-    // Valider le payload de base
-    if (!payload || !payload.data || !payload.data.taskId) {
-      console.error('[NanoBanana Callback] Missing required fields:', payload)
+    if (!payload || !payload.data) {
+      console.error('[NanoBanana Callback] Missing data field:', payload)
       return NextResponse.json({ error: 'Invalid payload structure' }, { status: 400 })
     }
 
-    const { taskId } = payload.data
-    
-    // Gérer différents formats de payload (resultImageUrl ou result_urls)
+    const taskId = payload.data?.taskId || 'unknown'
+
+    // Gérer l'échec de génération
+    if (payload.code !== 200) {
+      console.error(`[NanoBanana Callback] Generation failed: code=${payload.code}, msg=${payload.msg}, taskId=${taskId}`)
+      // Marquer l'image comme échouée si on a l'imageId
+      if (imageId) {
+        const supabase = createServiceRoleClient()
+        await supabase
+          .from('generated_images')
+          .update({ image_url: 'https://placeholder.com/error/failed.png' })
+          .eq('id', imageId)
+      }
+      return NextResponse.json({ received: true })
+    }
+
+    // Extraire l'URL de l'image générée
     let resultImageUrl: string | undefined
-    
+
     if (payload.data.info?.resultImageUrl) {
-      // Format attendu: info.resultImageUrl
       resultImageUrl = payload.data.info.resultImageUrl
     } else if (payload.data.info?.result_urls) {
-      // Format alternatif: info.result_urls (peut être un array ou une string)
-      const resultUrls = payload.data.info.result_urls
-      if (Array.isArray(resultUrls) && resultUrls.length > 0) {
-        resultImageUrl = resultUrls[0]
-      } else if (typeof resultUrls === 'string') {
-        resultImageUrl = resultUrls
-      }
+      const r = payload.data.info.result_urls
+      resultImageUrl = Array.isArray(r) ? r[0] : r
     } else if (payload.data.result_urls) {
-      // Format alternatif: result_urls directement dans data
-      const resultUrls = payload.data.result_urls
-      if (Array.isArray(resultUrls) && resultUrls.length > 0) {
-        resultImageUrl = resultUrls[0]
-      } else if (typeof resultUrls === 'string') {
-        resultImageUrl = resultUrls
-      }
+      const r = payload.data.result_urls
+      resultImageUrl = Array.isArray(r) ? r[0] : r
     } else if (payload.data.resultImageUrl) {
-      // Format alternatif: resultImageUrl directement dans data
       resultImageUrl = payload.data.resultImageUrl
     }
 
     if (!resultImageUrl) {
-      console.error('[NanoBanana Callback] No result image URL found in payload')
-      return NextResponse.json({ error: 'No result image URL found in payload' }, { status: 400 })
+      console.error('[NanoBanana Callback] No result image URL in payload:', JSON.stringify(payload))
+      return NextResponse.json({ error: 'No result image URL' }, { status: 400 })
     }
 
-    console.log(`[NanoBanana Callback] Received for taskId: ${taskId}`)
+    console.log(`[NanoBanana Callback] Received — imageId=${imageId}, taskId=${taskId}, url=${resultImageUrl}`)
 
     const supabase = createServiceRoleClient()
 
-    // 1. Trouver l'entrée generated_images correspondante au taskId
-    const { data: imageRecord, error: fetchError } = await supabase
-      .from('generated_images')
-      .select('*')
-      .eq('nanobanana_task_id', taskId)
-      .single()
+    // 1. Trouver le record — priorité à imageId (passé dans l'URL), fallback sur nanobanana_task_id
+    let imageRecord: any = null
+    let fetchError: any = null
 
-    if (fetchError || !imageRecord) {
-      console.error(`[NanoBanana Callback] Image record not found for taskId: ${taskId}`, fetchError)
+    if (imageId) {
+      const res = await supabase
+        .from('generated_images')
+        .select('*')
+        .eq('id', imageId)
+        .single()
+      imageRecord = res.data
+      fetchError = res.error
+    }
+
+    if (!imageRecord && taskId !== 'unknown') {
+      // Fallback: chercher par nanobanana_task_id
+      const res = await supabase
+        .from('generated_images')
+        .select('*')
+        .eq('nanobanana_task_id', taskId)
+        .single()
+      imageRecord = res.data
+      fetchError = res.error
+    }
+
+    if (!imageRecord) {
+      console.error(`[NanoBanana Callback] Record not found — imageId=${imageId}, taskId=${taskId}`, fetchError)
       return NextResponse.json({ error: 'Image record not found' }, { status: 404 })
     }
 

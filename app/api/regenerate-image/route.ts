@@ -116,16 +116,34 @@ export async function POST(req: NextRequest) {
 
     const analysisId = analysis?.id || null
 
-    // 7. Générer l'image modifiée via NanoBanana
-    const callbackUrl = process.env.NEXT_PUBLIC_CALLBACK_URL || `${process.env.NEXT_PUBLIC_SITE_URL}/api/nanobanana/callback`
-    
-    if (!callbackUrl) {
+    // 7. Créer d'abord le record en DB pour obtenir son ID
+    const { data: insertedRecord, error: insertError } = await supabaseAdmin
+      .from('generated_images')
+      .insert({
+        user_id: user.id,
+        analysis_id: analysisId,
+        image_url: 'https://placeholder.com/generating/pending.png',
+        photo_number: 1,
+        style_id: null,
+        prompt_used: prompt,
+        generation_type: 'regeneration',
+      })
+      .select('id')
+      .single()
+
+    if (insertError || !insertedRecord) {
       await addCredits(user.id, cost)
-      return NextResponse.json({ error: 'Callback URL non configurée' }, { status: 500 })
+      console.error('Failed to create image record:', insertError)
+      return NextResponse.json({ error: 'Erreur création du record' }, { status: 500 })
     }
 
+    const imageRecordId = insertedRecord.id
+
+    // 8. Appeler NanoBanana avec l'ID du record dans l'URL callback
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crushmaxxing.com'
+    const callbackUrl = `${appUrl}/api/nanobanana/callback?imageId=${imageRecordId}`
+
     try {
-      // Appeler NanoBanana — Image 1 = source, Image 2 = référence (si fournie)
       const imageUrls = finalReferenceUrl
         ? [finalImageUrl, finalReferenceUrl]
         : [finalImageUrl]
@@ -138,44 +156,26 @@ export async function POST(req: NextRequest) {
 
       const taskId = response.data.taskId
 
-      // Créer record en DB avec taskId
-      const placeholderUrl = `https://placeholder.com/generating/${taskId}.png`
-
-      const { error: insertError } = await supabaseAdmin
+      // Stocker le taskId (si la colonne existe)
+      await supabaseAdmin
         .from('generated_images')
-        .insert({
-          user_id: user.id,
-          analysis_id: analysisId,
-          image_url: placeholderUrl,
-          photo_number: 1, // Pas de numéro spécifique pour régénération
-          style_id: null, // Pas de style pour régénération
-          prompt_used: prompt,
-          generation_type: 'regeneration',
-          nanobanana_task_id: taskId,
-        })
+        .update({ nanobanana_task_id: taskId })
+        .eq('id', imageRecordId)
 
-      if (insertError) {
-        console.error(`Failed to insert image record for task ${taskId}:`, insertError)
-      }
-
-      console.log(`[Regenerate Image] Started: taskId=${taskId}, prompt=${customPrompt.substring(0, 50)}...`)
+      console.log(`[Regenerate Image] Started: taskId=${taskId}, recordId=${imageRecordId}`)
 
       return NextResponse.json({
         success: true,
         message: 'Modification lancée avec succès',
-        taskId: taskId,
+        taskId: imageRecordId, // On retourne l'imageRecordId comme "taskId" pour le polling
         info: 'L\'image modifiée sera disponible dans quelques minutes sur votre dashboard.'
       })
 
     } catch (genError: any) {
       console.error('NanoBanana regeneration error:', genError)
-      
-      // Refund credits
+      await supabaseAdmin.from('generated_images').delete().eq('id', imageRecordId)
       await addCredits(user.id, cost)
-      
-      return NextResponse.json({ 
-        error: `Modification échouée: ${genError.message}` 
-      }, { status: 500 })
+      return NextResponse.json({ error: `Modification échouée: ${genError.message}` }, { status: 500 })
     }
 
   } catch (error: any) {

@@ -104,17 +104,39 @@ export async function POST(req: NextRequest) {
 
     const analysisId = analysis?.id || null
 
-    // 7. Générer l'image via NanoBanana avec le prompt du style uniquement
+    // 7. Créer d'abord le record en DB pour obtenir son ID
+    const prompt = style.prompt_template
+    const placeholderUrl = `https://placeholder.com/generating/pending.png`
+
+    const { data: insertedRecord, error: insertError } = await supabaseAdmin
+      .from('generated_images')
+      .insert({
+        user_id: user.id,
+        analysis_id: analysisId,
+        image_url: placeholderUrl,
+        photo_number: 1,
+        style_id: style.id,
+        prompt_used: prompt,
+        generation_type: 'custom',
+      })
+      .select('id')
+      .single()
+
+    if (insertError || !insertedRecord) {
+      await addCredits(user.id, cost)
+      console.error('Failed to create image record:', insertError)
+      return NextResponse.json({ error: 'Erreur création du record' }, { status: 500 })
+    }
+
+    const imageRecordId = insertedRecord.id
+
+    // 8. Appeler NanoBanana avec l'ID du record dans l'URL callback
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crushmaxxing.com'
-    const callbackUrl = `${appUrl}/api/nanobanana/callback`
+    const callbackUrl = `${appUrl}/api/nanobanana/callback?imageId=${imageRecordId}`
 
     try {
-      // Utiliser UNIQUEMENT le prompt_template du style (pas de customPrompt)
-      const prompt = style.prompt_template
+      console.log(`[Generate Single Image] Starting generation: style=${style.style_name}, recordId=${imageRecordId}`)
 
-      console.log(`[Generate Single Image] Starting generation with style: ${style.style_name}`)
-
-      // Appeler NanoBanana
       const response = await generateImageNanoBanana({
         prompt: prompt,
         imageUrls: sourcePhotoUrls,
@@ -123,44 +145,27 @@ export async function POST(req: NextRequest) {
 
       const taskId = response.data.taskId
 
-      // Créer record en DB avec taskId
-      const placeholderUrl = `https://placeholder.com/generating/${taskId}.png`
-
-      const { error: insertError } = await supabaseAdmin
+      // Stocker le taskId dans le record (si la colonne existe)
+      await supabaseAdmin
         .from('generated_images')
-        .insert({
-          user_id: user.id,
-          analysis_id: analysisId,
-          image_url: placeholderUrl,
-          photo_number: 1, // Pas de numéro spécifique pour génération custom
-          style_id: style.id,
-          prompt_used: prompt,
-          generation_type: 'custom',
-          nanobanana_task_id: taskId,
-        })
+        .update({ nanobanana_task_id: taskId })
+        .eq('id', imageRecordId)
 
-      if (insertError) {
-        console.error(`Failed to insert image record for task ${taskId}:`, insertError)
-      }
-
-      console.log(`[Single Image Generation] Started: taskId=${taskId}, style=${style.style_name}`)
+      console.log(`[Single Image Generation] Started: taskId=${taskId}, recordId=${imageRecordId}`)
 
       return NextResponse.json({
         success: true,
         message: 'Génération lancée avec succès',
-        taskId: taskId,
+        taskId: imageRecordId, // On retourne l'imageRecordId comme "taskId" pour le polling
         info: 'L\'image sera disponible dans quelques minutes sur votre dashboard.'
       })
 
     } catch (genError: any) {
       console.error('NanoBanana generation error:', genError)
-      
-      // Refund credits
+      // Supprimer le record créé + rembourser
+      await supabaseAdmin.from('generated_images').delete().eq('id', imageRecordId)
       await addCredits(user.id, cost)
-      
-      return NextResponse.json({ 
-        error: `Génération échouée: ${genError.message}` 
-      }, { status: 500 })
+      return NextResponse.json({ error: `Génération échouée: ${genError.message}` }, { status: 500 })
     }
 
   } catch (error: any) {
