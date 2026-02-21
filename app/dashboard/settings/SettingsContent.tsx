@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Coins, Plus, Infinity, Sparkles, MessageCircle, Users, LogOut, Trash2 } from 'lucide-react'
 import { RechargeModal } from '@/components/credits/RechargeModal'
 import { formatCredits } from '@/lib/credits'
-import { deleteAccount } from '@/app/auth/actions'
+import { deleteAccount, signOut } from '@/app/auth/actions'
 
 interface SettingsContentProps {
   credits: number
@@ -22,6 +22,7 @@ export function SettingsContent({
   const [isRechargeModalOpen, setIsRechargeModalOpen] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isSigningOut, setIsSigningOut] = useState(false)
 
   return (
     <>
@@ -130,19 +131,16 @@ export function SettingsContent({
 
         {/* Se désabonner */}
         <section className="bg-[#1f2128] border border-[#2a2d36] rounded-lg p-6">
-          <h2 className="font-sora font-bold text-white text-lg mb-3 flex items-center gap-2">
+          <h2 className="font-sora font-bold text-white text-lg mb-4 flex items-center gap-2">
             <LogOut className="w-5 h-5" />
             Se désabonner
           </h2>
-          <p className="font-inter text-[#9da3af] text-sm">
-            Pour résilier votre abonnement, contactez-nous à{' '}
-            <a
-              href="mailto:contact@cruchmaxxing.fr"
-              className="text-[#6366f1] hover:underline"
-            >
-              contact@cruchmaxxing.fr
-            </a>
-          </p>
+          <a
+            href="mailto:contact@crushmaxxing.com?subject=Résiliation abonnement Crushmaxxing"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-inter text-sm font-medium text-white border border-[#2a2d36] hover:border-white/30 hover:bg-white/5 transition-colors"
+          >
+            Contacter le support pour résilier
+          </a>
         </section>
 
         {/* Supprimer le compte */}
@@ -156,12 +154,25 @@ export function SettingsContent({
           </p>
 
           {!showDeleteConfirm ? (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="px-4 py-2 rounded-lg font-inter text-sm font-medium text-red-primary border border-red-primary/40 hover:bg-red-primary/10 transition-colors"
-            >
-              Supprimer mon compte
-            </button>
+            <div className="flex items-center gap-3 flex-wrap">
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="px-4 py-2 rounded-lg font-inter text-sm font-medium text-red-primary border border-red-primary/40 hover:bg-red-primary/10 transition-colors"
+              >
+                Supprimer mon compte
+              </button>
+              <button
+                onClick={async () => {
+                  setIsSigningOut(true)
+                  await signOut()
+                }}
+                disabled={isSigningOut}
+                className="px-4 py-2 rounded-lg font-inter text-sm font-medium text-white border border-[#2a2d36] hover:border-white/30 hover:bg-white/5 transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                <LogOut className="w-4 h-4" />
+                {isSigningOut ? 'Déconnexion...' : 'Se déconnecter'}
+              </button>
+            </div>
           ) : (
             <div className="bg-red-primary/10 border border-red-primary/30 rounded-xl p-4 space-y-3">
               <p className="text-white font-semibold text-sm">Êtes-vous sûr ? Cette action est définitive.</p>
