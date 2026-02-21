@@ -1,8 +1,11 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { MobileNav } from '@/components/dashboard/MobileNav'
-import { isUserAdmin } from '@/lib/credits-server'
+import { isUserAdmin, addCredits } from '@/lib/credits-server'
+import Stripe from 'stripe'
+import { CREDIT_COSTS } from '@/lib/credits'
 
 export default async function DashboardLayout({
   children,
@@ -24,13 +27,46 @@ export default async function DashboardLayout({
     // Vérifier que l'utilisateur a payé
     const { data: analysis } = await supabase
       .from('analyses')
-      .select('paid_at')
+      .select('paid_at, stripe_session_id, id')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .single()
 
     if (!analysis?.paid_at) {
-      redirect('/pricing')
+      // Webhook peut ne pas encore être arrivé — vérifier directement avec Stripe
+      if (analysis?.stripe_session_id && process.env.STRIPE_SECRET_KEY) {
+        try {
+          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-02-24.acacia' })
+          const session = await stripe.checkout.sessions.retrieve(analysis.stripe_session_id)
+
+          if (session.payment_status === 'paid') {
+            // Paiement confirmé par Stripe — mettre à jour la base avant le webhook
+            const supabaseAdmin = createSupabaseAdmin(
+              process.env.NEXT_PUBLIC_SUPABASE_URL!,
+              process.env.SUPABASE_SERVICE_ROLE_KEY!
+            )
+            await supabaseAdmin
+              .from('analyses')
+              .update({ paid_at: new Date().toISOString(), status: 'paid', product_type: 'plan' })
+              .eq('id', analysis.id)
+              .eq('user_id', user.id)
+
+            // Ajouter les crédits si pas encore fait
+            try {
+              await addCredits(user.id, CREDIT_COSTS.INITIAL_PURCHASE)
+            } catch {
+              // Crédits déjà ajoutés par le webhook, ignorer
+            }
+            // Laisser passer — paiement validé
+          } else {
+            redirect('/pricing')
+          }
+        } catch {
+          redirect('/pricing')
+        }
+      } else {
+        redirect('/pricing')
+      }
     }
   }
 
