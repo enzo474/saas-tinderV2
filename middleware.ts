@@ -47,8 +47,16 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // Public routes
-  if (path === '/' || path === '/auth' || path.startsWith('/auth/callback') || path === '/privacy' || path === '/terms') {
+  // Public routes (dont les webhooks externes — pas de session utilisateur)
+  if (
+    path === '/' ||
+    path === '/auth' ||
+    path.startsWith('/auth/callback') ||
+    path === '/privacy' ||
+    path === '/terms' ||
+    path.startsWith('/api/nanobanana/') ||
+    path.startsWith('/api/stripe/')
+  ) {
     return response
   }
 
