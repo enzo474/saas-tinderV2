@@ -129,6 +129,7 @@ export function BioForm({ initialCredits, userId, analysisData }: BioFormProps) 
   const inputClass = "w-full bg-bg-primary border-2 border-border-primary rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-red-primary transition-colors duration-200"
 
   return (
+    <>
     <div className="grid lg:grid-cols-2 gap-6">
 
       {/* Formulaire */}
@@ -296,5 +297,6 @@ export function BioForm({ initialCredits, userId, analysisData }: BioFormProps) 
 
     </div>
     <RechargeModal isOpen={showRechargeModal} onClose={() => setShowRechargeModal(false)} currentCredits={credits} />
+    </>
   )
 }
