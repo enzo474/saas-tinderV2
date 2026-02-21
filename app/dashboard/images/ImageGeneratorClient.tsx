@@ -302,6 +302,13 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
             setIsGenerating(false)
             router.push('/dashboard/home')
           }, 1500)
+        } else if (data.status === 'failed') {
+          clearAll()
+          setPendingTaskId(null)
+          setError('La génération a échoué. Vos crédits ont été remboursés.')
+          setNewImageStep('select-style')
+          setEditImageStep('edit-prompt')
+          setIsGenerating(false)
         }
       } catch {
         // Ignore poll errors, retry next interval

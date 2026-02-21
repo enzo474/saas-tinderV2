@@ -102,7 +102,15 @@ export async function middleware(request: NextRequest) {
   }
 
   // Redirect authenticated users without analysis to /start
-  if (!analysis && !path.startsWith('/start') && path !== '/auth/callback') {
+  // Exclure /onboarding et /ob2 pour éviter la boucle : /start → /onboarding → /start → ...
+  if (
+    !analysis &&
+    !path.startsWith('/start') &&
+    !path.startsWith('/onboarding') &&
+    !path.startsWith('/ob2') &&
+    !path.startsWith('/analysis') &&
+    path !== '/auth/callback'
+  ) {
     return copyCookiesToResponse(
       response,
       NextResponse.redirect(new URL('/start', request.url))
