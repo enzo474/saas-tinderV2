@@ -90,16 +90,28 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
     setNewImageStep('generating')
 
     try {
-      const photosBase64 = await Promise.all(
-        sourcePhotos.map(async (photo) => {
-          return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader()
-            reader.onloadend = () => resolve(reader.result as string)
-            reader.onerror = reject
-            reader.readAsDataURL(photo)
-          })
+      const compressPhoto = (file: File): Promise<string> =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            const img = new Image()
+            img.onload = () => {
+              const MAX = 1024
+              const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+              const canvas = document.createElement('canvas')
+              canvas.width = Math.round(img.width * ratio)
+              canvas.height = Math.round(img.height * ratio)
+              canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+              resolve(canvas.toDataURL('image/jpeg', 0.8))
+            }
+            img.onerror = reject
+            img.src = reader.result as string
+          }
+          reader.onerror = reject
+          reader.readAsDataURL(file)
         })
-      )
+
+      const photosBase64 = await Promise.all(sourcePhotos.map(compressPhoto))
 
       const response = await fetch('/api/generate-single-image', {
         method: 'POST',

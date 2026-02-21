@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Download, Loader2, X } from 'lucide-react'
+import { Download, Loader2, X, Image as ImageIcon } from 'lucide-react'
 
 interface GeneratedImage {
   id: string
@@ -90,7 +90,7 @@ export function ImageGallery({ initialImages, userId }: ImageGalleryProps) {
             {hasGeneratingImages ? (
               <Loader2 className="w-8 h-8 text-red-primary animate-spin" />
             ) : (
-              <span className="text-2xl">🖼️</span>
+              <ImageIcon className="w-8 h-8 text-red-primary/60" />
             )}
           </div>
           <h3 className="font-montserrat font-bold text-white text-lg mb-2">

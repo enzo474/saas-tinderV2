@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Image as ImageIcon } from 'lucide-react'
 
 export interface ImageFolder {
   slug: string
@@ -19,7 +20,7 @@ export function ImageFolderList({ folders }: ImageFolderListProps) {
       <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-12 text-center">
         <div className="max-w-sm mx-auto">
           <div className="w-16 h-16 bg-red-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">🖼️</span>
+            <ImageIcon className="w-8 h-8 text-red-primary/60" />
           </div>
           <h3 className="font-montserrat font-bold text-white text-lg mb-2">
             Aucune image générée
@@ -52,7 +53,7 @@ export function ImageFolderList({ folders }: ImageFolderListProps) {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-text-tertiary text-3xl">🖼️</span>
+                  <ImageIcon className="w-10 h-10 text-text-tertiary" />
                 </div>
               )}
             </div>
