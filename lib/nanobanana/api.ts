@@ -17,6 +17,7 @@ export interface NanoBananaGenerateResponse {
     taskId: string
   }
   message?: string
+  msg?: string
 }
 
 export interface NanoBananaCallbackPayload {
