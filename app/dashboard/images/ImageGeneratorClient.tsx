@@ -6,6 +6,7 @@ import { PhotoUploader } from '@/components/image-generator/PhotoUploader'
 import { SingleStylePicker } from '@/components/image-generator/SingleStylePicker'
 import { EditPromptInput } from '@/components/image-generator/EditPromptInput'
 import { Button } from '@/components/ui/Button'
+import { RechargeModal } from '@/components/credits/RechargeModal'
 import { useRouter } from 'next/navigation'
 import { Sparkles, Image as ImageIcon, Upload } from 'lucide-react'
 
@@ -65,6 +66,15 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
   // Common
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showRechargeModal, setShowRechargeModal] = useState(false)
+  const [credits, setCredits] = useState(0)
+
+  useEffect(() => {
+    fetch('/api/user/credits')
+      .then(r => r.json())
+      .then(d => { if (typeof d.credits === 'number') setCredits(d.credits) })
+      .catch(() => {})
+  }, [])
 
   // Polling jusqu'à fin réelle de la génération
   const [pendingTaskId, setPendingTaskId] = useState<string | null>(null)
@@ -125,6 +135,12 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.type === 'insufficient_credits') {
+          setShowRechargeModal(true)
+          setNewImageStep('select-style')
+          setIsGenerating(false)
+          return
+        }
         throw new Error(data.error || 'Erreur lors de la génération')
       }
 
@@ -213,6 +229,12 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
       const data = await response.json()
 
       if (!response.ok) {
+        if (data.type === 'insufficient_credits') {
+          setShowRechargeModal(true)
+          setEditImageStep('edit-prompt')
+          setIsGenerating(false)
+          return
+        }
         throw new Error(data.error || 'Erreur lors de la modification')
       }
 
@@ -299,6 +321,8 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
   // Écran de sélection de mode
   if (!mode) {
     return (
+      <>
+      <RechargeModal isOpen={showRechargeModal} onClose={() => setShowRechargeModal(false)} currentCredits={credits} />
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="font-montserrat font-bold text-white text-2xl md:text-3xl mb-2">Générateur d&apos;Images</h1>
@@ -344,6 +368,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
           </button>
         </div>
       </div>
+      </>
     )
   }
 
@@ -383,6 +408,8 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
     const steps = ['Upload photos', 'Choisir style', 'Générer']
     const stepKey = newImageStep === 'upload' ? steps[0] : newImageStep === 'select-style' ? steps[1] : steps[2]
     return (
+      <>
+      <RechargeModal isOpen={showRechargeModal} onClose={() => setShowRechargeModal(false)} currentCredits={credits} />
       <div className="max-w-4xl mx-auto">
         <StepBar steps={steps} current={stepKey} />
 
@@ -457,6 +484,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
           </div>
         )}
       </div>
+      </>
     )
   }
 
@@ -470,6 +498,8 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
       steps[3]
 
     return (
+      <>
+      <RechargeModal isOpen={showRechargeModal} onClose={() => setShowRechargeModal(false)} currentCredits={credits} />
       <div className="max-w-4xl mx-auto">
         <StepBar steps={steps} current={stepKey} />
 
@@ -796,6 +826,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
           </div>
         )}
       </div>
+      </>
     )
   }
 

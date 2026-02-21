@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2, Sparkles, Copy, Check, Plus, Trash2 } from 'lucide-react'
 import { CREDIT_COSTS } from '@/lib/credits'
+import { RechargeModal } from '@/components/credits/RechargeModal'
 
 interface AnalysisData {
   job?: string
@@ -22,6 +23,7 @@ export function BioForm({ initialCredits, userId, analysisData }: BioFormProps) 
   const [isGenerating, setIsGenerating] = useState(false)
   const [generatedBio, setGeneratedBio] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showRechargeModal, setShowRechargeModal] = useState(false)
 
   // Form state - pré-rempli depuis l'analyse (plan d'optimisation)
   const [job, setJob] = useState(analysisData?.job || '')
@@ -94,7 +96,7 @@ export function BioForm({ initialCredits, userId, analysisData }: BioFormProps) 
 
       if (!response.ok) {
         if (data.type === 'insufficient_credits') {
-          alert(data.error)
+          setShowRechargeModal(true)
         } else {
           const fullError = data.details ? `${data.error}\n\nDétails: ${data.details}` : data.error
           alert(`Erreur: ${fullError}`)
@@ -293,5 +295,6 @@ export function BioForm({ initialCredits, userId, analysisData }: BioFormProps) 
       </div>
 
     </div>
+    <RechargeModal isOpen={showRechargeModal} onClose={() => setShowRechargeModal(false)} currentCredits={credits} />
   )
 }
