@@ -42,6 +42,7 @@ export default async function DashboardProfilePage() {
     ...(generatedImages?.map(img => img.image_url) || [])
   ].filter(url => url && !url.includes('placeholder.com'))
 
+  const fullPlan = analysisData?.full_plan as { optimized_bios?: Array<{ type: string; text: string }> } | null
   const optimizedBios = (fullPlan?.optimized_bios || []).map((bio, i) => ({
     id: `plan-bio-${i}`,
     bio_text: bio.text,
