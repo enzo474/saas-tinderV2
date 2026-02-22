@@ -52,6 +52,9 @@ export function CrushTalkPricingClient() {
   const handleSubscribe = async (plan: CrushTalkPlan) => {
     setLoading(plan)
     setError(null)
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CrushTalkPricingClient.tsx:handleSubscribe',message:'handleSubscribe called',data:{plan,endpoint:'/api/crushtalk/checkout-session'},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{})
+    // #endregion
     try {
       const res = await fetch('/api/crushtalk/checkout-session', {
         method: 'POST',
@@ -59,6 +62,9 @@ export function CrushTalkPricingClient() {
         body: JSON.stringify({ plan }),
       })
       const data = await res.json()
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CrushTalkPricingClient.tsx:handleSubscribe',message:'API response received',data:{status:res.status,ok:res.ok,error:data.error,hasUrl:!!data.url},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{})
+      // #endregion
       if (!res.ok || data.error) {
         setError(data.error || 'Erreur lors de la création de la session.')
         setLoading(null)
@@ -68,6 +74,9 @@ export function CrushTalkPricingClient() {
         window.location.href = data.url
       }
     } catch (err: any) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CrushTalkPricingClient.tsx:handleSubscribe',message:'fetch threw error',data:{error:String(err)},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{})
+      // #endregion
       setError('Erreur réseau. Réessaie.')
       setLoading(null)
     }

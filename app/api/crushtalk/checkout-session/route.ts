@@ -4,6 +4,9 @@ import Stripe from 'stripe'
 import { CRUSHTALK_PLANS, type CrushTalkPlan } from '@/app/api/stripe/crushtalk-checkout/actions'
 
 export async function POST(req: NextRequest) {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout-session/route.ts:POST',message:'API route reached',data:{hasStripeKey:!!process.env.STRIPE_SECRET_KEY,chillPriceId:process.env.STRIPE_CRUSHTALK_CHILL_PRICE_ID||'MISSING',charoPriceId:process.env.STRIPE_CRUSHTALK_CHARO_PRICE_ID||'MISSING'},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{})
+  // #endregion
   try {
     const { plan } = await req.json() as { plan: CrushTalkPlan }
 
@@ -11,6 +14,9 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout-session/route.ts:POST',message:'user not authenticated',data:{},timestamp:Date.now(),hypothesisId:'D'})}).catch(()=>{})
+      // #endregion
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
     }
 
@@ -20,6 +26,9 @@ export async function POST(req: NextRequest) {
     }
 
     if (!planConfig.priceId) {
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout-session/route.ts:POST',message:'priceId missing',data:{plan,priceId:planConfig.priceId},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{})
+      // #endregion
       return NextResponse.json(
         { error: `Price ID manquant pour le plan "${plan}". Vérifie les variables Stripe.` },
         { status: 400 }
@@ -56,8 +65,14 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout-session/route.ts:POST',message:'session created successfully',data:{hasUrl:!!session.url},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{})
+    // #endregion
     return NextResponse.json({ url: session.url })
   } catch (error: any) {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'checkout-session/route.ts:POST',message:'caught error',data:{error:String(error),message:error?.message},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{})
+    // #endregion
     console.error('[checkout-session] Error:', error)
     return NextResponse.json({ error: error?.message ?? 'Erreur Stripe' }, { status: 500 })
   }
