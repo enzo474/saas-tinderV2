@@ -25,8 +25,8 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
   ]
 
   const textGameItems = [
-    { path: '/dashboard/hooks', label: 'Accroche', badge: '-50%', badgeColor: 'red' as const },
-    { path: '/dashboard/discussion', label: 'Discussion', locked: true, badge: 'Bientôt', badgeColor: 'gold' as const },
+    { path: '/dashboard/hooks', label: 'Accroche' },
+    { path: '/dashboard/discussion', label: 'Discussion' },
   ]
 
   return (
@@ -119,34 +119,7 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
 
           <div className="mt-3 pt-3 border-t border-border-primary space-y-1">
             {textGameItems.map((item) => {
-              const active = !item.locked && isActive(item.path)
-
-              const content = (
-                <>
-                  <span className="flex-1">{item.label}</span>
-                  {item.badge && (
-                    <span className={`
-                      text-xs px-2.5 py-1 rounded-full font-semibold
-                      ${item.badgeColor === 'red' ? 'bg-red-primary text-white' : ''}
-                      ${item.badgeColor === 'gold' ? 'bg-gold-primary text-black' : ''}
-                    `}>
-                      {item.badge}
-                    </span>
-                  )}
-                </>
-              )
-
-              if (item.locked) {
-                return (
-                  <span
-                    key={item.path}
-                    className="flex items-center justify-between px-4 py-3 rounded-lg text-sm text-text-tertiary opacity-60 cursor-not-allowed"
-                  >
-                    {content}
-                  </span>
-                )
-              }
-
+              const active = isActive(item.path)
               return (
                 <Link
                   key={item.path}
@@ -161,7 +134,7 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
                     }
                   `}
                 >
-                  {content}
+                  <span>{item.label}</span>
                 </Link>
               )
             })}

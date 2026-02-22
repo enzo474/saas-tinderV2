@@ -1,13 +1,26 @@
-import { Suspense } from 'react'
-import { getPresaleCount } from '@/lib/presale'
-import { DiscussionDemo } from '@/components/dashboard/DiscussionDemo'
+import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { CrushTalkPage } from '@/components/crushtalk/CrushTalkPage'
 
 export default async function DiscussionPage() {
-  const presaleCount = await getPresaleCount()
+  const supabase = await createClient()
+  const supabaseAdmin = createServiceRoleClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth')
+
+  const [{ data: onboarding }, { data: credits }] = await Promise.all([
+    supabase.from('crushtalk_onboarding').select('id').eq('user_id', user.id).single(),
+    supabaseAdmin.from('crushtalk_credits').select('balance').eq('user_id', user.id).single(),
+  ])
 
   return (
-    <Suspense fallback={<div className="text-text-secondary">Chargement...</div>}>
-      <DiscussionDemo presaleCount={presaleCount} />
-    </Suspense>
+    <CrushTalkPage
+      messageType="reponse"
+      hasOnboarding={!!onboarding}
+      initialCredits={credits?.balance ?? 0}
+      userId={user.id}
+    />
   )
 }
