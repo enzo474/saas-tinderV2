@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, MessageSquare, MessageCircle, Zap, Infinity, LayoutDashboard } from 'lucide-react'
+import { Menu, X, User, MessageSquare, MessageCircle, Zap, Infinity, LayoutDashboard, ArrowUpRight } from 'lucide-react'
 
 interface CrushTalkMobileNavProps {
   userEmail: string
@@ -84,8 +84,26 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
         {/* Credits */}
         <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(247,127,0,0.06)', borderColor: 'rgba(247,127,0,0.2)' }}>
           <div className="flex items-center gap-2">
-            {isUnlimited ? <Infinity className="w-4 h-4" style={{ color: '#F77F00' }} /> : <Zap className="w-4 h-4" style={{ color: '#F77F00' }} />}
-            <span className="font-bold text-white">{isUnlimited ? 'Illimité' : `${credits} crédits`}</span>
+            {isUnlimited ? (
+              <>
+                <Infinity className="w-4 h-4" style={{ color: '#F77F00' }} />
+                <span className="font-bold text-white">Illimité</span>
+                <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-bold text-white" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>Charo</span>
+              </>
+            ) : (
+              <>
+                <Zap className="w-4 h-4" style={{ color: '#F77F00' }} />
+                <span className="font-bold text-white">{credits} crédits</span>
+                <Link
+                  href="/pricing"
+                  onClick={() => setIsOpen(false)}
+                  className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white flex items-center gap-1"
+                  style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+                >
+                  Upgrade <ArrowUpRight className="w-3 h-3" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
 

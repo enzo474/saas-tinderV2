@@ -2,14 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb } from 'lucide-react'
+import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock } from 'lucide-react'
 
 interface SidebarProps {
   userEmail: string
   isAdmin?: boolean
+  credits?: number
+  hasPlan?: boolean
 }
 
-export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
+export function Sidebar({ userEmail, isAdmin = false, credits = 0, hasPlan = false }: SidebarProps) {
   const pathname = usePathname()
   const isActive = (path: string) => pathname === path
 
@@ -39,6 +41,39 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
         </div>
       </div>
 
+      {/* Carte Crédits */}
+      {hasPlan ? (
+        <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(230,57,70,0.06)', borderColor: 'rgba(230,57,70,0.2)' }}>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'rgba(230,57,70,0.7)' }}>Crédits</p>
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5" style={{ color: '#E63946' }} />
+            <span className="font-montserrat font-bold text-white text-xl">{credits}</span>
+            <Link
+              href="/pricing"
+              className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80 flex items-center gap-1"
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+            >
+              Upgrade <ArrowUpRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(230,57,70,0.04)', borderColor: 'rgba(230,57,70,0.15)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <Lock className="w-4 h-4" style={{ color: 'rgba(230,57,70,0.6)' }} />
+            <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>Photos Pro verrouillé</p>
+          </div>
+          <p className="text-xs mb-3" style={{ color: '#6b7280' }}>Génère tes photos pro avec l&apos;IA</p>
+          <Link
+            href="/pricing"
+            className="block w-full text-center text-xs px-2.5 py-2 rounded-lg font-semibold text-white transition-opacity hover:opacity-80"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          >
+            Débloquer Photos Pro
+          </Link>
+        </div>
+      )}
+
       {/* Navigation */}
       <nav className="flex-1 p-3 flex flex-col gap-1 mt-3">
         {photoProItems.map(({ path, label, icon: Icon }) => {
@@ -64,9 +99,21 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
           )
         })}
 
+        {/* Switch vers CrushTalk — juste après les nav items */}
+        <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+          <Link
+            href="/ct/accroche"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+            style={{ color: '#6b7280' }}
+          >
+            <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
+            <span>CrushTalk</span>
+          </Link>
+        </div>
+
         {/* Admin Panel */}
         {isAdmin && (
-          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+          <div className="mt-2 pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
             <Link
               href="/dashboard/admin"
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200"
@@ -87,19 +134,6 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
 
         {/* Spacer */}
         <div className="mt-auto" />
-
-        {/* Switch vers CrushTalk */}
-        <div className="pt-3 mt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
-          <Link
-            href="/ct/accroche"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
-            style={{ color: '#6b7280' }}
-          >
-            <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
-            <span>CrushTalk</span>
-            <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>→</span>
-          </Link>
-        </div>
 
         {/* Feedback */}
         <div className="pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>

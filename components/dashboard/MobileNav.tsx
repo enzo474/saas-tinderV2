@@ -3,14 +3,16 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb } from 'lucide-react'
+import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock } from 'lucide-react'
 
 interface MobileNavProps {
   userEmail: string
   isAdmin?: boolean
+  credits?: number
+  hasPlan?: boolean
 }
 
-export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
+export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = false }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
   const pathname = usePathname()
   const isActive = (path: string) => pathname === path
@@ -38,14 +40,22 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
             Photos Pro
           </div>
         </div>
-        <button
-          onClick={() => setIsOpen(true)}
-          className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
-          style={{ color: '#9da3af', background: '#1A1A1A' }}
-          aria-label="Ouvrir le menu"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-3">
+          {hasPlan && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}>
+              <Zap className="w-3.5 h-3.5 text-white" />
+              <span className="text-white font-bold text-xs">{credits}</span>
+            </div>
+          )}
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
+            style={{ color: '#9da3af', background: '#1A1A1A' }}
+            aria-label="Ouvrir le menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Overlay */}
@@ -75,6 +85,39 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
           </button>
         </div>
 
+        {/* Carte Crédits */}
+        {hasPlan ? (
+          <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(230,57,70,0.06)', borderColor: 'rgba(230,57,70,0.2)' }}>
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4" style={{ color: '#E63946' }} />
+              <span className="font-bold text-white">{credits} crédits</span>
+              <Link
+                href="/pricing"
+                onClick={() => setIsOpen(false)}
+                className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white flex items-center gap-1"
+                style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+              >
+                Upgrade <ArrowUpRight className="w-3 h-3" />
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(230,57,70,0.04)', borderColor: 'rgba(230,57,70,0.15)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Lock className="w-4 h-4" style={{ color: 'rgba(230,57,70,0.6)' }} />
+              <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>Photos Pro verrouillé</p>
+            </div>
+            <Link
+              href="/pricing"
+              onClick={() => setIsOpen(false)}
+              className="block w-full text-center text-xs px-2.5 py-2 rounded-lg font-semibold text-white"
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+            >
+              Débloquer Photos Pro
+            </Link>
+          </div>
+        )}
+
         <nav className="flex-1 p-3 flex flex-col gap-1 mt-3 overflow-y-auto">
           {photoProItems.map(({ path, label, icon: Icon }) => {
             const active = isActive(path)
@@ -98,8 +141,21 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
             )
           })}
 
+          {/* Switch vers CrushTalk — juste après les nav items */}
+          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+            <Link
+              href="/ct/accroche"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+              style={{ color: '#6b7280' }}
+            >
+              <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
+              <span>CrushTalk</span>
+            </Link>
+          </div>
+
           {isAdmin && (
-            <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+            <div className="mt-2 pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
               <Link
                 href="/dashboard/admin"
                 onClick={() => setIsOpen(false)}
@@ -121,21 +177,6 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
 
           <div className="mt-auto" />
 
-          {/* Switch vers CrushTalk */}
-          <div className="pt-3 mt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
-            <Link
-              href="/ct/accroche"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
-              style={{ color: '#6b7280' }}
-            >
-              <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
-              <span>CrushTalk</span>
-              <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>→</span>
-            </Link>
-          </div>
-
-          {/* Feedback */}
           <div className="pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
             <Link
               href="/dashboard/feedback"

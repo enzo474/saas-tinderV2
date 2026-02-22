@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseAdmin } from '@supabase/supabase-js'
 import { Sidebar } from '@/components/dashboard/Sidebar'
 import { MobileNav } from '@/components/dashboard/MobileNav'
-import { isUserAdmin, addCredits } from '@/lib/credits-server'
+import { isUserAdmin, addCredits, getUserCredits } from '@/lib/credits-server'
 import Stripe from 'stripe'
 import { CREDIT_COSTS } from '@/lib/credits'
 
@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   }
 
   // Lancer les queries en parallèle (analyses + CrushTalk onboarding pour autoriser les users CrushTalk)
-  const [isAdmin, { data: analysis }, { data: crushTalkOnboarding }] = await Promise.all([
+  const [isAdmin, { data: analysis }, { data: crushTalkOnboarding }, photoCredits] = await Promise.all([
     isUserAdmin(user.id),
     supabase
       .from('analyses')
@@ -33,6 +33,7 @@ export default async function DashboardLayout({
       .select('id')
       .eq('user_id', user.id)
       .single(),
+    getUserCredits(user.id),
   ])
 
   // Les admins bypass la vérification de paiement
@@ -80,10 +81,20 @@ export default async function DashboardLayout({
   return (
     <div className="h-screen bg-bg-primary flex overflow-hidden">
       {/* Mobile top nav */}
-      <MobileNav userEmail={user.email || ''} isAdmin={isAdmin} />
+      <MobileNav
+        userEmail={user.email || ''}
+        isAdmin={isAdmin}
+        credits={photoCredits}
+        hasPlan={!!analysis?.paid_at}
+      />
 
       {/* Sidebar (desktop only) */}
-      <Sidebar userEmail={user.email || ''} isAdmin={isAdmin} />
+      <Sidebar
+        userEmail={user.email || ''}
+        isAdmin={isAdmin}
+        credits={photoCredits}
+        hasPlan={!!analysis?.paid_at}
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-0">

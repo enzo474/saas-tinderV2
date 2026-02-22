@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { MessageSquare, MessageCircle, User, Zap, Infinity, LayoutDashboard } from 'lucide-react'
+import { MessageSquare, MessageCircle, User, Zap, Infinity, LayoutDashboard, ArrowUpRight, Lock } from 'lucide-react'
 
 interface CrushTalkSidebarProps {
   userEmail: string
@@ -48,16 +48,28 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
               <span className="font-montserrat font-bold text-white text-lg">Illimité</span>
               <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-bold text-white" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>Charo</span>
             </>
-          ) : (
+          ) : credits > 0 ? (
             <>
               <Zap className="w-5 h-5" style={{ color: '#F77F00' }} />
               <span className="font-montserrat font-bold text-white text-xl">{credits}</span>
               <Link
-                href="#recharge"
+                href="/pricing"
+                className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80 flex items-center gap-1"
+                style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+              >
+                Upgrade <ArrowUpRight className="w-3 h-3" />
+              </Link>
+            </>
+          ) : (
+            <>
+              <Lock className="w-4 h-4" style={{ color: 'rgba(247,127,0,0.6)' }} />
+              <span className="font-montserrat font-bold text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>0 crédit</span>
+              <Link
+                href="/pricing"
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80"
                 style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
               >
-                + Recharger
+                Upgrade
               </Link>
             </>
           )}
