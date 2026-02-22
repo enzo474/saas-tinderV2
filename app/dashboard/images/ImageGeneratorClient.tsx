@@ -181,11 +181,21 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
   const handleOwnPhotoStep1 = (file: File) => {
     const reader = new FileReader()
     reader.onloadend = () => {
-      const result = reader.result as string
-      setSourceImageUrl(result)
-      setSelectedGeneratedImage('')
-      setOwnPhotoMode(false)
-      setEditImageStep('upload-reference')
+      const img = new window.Image()
+      img.onload = () => {
+        const MAX = 1024
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * ratio)
+        canvas.height = Math.round(img.height * ratio)
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        const compressed = canvas.toDataURL('image/jpeg', 0.8)
+        setSourceImageUrl(compressed)
+        setSelectedGeneratedImage('')
+        setOwnPhotoMode(false)
+        setEditImageStep('upload-reference')
+      }
+      img.src = reader.result as string
     }
     reader.readAsDataURL(file)
   }
@@ -194,12 +204,21 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
     setReferenceImageFile(file)
     const reader = new FileReader()
     reader.onloadend = () => {
-      const result = reader.result as string
-      setReferenceImageData(result)
-      if (ownPhotoMode) {
-        // Own photo mode: the uploaded image IS the source
-        setSourceImageUrl(result)
+      const img = new window.Image()
+      img.onload = () => {
+        const MAX = 1024
+        const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width = Math.round(img.width * ratio)
+        canvas.height = Math.round(img.height * ratio)
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        const compressed = canvas.toDataURL('image/jpeg', 0.8)
+        setReferenceImageData(compressed)
+        if (ownPhotoMode) {
+          setSourceImageUrl(compressed)
+        }
       }
+      img.src = reader.result as string
     }
     reader.readAsDataURL(file)
   }
