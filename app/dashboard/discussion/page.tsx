@@ -15,10 +15,13 @@ export default async function DiscussionPage() {
     supabaseAdmin.from('crushtalk_credits').select('balance').eq('user_id', user.id).single(),
   ])
 
+  // Onboarding CrushTalk pas encore fait → page dédiée
+  if (!onboarding) redirect('/crushtalk/onboarding')
+
   return (
     <CrushTalkPage
       messageType="reponse"
-      hasOnboarding={!!onboarding}
+      hasOnboarding={true}
       initialCredits={credits?.balance ?? 0}
       userId={user.id}
     />

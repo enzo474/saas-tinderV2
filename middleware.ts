@@ -54,6 +54,8 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/auth/callback') ||
     path === '/privacy' ||
     path === '/terms' ||
+    path === '/crushtalk' ||
+    path === '/crushtalk/login' ||
     path.startsWith('/api/nanobanana/') ||
     path.startsWith('/api/stripe/')
   ) {
@@ -71,12 +73,13 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // Pour les routes onboarding/ob2/analysis : juste auth, pas de check DB
+  // Pour les routes onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
   if (
     path.startsWith('/onboarding') ||
     path.startsWith('/ob2') ||
     path.startsWith('/analysis') ||
-    path.startsWith('/start')
+    path.startsWith('/start') ||
+    path.startsWith('/crushtalk/')
   ) {
     return response
   }

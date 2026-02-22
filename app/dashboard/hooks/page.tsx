@@ -15,10 +15,13 @@ export default async function HooksPage() {
     supabaseAdmin.from('crushtalk_credits').select('balance').eq('user_id', user.id).single(),
   ])
 
+  // Onboarding CrushTalk pas encore fait → page dédiée
+  if (!onboarding) redirect('/crushtalk/onboarding')
+
   return (
     <CrushTalkPage
       messageType="accroche"
-      hasOnboarding={!!onboarding}
+      hasOnboarding={true}
       initialCredits={credits?.balance ?? 0}
       userId={user.id}
     />

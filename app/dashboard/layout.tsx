@@ -19,8 +19,8 @@ export default async function DashboardLayout({
     redirect('/auth')
   }
 
-  // Lancer les deux queries en parallèle
-  const [isAdmin, { data: analysis }] = await Promise.all([
+  // Lancer les queries en parallèle (analyses + CrushTalk onboarding pour autoriser les users CrushTalk)
+  const [isAdmin, { data: analysis }, { data: crushTalkOnboarding }] = await Promise.all([
     isUserAdmin(user.id),
     supabase
       .from('analyses')
@@ -28,10 +28,16 @@ export default async function DashboardLayout({
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .single(),
+    supabase
+      .from('crushtalk_onboarding')
+      .select('id')
+      .eq('user_id', user.id)
+      .single(),
   ])
 
   // Les admins bypass la vérification de paiement
-  if (!isAdmin) {
+  // Les users CrushTalk (onboarding CrushTalk complété) ont aussi accès au dashboard
+  if (!isAdmin && !crushTalkOnboarding) {
 
     if (!analysis?.paid_at) {
       // Webhook peut ne pas encore être arrivé — vérifier directement avec Stripe
