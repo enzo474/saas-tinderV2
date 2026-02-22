@@ -8,6 +8,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-02-24.acacia',
 })
 
+// Pour le bouton "Recharge" dans la sidebar (pas besoin d'analysisId explicite)
+export async function createRechargeSession() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth')
+
+  const { data: analysis } = await supabase
+    .from('analyses')
+    .select('id')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    .single()
+
+  if (!analysis) return { error: 'Aucune analyse trouvée' }
+  return createCheckoutSession(analysis.id)
+}
+
 export async function createCheckoutSession(analysisId: string) {
   const supabase = await createClient()
   

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock } from 'lucide-react'
+import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock, RefreshCw } from 'lucide-react'
+import { CrushPictureRechargeModal } from './CrushPictureRechargeModal'
 
 interface MobileNavProps {
   userEmail: string
@@ -14,6 +15,7 @@ interface MobileNavProps {
 
 export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = false }: MobileNavProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [showRecharge, setShowRecharge] = useState(false)
   const pathname = usePathname()
   const isActive = (path: string) => pathname === path
 
@@ -37,10 +39,10 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
             Crushmaxxing
           </span>
           <div className="px-2 py-0.5 rounded-full border text-xs font-bold" style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)', color: '#E63946' }}>
-            Photos Pro
+            CrushPicture
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           {hasPlan && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}>
               <Zap className="w-3.5 h-3.5 text-white" />
@@ -77,7 +79,7 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
             </span>
             <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-bold" style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)', color: '#E63946' }}>
               <ImageIcon className="w-3 h-3" />
-              Photos Pro
+              CrushPicture
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="w-9 h-9 flex items-center justify-center rounded-lg" style={{ color: '#9da3af', background: '#1A1A1A' }}>
@@ -91,29 +93,28 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4" style={{ color: '#E63946' }} />
               <span className="font-bold text-white">{credits} crédits</span>
-              <Link
-                href="/pricing"
-                onClick={() => setIsOpen(false)}
+              <button
+                onClick={() => { setIsOpen(false); setShowRecharge(true) }}
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white flex items-center gap-1"
                 style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
               >
-                Upgrade <ArrowUpRight className="w-3 h-3" />
-              </Link>
+                <RefreshCw className="w-3 h-3" /> Recharge
+              </button>
             </div>
           </div>
         ) : (
           <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(230,57,70,0.04)', borderColor: 'rgba(230,57,70,0.15)' }}>
             <div className="flex items-center gap-2 mb-2">
               <Lock className="w-4 h-4" style={{ color: 'rgba(230,57,70,0.6)' }} />
-              <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>Photos Pro verrouillé</p>
+              <p className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>CrushPicture verrouillé</p>
             </div>
             <Link
               href="/pricing"
               onClick={() => setIsOpen(false)}
-              className="block w-full text-center text-xs px-2.5 py-2 rounded-lg font-semibold text-white"
+              className="flex items-center justify-center gap-1 w-full text-center text-xs px-2.5 py-2 rounded-lg font-semibold text-white"
               style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
             >
-              Débloquer Photos Pro
+              Débloquer <ArrowUpRight className="w-3 h-3" />
             </Link>
           </div>
         )}
@@ -141,7 +142,7 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
             )
           })}
 
-          {/* Switch vers CrushTalk — juste après les nav items */}
+          {/* Switch vers CrushTalk */}
           <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
             <Link
               href="/ct/accroche"
@@ -204,11 +205,13 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-sm font-medium truncate">{userEmail.split('@')[0]}</p>
-              <p className="text-xs" style={{ color: '#6b7280' }}>Photos Pro</p>
+              <p className="text-xs" style={{ color: '#6b7280' }}>CrushPicture</p>
             </div>
           </Link>
         </div>
       </div>
+
+      {showRecharge && <CrushPictureRechargeModal onClose={() => setShowRecharge(false)} />}
     </>
   )
 }

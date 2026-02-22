@@ -95,7 +95,7 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
                 <Zap className="w-4 h-4" style={{ color: '#F77F00' }} />
                 <span className="font-bold text-white">{credits} crédits</span>
                 <Link
-                  href="/pricing"
+                  href="/ct/pricing"
                   onClick={() => setIsOpen(false)}
                   className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white flex items-center gap-1"
                   style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
@@ -132,7 +132,7 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
               <Link href="/dashboard/home" onClick={() => setIsOpen(false)}
                 className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm" style={{ color: '#6b7280' }}>
                 <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-                <span>Photos Pro</span>
+                <span>CrushPicture</span>
               </Link>
             </div>
           )}

@@ -56,8 +56,8 @@ export async function createCrushTalkCheckoutSession(plan: CrushTalkPlan) {
       ],
       mode: 'subscription',
       allow_promotion_codes: true,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/hooks?subscription=success&plan=${plan}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/hooks?subscription=cancelled`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/ct/accroche?subscription=success&plan=${plan}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/ct/pricing`,
       metadata: {
         product_type: planConfig.productType,
         user_id: user.id,

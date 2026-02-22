@@ -53,7 +53,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
               <Zap className="w-5 h-5" style={{ color: '#F77F00' }} />
               <span className="font-montserrat font-bold text-white text-xl">{credits}</span>
               <Link
-                href="/pricing"
+                href="/ct/pricing"
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80 flex items-center gap-1"
                 style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
               >
@@ -65,7 +65,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
               <Lock className="w-4 h-4" style={{ color: 'rgba(247,127,0,0.6)' }} />
               <span className="font-montserrat font-bold text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>0 crédit</span>
               <Link
-                href="/pricing"
+                href="/ct/pricing"
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80"
                 style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
               >
@@ -110,7 +110,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
               style={{ color: '#6b7280' }}
             >
               <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-              <span>Photos Pro</span>
+              <span>CrushPicture</span>
             </Link>
           </div>
         )}
