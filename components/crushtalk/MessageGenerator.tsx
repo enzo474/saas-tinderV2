@@ -176,7 +176,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
         <div
           className="flex items-center gap-2 px-4 py-2 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
-          style={{ background: isUnlimited ? 'linear-gradient(135deg, #F77F00, #FFAA33)' : 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
           onClick={() => !isUnlimited && setShowRechargeModal(true)}
           title={isUnlimited ? 'Pack Charo — Illimité' : 'Cliquer pour recharger'}
         >

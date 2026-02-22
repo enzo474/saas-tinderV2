@@ -1,10 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { getUserCredits, isUserAdmin } from '@/lib/credits-server'
 import { SettingsContent } from './SettingsContent'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
+  const supabaseAdmin = createServiceRoleClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/auth')
@@ -15,19 +16,11 @@ export default async function SettingsPage() {
     isUserAdmin(user.id),
   ])
 
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('presale_purchased_at')
-    .eq('id', user.id)
-    .single()
-
-  const { data: analysis } = await supabase
-    .from('analyses')
-    .select('paid_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
+  const [{ data: profile }, { data: analysis }, { data: crushTalkCredits }] = await Promise.all([
+    supabase.from('user_profiles').select('presale_purchased_at').eq('id', user.id).single(),
+    supabase.from('analyses').select('paid_at').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).single(),
+    supabaseAdmin.from('crushtalk_credits').select('balance, subscription_type, subscription_status').eq('user_id', user.id).single(),
+  ])
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -45,6 +38,10 @@ export default async function SettingsPage() {
         isAdmin={isAdmin}
         presalePurchasedAt={profile?.presale_purchased_at ?? null}
         paidAt={analysis?.paid_at ?? null}
+        crushTalkSubscription={crushTalkCredits?.subscription_type && crushTalkCredits?.subscription_status === 'active'
+          ? { type: crushTalkCredits.subscription_type, status: crushTalkCredits.subscription_status }
+          : null
+        }
       />
     </div>
   )
