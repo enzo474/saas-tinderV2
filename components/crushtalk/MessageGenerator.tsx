@@ -51,7 +51,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
   const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [contextMessage, setContextMessage] = useState('')
   const [selectedTones, setSelectedTones] = useState<string[]>(['Direct', 'Drôle', 'Mystérieux', 'Compliment'])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -112,7 +111,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
           mediaType,
           messageType: activeType,
           selectedTones,
-          contextMessage: activeType === 'reponse' ? contextMessage : undefined,
         }),
       })
 
@@ -148,7 +146,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
     setScreenshotPreview(null)
     setResults(null)
     setError(null)
-    setContextMessage('')
   }
 
   return (
@@ -254,19 +251,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
             )}
           </div>
 
-          {/* Contexte (si réponse) */}
-          {activeType === 'reponse' && (
-            <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
-              <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-3">Son dernier message</p>
-              <textarea
-                value={contextMessage}
-                onChange={e => setContextMessage(e.target.value)}
-                placeholder='Colle son dernier message ici pour une réponse adaptée...'
-                rows={3}
-                className="w-full bg-bg-primary/50 border border-border-primary rounded-xl px-4 py-3 text-white text-sm placeholder-text-tertiary resize-none focus:outline-none focus:border-red-primary/60 transition-colors"
-              />
-            </div>
-          )}
 
           {/* Sélecteur de tons */}
           <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
