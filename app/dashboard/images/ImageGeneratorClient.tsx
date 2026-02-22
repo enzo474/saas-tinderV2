@@ -734,40 +734,42 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
           const hasRef = promptImages.length > 1
 
           return (
-            <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-8">
+            <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-4 md:p-8">
               <div className="flex items-center justify-between mb-1">
-                <h2 className="font-montserrat font-bold text-white text-xl">Décrivez vos modifications</h2>
+                <h2 className="font-montserrat font-bold text-white text-lg md:text-xl">Décrivez vos modifications</h2>
                 <Button variant="secondary" size="sm" onClick={() => setEditImageStep('upload-reference')}>
                   ← Retour
                 </Button>
               </div>
-              <p className="text-text-secondary text-sm mb-6">
+              <p className="text-text-secondary text-sm mb-4 md:mb-6">
                 Décris précisément ce que tu veux changer. L&apos;IA appliquera tes instructions en conservant ton identité.
               </p>
 
               {/* Aperçu des images numérotées */}
               {promptImages.length > 0 && (
-                <div className="p-4 bg-bg-primary/60 border border-border-primary rounded-xl mb-6">
-                  <div className="flex items-start gap-3 flex-wrap">
-                    {promptImages.map((img) => (
-                      <div key={img.label} className="flex flex-col items-center gap-1.5">
-                        <div className="relative w-16 md:w-20 aspect-[3/4] rounded-lg overflow-hidden border-2 border-border-primary">
-                          <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
-                          <div className="absolute top-1 left-1 bg-red-primary text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow-lg leading-tight">
-                            {img.label}
+                <div className="p-3 md:p-4 bg-bg-primary/60 border border-border-primary rounded-xl mb-4 md:mb-6">
+                  <div className="flex flex-col gap-3">
+                    {/* Thumbnails */}
+                    <div className="flex items-end gap-3">
+                      {promptImages.map((img) => (
+                        <div key={img.label} className="flex flex-col items-center gap-1">
+                          <div className="relative w-14 md:w-20 aspect-[3/4] rounded-lg overflow-hidden border-2 border-border-primary">
+                            <img src={img.src} alt={img.label} className="w-full h-full object-cover" />
+                            <div className="absolute top-0.5 left-0.5 bg-red-primary text-white text-[10px] font-bold px-1 py-0.5 rounded-full shadow leading-tight">
+                              {img.label}
+                            </div>
                           </div>
+                          <p className="text-text-tertiary text-[11px]">{img.hint}</p>
                         </div>
-                        <p className="text-text-tertiary text-xs">{img.hint}</p>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                    {/* Texte sous les images */}
                     {hasRef && (
-                      <div className="flex-1 min-w-[120px] self-center mt-1">
-                        <p className="text-text-secondary text-xs md:text-sm leading-relaxed">
-                          Tu as <strong className="text-white">2 images</strong> disponibles.{' '}
-                          Utilise <span className="text-red-light font-semibold">&quot;Image&nbsp;1&quot;</span> et{' '}
-                          <span className="text-red-light font-semibold">&quot;Image&nbsp;2&quot;</span> dans ton prompt pour les référencer.
-                        </p>
-                      </div>
+                      <p className="text-text-secondary text-xs md:text-sm leading-relaxed">
+                        Tu as <strong className="text-white">2 images</strong> disponibles. Utilise{' '}
+                        <span className="text-red-light font-semibold">&quot;Image&nbsp;1&quot;</span> et{' '}
+                        <span className="text-red-light font-semibold">&quot;Image&nbsp;2&quot;</span> dans ton prompt pour les référencer.
+                      </p>
                     )}
                   </div>
                 </div>
