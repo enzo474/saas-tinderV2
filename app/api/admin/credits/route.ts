@@ -21,20 +21,32 @@ export async function GET() {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Récupère les profils correspondants
   const userIds = analyses?.map(a => a.user_id) ?? []
   if (userIds.length === 0) return NextResponse.json({ users: [] })
 
+  // Crédits depuis user_profiles
   const { data: profiles } = await supabaseAdmin
     .from('user_profiles')
-    .select('id, email, credits')
+    .select('id, credits')
     .in('id', userIds)
 
-  const users = analyses?.map(a => {
+  // Emails depuis auth.users (service role uniquement)
+  const authUsersPromises = userIds.map(id =>
+    supabaseAdmin.auth.admin.getUserById(id)
+  )
+  const authResults = await Promise.all(authUsersPromises)
+
+  const users = analyses?.map((a, i) => {
     const p = profiles?.find(p => p.id === a.user_id)
+    const authUser = authResults[i]?.data?.user
+    const email =
+      authUser?.email ??
+      authUser?.user_metadata?.email ??
+      authUser?.user_metadata?.full_name ??
+      a.user_id.slice(0, 8) + '...'
     return {
       id: a.user_id,
-      email: p?.email ?? 'Inconnu',
+      email,
       credits: p?.credits ?? 0,
       paid_at: a.paid_at,
     }
