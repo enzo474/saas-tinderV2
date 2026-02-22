@@ -123,7 +123,8 @@ export function ImageGallery({ initialImages, userId }: ImageGalleryProps) {
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
 
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            {/* Overlay téléchargement — desktop uniquement (mobile = tap → lightbox) */}
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center justify-center">
               <button
                 onClick={(e) => {
                   e.stopPropagation()
@@ -148,37 +149,41 @@ export function ImageGallery({ initialImages, userId }: ImageGalleryProps) {
       {/* Lightbox plein écran */}
       {selectedImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center"
           role="dialog"
           aria-modal="true"
           aria-label="Aperçu image"
         >
-          <button
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors z-10"
-            aria-label="Fermer"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <div
-            className="relative max-h-[90vh] w-auto aspect-[9/16] flex items-center justify-center"
-            onClick={(e) => e.stopPropagation()}
-          >
+          {/* Header */}
+          <div className="flex items-center justify-between w-full px-4 py-3 flex-shrink-0">
+            <span className="text-white/60 text-sm">Photo {selectedImage.photo_number}</span>
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label="Fermer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Image */}
+          <div className="flex-1 flex items-center justify-center w-full px-4 min-h-0">
             <img
               src={selectedImage.image_url}
               alt={`Photo ${selectedImage.photo_number}`}
-              className="max-h-[90vh] w-auto object-contain"
+              className="max-h-full max-w-full object-contain rounded-xl"
+              style={{ maxHeight: 'calc(100vh - 140px)' }}
             />
+          </div>
+
+          {/* Bouton télécharger en bas */}
+          <div className="w-full px-4 py-4 flex-shrink-0">
             <button
-              onClick={(e) => {
-                e.stopPropagation()
-                handleDownload(selectedImage.image_url, `photo-${selectedImage.id}.jpg`)
-              }}
-              className="absolute bottom-4 right-4 bg-red-primary hover:bg-red-dark text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors shadow-lg"
+              onClick={() => handleDownload(selectedImage.image_url, `photo-${selectedImage.id}.jpg`)}
+              className="w-full bg-red-primary hover:bg-red-dark text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-3 transition-colors shadow-lg text-base active:scale-95"
             >
-              <Download className="w-4 h-4" />
-              Télécharger
+              <Download className="w-5 h-5" />
+              Télécharger cette photo
             </button>
           </div>
         </div>
