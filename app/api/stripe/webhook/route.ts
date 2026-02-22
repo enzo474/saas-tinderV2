@@ -20,6 +20,101 @@ function getSupabaseClient() {
   return createClient(url, key)
 }
 
+// ────────────────────────────────────────────────────────────
+// Helpers CrushTalk
+// ────────────────────────────────────────────────────────────
+async function handleCrushTalkSubscriptionStart(
+  supabase: ReturnType<typeof getSupabaseClient>,
+  userId: string,
+  plan: 'chill' | 'charo',
+  subscriptionId: string,
+  customerId: string,
+  periodEnd: number
+) {
+  const isUnlimited = plan === 'charo'
+  const creditsToAdd = isUnlimited ? 0 : 500
+
+  // S'assurer que la ligne existe
+  const { data: existing } = await supabase
+    .from('crushtalk_credits')
+    .select('balance')
+    .eq('user_id', userId)
+    .single()
+
+  if (!existing) {
+    await supabase.from('crushtalk_credits').insert({
+      user_id: userId,
+      balance: creditsToAdd,
+      used_total: 0,
+      subscription_type: plan,
+      stripe_subscription_id: subscriptionId,
+      stripe_customer_id: customerId,
+      subscription_status: 'active',
+      subscription_current_period_end: new Date(periodEnd * 1000).toISOString(),
+    })
+  } else {
+    await supabase.from('crushtalk_credits').update({
+      balance: isUnlimited ? (existing.balance ?? 0) : (existing.balance ?? 0) + creditsToAdd,
+      subscription_type: plan,
+      stripe_subscription_id: subscriptionId,
+      stripe_customer_id: customerId,
+      subscription_status: 'active',
+      subscription_current_period_end: new Date(periodEnd * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq('user_id', userId)
+  }
+  console.log(`[CrushTalk] Subscription ${plan} activated for user ${userId} - ${isUnlimited ? 'unlimited' : `+${creditsToAdd} credits`}`)
+}
+
+async function handleCrushTalkRenewal(
+  supabase: ReturnType<typeof getSupabaseClient>,
+  subscriptionId: string,
+  periodEnd: number
+) {
+  const { data: credits } = await supabase
+    .from('crushtalk_credits')
+    .select('user_id, subscription_type, balance')
+    .eq('stripe_subscription_id', subscriptionId)
+    .single()
+
+  if (!credits) {
+    console.warn(`[CrushTalk] Renewal: no credits row found for subscription ${subscriptionId}`)
+    return
+  }
+
+  if (credits.subscription_type === 'chill') {
+    // Renouvellement Chill : ajouter 500 crédits
+    await supabase.from('crushtalk_credits').update({
+      balance: (credits.balance ?? 0) + 500,
+      subscription_status: 'active',
+      subscription_current_period_end: new Date(periodEnd * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq('stripe_subscription_id', subscriptionId)
+    console.log(`[CrushTalk] Renewal Chill: +500 credits for user ${credits.user_id}`)
+  } else if (credits.subscription_type === 'charo') {
+    // Renouvellement Charo : juste mettre à jour la date de fin
+    await supabase.from('crushtalk_credits').update({
+      subscription_status: 'active',
+      subscription_current_period_end: new Date(periodEnd * 1000).toISOString(),
+      updated_at: new Date().toISOString(),
+    }).eq('stripe_subscription_id', subscriptionId)
+    console.log(`[CrushTalk] Renewal Charo: extended for user ${credits.user_id}`)
+  }
+}
+
+async function handleCrushTalkCancellation(
+  supabase: ReturnType<typeof getSupabaseClient>,
+  subscriptionId: string
+) {
+  await supabase.from('crushtalk_credits').update({
+    subscription_type: null,
+    subscription_status: 'canceled',
+    stripe_subscription_id: null,
+    updated_at: new Date().toISOString(),
+  }).eq('stripe_subscription_id', subscriptionId)
+  console.log(`[CrushTalk] Subscription cancelled: ${subscriptionId}`)
+}
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = getSupabaseClient()
@@ -111,6 +206,38 @@ export async function POST(req: NextRequest) {
         }
         console.log(`Presale purchased by user ${userId} (${productType})`)
       }
+      // ── CrushTalk Chill ──
+      else if (productType === 'crushtalk_chill') {
+        const sub = session.subscription as string
+        const customer = session.customer as string
+        try {
+          const subscription = await stripe.subscriptions.retrieve(sub)
+          await handleCrushTalkSubscriptionStart(
+            supabase, userId, 'chill', sub, customer,
+            subscription.current_period_end
+          )
+        } catch (e: any) {
+          console.error('[CrushTalk] Error activating chill:', e)
+          return NextResponse.json({ error: e.message }, { status: 500 })
+        }
+      }
+
+      // ── CrushTalk Charo ──
+      else if (productType === 'crushtalk_charo') {
+        const sub = session.subscription as string
+        const customer = session.customer as string
+        try {
+          const subscription = await stripe.subscriptions.retrieve(sub)
+          await handleCrushTalkSubscriptionStart(
+            supabase, userId, 'charo', sub, customer,
+            subscription.current_period_end
+          )
+        } catch (e: any) {
+          console.error('[CrushTalk] Error activating charo:', e)
+          return NextResponse.json({ error: e.message }, { status: 500 })
+        }
+      }
+
       else {
         // Ancien format de compatibilité (si pas de product_type spécifié)
         if (analysisId) {
@@ -136,6 +263,47 @@ export async function POST(req: NextRequest) {
             // Ignore error for backward compatibility
           }
         }
+      }
+    }
+
+    // ── Renouvellement abonnement CrushTalk (mensuel) ──
+    if (event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object as Stripe.Invoice
+      const subscriptionId = typeof invoice.subscription === 'string'
+        ? invoice.subscription
+        : invoice.subscription?.id
+
+      if (subscriptionId && invoice.billing_reason === 'subscription_cycle') {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const plan = subscription.metadata?.plan
+        if (plan === 'chill' || plan === 'charo') {
+          await handleCrushTalkRenewal(supabase, subscriptionId, subscription.current_period_end)
+        }
+      }
+    }
+
+    // ── Annulation abonnement CrushTalk ──
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object as Stripe.Subscription
+      const plan = subscription.metadata?.plan
+      if (plan === 'chill' || plan === 'charo') {
+        await handleCrushTalkCancellation(supabase, subscription.id)
+      }
+    }
+
+    // ── Mise à jour statut (past_due, etc.) ──
+    if (event.type === 'customer.subscription.updated') {
+      const subscription = event.data.object as Stripe.Subscription
+      const plan = subscription.metadata?.plan
+      if (plan === 'chill' || plan === 'charo') {
+        const newStatus = subscription.status === 'active' ? 'active'
+          : subscription.status === 'past_due' ? 'past_due'
+          : 'canceled'
+        await supabase.from('crushtalk_credits').update({
+          subscription_status: newStatus,
+          subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
+          updated_at: new Date().toISOString(),
+        }).eq('stripe_subscription_id', subscription.id)
       }
     }
 

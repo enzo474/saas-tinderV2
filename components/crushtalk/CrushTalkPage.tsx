@@ -8,21 +8,19 @@ interface CrushTalkPageProps {
   messageType: 'accroche' | 'reponse'
   hasOnboarding: boolean
   initialCredits: number
+  initialSubscriptionType?: string | null
   userId: string
 }
 
-export function CrushTalkPage({ messageType, hasOnboarding, initialCredits, userId }: CrushTalkPageProps) {
+export function CrushTalkPage({ messageType, hasOnboarding, initialCredits, initialSubscriptionType, userId }: CrushTalkPageProps) {
   const [onboardingDone, setOnboardingDone] = useState(hasOnboarding)
-  // Après l'onboarding, 20 crédits sont offerts
-  const [credits, setCredits] = useState(hasOnboarding ? initialCredits : initialCredits)
+  const [credits, setCredits] = useState(initialCredits)
 
   if (!onboardingDone) {
     return (
       <OnboardingFlow
         onComplete={() => {
-          // Après onboarding, les crédits sont créés côté API (20 crédits)
-          // On les rafraîchit en rechargeant les données
-          setCredits(20)
+          setCredits(5)
           setOnboardingDone(true)
         }}
       />
@@ -33,6 +31,7 @@ export function CrushTalkPage({ messageType, hasOnboarding, initialCredits, user
     <MessageGenerator
       messageType={messageType}
       initialCredits={credits}
+      initialSubscriptionType={initialSubscriptionType}
       userId={userId}
     />
   )

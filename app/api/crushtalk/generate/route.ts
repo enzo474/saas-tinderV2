@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Vérifier/créer les crédits CrushTalk
     let { data: creditsRow } = await supabaseAdmin
       .from('crushtalk_credits')
-      .select('balance, used_total')
+      .select('balance, used_total, subscription_type, subscription_status')
       .eq('user_id', user.id)
       .single()
 
@@ -36,28 +36,38 @@ export async function POST(req: NextRequest) {
       const { data: newRow } = await supabaseAdmin
         .from('crushtalk_credits')
         .insert({ user_id: user.id, balance: INITIAL_CREDITS, used_total: 0 })
-        .select('balance, used_total')
+        .select('balance, used_total, subscription_type, subscription_status')
         .single()
       creditsRow = newRow
     }
 
-    if (!creditsRow || creditsRow.balance < CREDITS_PER_GENERATION) {
-      return NextResponse.json({
-        error: 'Crédits insuffisants',
-        balance: creditsRow?.balance ?? 0,
-        required: CREDITS_PER_GENERATION,
-        type: 'insufficient_credits',
-      }, { status: 402 })
-    }
+    // Plan Charo = illimité : on ne déduit pas de crédits
+    const isUnlimited = creditsRow?.subscription_type === 'charo' && creditsRow?.subscription_status === 'active'
 
-    // Déduire les crédits de manière atomique
-    const { data: deducted } = await supabaseAdmin.rpc('deduct_crushtalk_credits', {
-      user_id_param: user.id,
-      cost: CREDITS_PER_GENERATION,
-    })
+    if (!isUnlimited) {
+      if (!creditsRow || creditsRow.balance < CREDITS_PER_GENERATION) {
+        return NextResponse.json({
+          error: 'Crédits insuffisants',
+          balance: creditsRow?.balance ?? 0,
+          required: CREDITS_PER_GENERATION,
+          type: 'insufficient_credits',
+        }, { status: 402 })
+      }
 
-    if (!deducted) {
-      return NextResponse.json({ error: 'Crédits insuffisants', type: 'insufficient_credits' }, { status: 402 })
+      // Déduire les crédits de manière atomique
+      const { data: deducted } = await supabaseAdmin.rpc('deduct_crushtalk_credits', {
+        user_id_param: user.id,
+        cost: CREDITS_PER_GENERATION,
+      })
+
+      if (!deducted) {
+        return NextResponse.json({ error: 'Crédits insuffisants', type: 'insufficient_credits' }, { status: 402 })
+      }
+    } else {
+      // Charo : juste incrémenter used_total pour les stats
+      await supabaseAdmin.from('crushtalk_credits')
+        .update({ used_total: (creditsRow?.used_total ?? 0) + CREDITS_PER_GENERATION, updated_at: new Date().toISOString() })
+        .eq('user_id', user.id)
     }
 
     // Analyser le profil avec Claude Vision
@@ -69,10 +79,12 @@ export async function POST(req: NextRequest) {
     try {
       profileAnalysis = await analyzeProfileWithVision(imageBase64, validMediaType)
     } catch (visionError: any) {
-      // Rembourser les crédits si Claude échoue
-      await supabaseAdmin.from('crushtalk_credits')
-        .update({ balance: creditsRow.balance, used_total: creditsRow.used_total, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id)
+      // Rembourser les crédits si Claude échoue (sauf pour Charo)
+      if (!isUnlimited) {
+        await supabaseAdmin.from('crushtalk_credits')
+          .update({ balance: creditsRow!.balance, used_total: creditsRow!.used_total, updated_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+      }
       return NextResponse.json({ error: 'Erreur analyse du profil: ' + visionError.message }, { status: 500 })
     }
 
@@ -86,10 +98,12 @@ export async function POST(req: NextRequest) {
         contextMessage
       )
     } catch (genError: any) {
-      // Rembourser les crédits si génération échoue
-      await supabaseAdmin.from('crushtalk_credits')
-        .update({ balance: creditsRow.balance, used_total: creditsRow.used_total, updated_at: new Date().toISOString() })
-        .eq('user_id', user.id)
+      // Rembourser les crédits si génération échoue (sauf pour Charo)
+      if (!isUnlimited) {
+        await supabaseAdmin.from('crushtalk_credits')
+          .update({ balance: creditsRow!.balance, used_total: creditsRow!.used_total, updated_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+      }
       return NextResponse.json({ error: 'Erreur génération messages: ' + genError.message }, { status: 500 })
     }
 
@@ -113,7 +127,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       messages,
       profileAnalysis,
-      newBalance: updatedCredits?.balance ?? 0,
+      newBalance: isUnlimited ? -1 : (updatedCredits?.balance ?? 0),
+      isUnlimited,
     })
 
   } catch (error: any) {

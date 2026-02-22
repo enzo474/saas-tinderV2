@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useCallback } from 'react'
-import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap } from 'lucide-react'
+import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap, Infinity } from 'lucide-react'
+import { RechargeModal } from './RechargeModal'
 
 interface GeneratedMessage {
   tone: string
@@ -12,6 +13,7 @@ interface GeneratedMessage {
 interface MessageGeneratorProps {
   messageType: 'accroche' | 'reponse'
   initialCredits: number
+  initialSubscriptionType?: string | null
   userId: string
 }
 
@@ -47,7 +49,7 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: string 
   })
 }
 
-export function MessageGenerator({ messageType: initialType, initialCredits, userId }: MessageGeneratorProps) {
+export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId }: MessageGeneratorProps) {
   const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
@@ -56,9 +58,14 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
   const [credits, setCredits] = useState(initialCredits)
+  const [subscriptionType, setSubscriptionType] = useState<string | null>(initialSubscriptionType ?? null)
+  const [showRechargeModal, setShowRechargeModal] = useState(false)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isUnlimited = subscriptionType === 'charo'
+  const hasEnoughCredits = isUnlimited || credits >= CREDITS_PER_GENERATION
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -91,8 +98,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
       setError('Upload un screenshot de profil pour continuer.')
       return
     }
-    if (credits < CREDITS_PER_GENERATION) {
-      setError(`Crédits insuffisants. Il te faut ${CREDITS_PER_GENERATION} crédits CrushTalk.`)
+    if (!hasEnoughCredits) {
+      setShowRechargeModal(true)
       return
     }
 
@@ -126,7 +133,11 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
       }
 
       setResults(data.messages)
-      setCredits(data.newBalance)
+      if (data.isUnlimited) {
+        setSubscriptionType('charo')
+      } else {
+        setCredits(data.newBalance)
+      }
     } catch (e: any) {
       setError(e.message || 'Erreur réseau')
     } finally {
@@ -164,12 +175,23 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
           </p>
         </div>
         <div
-          className="flex items-center gap-2 px-4 py-2 rounded-full flex-shrink-0"
-          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          className="flex items-center gap-2 px-4 py-2 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+          style={{ background: isUnlimited ? 'linear-gradient(135deg, #F77F00, #FFAA33)' : 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          onClick={() => !isUnlimited && setShowRechargeModal(true)}
+          title={isUnlimited ? 'Pack Charo — Illimité' : 'Cliquer pour recharger'}
         >
-          <Zap className="w-4 h-4 text-white" />
-          <span className="font-montserrat font-bold text-white text-sm">{credits}</span>
-          <span className="text-white/80 text-xs">crédits</span>
+          {isUnlimited ? (
+            <>
+              <Infinity className="w-4 h-4 text-white" />
+              <span className="font-montserrat font-bold text-white text-sm">Illimité</span>
+            </>
+          ) : (
+            <>
+              <Zap className="w-4 h-4 text-white" />
+              <span className="font-montserrat font-bold text-white text-sm">{credits}</span>
+              <span className="text-white/80 text-xs">crédits</span>
+            </>
+          )}
         </div>
       </div>
 
@@ -281,7 +303,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
           )}
           <button
             onClick={handleGenerate}
-            disabled={!screenshot || loading || credits < CREDITS_PER_GENERATION}
+            disabled={!screenshot || loading}
             className="w-full py-4 rounded-xl font-bold text-base text-white flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
@@ -293,7 +315,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
             ) : (
               <>
                 <MessageSquare className="w-4 h-4" />
-                Générer mes messages ({CREDITS_PER_GENERATION} crédits)
+                {isUnlimited ? 'Générer mes messages' : `Générer mes messages (${CREDITS_PER_GENERATION} crédits)`}
               </>
             )}
           </button>
@@ -382,25 +404,39 @@ export function MessageGenerator({ messageType: initialType, initialCredits, use
 
               <button
                 onClick={handleGenerate}
-                disabled={loading || credits < CREDITS_PER_GENERATION}
+                disabled={loading}
                 className="w-full py-3 rounded-xl border-2 border-border-primary hover:border-red-primary/50 text-text-secondary hover:text-white text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <RefreshCw className="w-4 h-4" />
-                Regénérer ({CREDITS_PER_GENERATION} crédits)
+                {isUnlimited ? 'Regénérer' : `Regénérer (${CREDITS_PER_GENERATION} crédits)`}
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Crédits faibles */}
-      {credits < CREDITS_PER_GENERATION && (
-        <div className="bg-red-primary/10 border border-red-primary/30 rounded-xl p-4">
-          <p className="text-red-light text-sm font-medium">
-            Tu n'as plus assez de crédits CrushTalk ({credits} restants · {CREDITS_PER_GENERATION} requis).
-            Les recharges arrivent bientôt !
+      {/* Bannière recharge quand crédits insuffisants */}
+      {!isUnlimited && credits < CREDITS_PER_GENERATION && (
+        <div className="flex items-center justify-between bg-[#F77F00]/10 border border-[#F77F00]/30 rounded-xl p-4">
+          <p className="text-[#F77F00] text-sm font-medium">
+            Tu n'as plus assez de crédits ({credits} restants · {CREDITS_PER_GENERATION} requis).
           </p>
+          <button
+            onClick={() => setShowRechargeModal(true)}
+            className="ml-4 px-4 py-2 rounded-lg text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+          >
+            Recharger
+          </button>
         </div>
+      )}
+
+      {/* Modal recharge */}
+      {showRechargeModal && (
+        <RechargeModal
+          onClose={() => setShowRechargeModal(false)}
+          currentBalance={credits}
+        />
       )}
     </div>
   )

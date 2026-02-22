@@ -12,17 +12,22 @@ export default async function DiscussionPage() {
 
   const [{ data: onboarding }, { data: credits }] = await Promise.all([
     supabase.from('crushtalk_onboarding').select('id').eq('user_id', user.id).single(),
-    supabaseAdmin.from('crushtalk_credits').select('balance').eq('user_id', user.id).single(),
+    supabaseAdmin.from('crushtalk_credits').select('balance, subscription_type, subscription_status').eq('user_id', user.id).single(),
   ])
 
   // Onboarding CrushTalk pas encore fait → page dédiée
   if (!onboarding) redirect('/crushtalk/onboarding')
+
+  const subscriptionType = credits?.subscription_type && credits?.subscription_status === 'active'
+    ? credits.subscription_type
+    : null
 
   return (
     <CrushTalkPage
       messageType="reponse"
       hasOnboarding={true}
       initialCredits={credits?.balance ?? 0}
+      initialSubscriptionType={subscriptionType}
       userId={user.id}
     />
   )
