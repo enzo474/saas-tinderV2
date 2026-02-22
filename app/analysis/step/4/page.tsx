@@ -9,21 +9,21 @@ import { getOrCreateAnalysis } from '@/lib/actions/onboarding'
 import { saveAnalysisStep5 } from '@/lib/actions/analysis'
 
 const lifestyleOptions = [
-  { label: 'Ambitieux / Business', img: '/lifestyle-business.jpeg' },
-  { label: 'Social / Sorties',     img: '/lifestyle-social.jpeg' },
-  { label: 'Posé / Minimal',       img: '/lifestyle-pose.jpeg' },
-  { label: 'Sportif / Actif',      img: '/lifestyle-sportif.jpeg' },
-  { label: 'Voyageur',             img: '/lifestyle-voyageur.jpeg' },
-  { label: 'Créatif / Artistique', img: '/lifestyle-creatif.jpeg' },
+  { label: 'Ambitieux / Business', img: '/lifestyle-business.webp' },
+  { label: 'Social / Sorties',     img: '/lifestyle-social.webp' },
+  { label: 'Posé / Minimal',       img: '/lifestyle-pose.webp' },
+  { label: 'Sportif / Actif',      img: '/lifestyle-sportif.webp' },
+  { label: 'Voyageur',             img: '/lifestyle-voyageur.webp' },
+  { label: 'Créatif / Artistique', img: '/lifestyle-creatif.webp' },
 ]
 
 const vibeOptions = [
-  { label: 'Mystérieux',       img: '/vibe-mysterieux.jpeg' },
-  { label: 'Ambitieux',        img: '/vibe-ambitieux.jpeg' },
-  { label: 'Drôle / Fun',      img: '/vibe-fun.jpeg' },
-  { label: 'Classe / Élégant', img: '/vibe-elegant.jpeg' },
-  { label: 'Calme & confiant', img: '/vibe-calme.jpeg' },
-  { label: 'Aventurier',       img: '/vibe-aventurier.jpeg' },
+  { label: 'Mystérieux',       img: '/vibe-mysterieux.webp' },
+  { label: 'Ambitieux',        img: '/vibe-ambitieux.webp' },
+  { label: 'Drôle / Fun',      img: '/vibe-fun.webp' },
+  { label: 'Classe / Élégant', img: '/vibe-elegant.webp' },
+  { label: 'Calme & confiant', img: '/vibe-calme.webp' },
+  { label: 'Aventurier',       img: '/vibe-aventurier.webp' },
 ]
 
 export const dynamic = 'force-dynamic'

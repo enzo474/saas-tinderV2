@@ -64,7 +64,7 @@ export function StyleChangeSection({ generatedImg, face, style }: Props) {
     fakeUpload(
       setBaseStep,
       setBaseProgress,
-      () => { setBaseStep('done'); setBaseImg('/style_1.jpeg') }
+      () => { setBaseStep('done'); setBaseImg('/style_1.webp') }
     )
   }
 
@@ -85,7 +85,7 @@ export function StyleChangeSection({ generatedImg, face, style }: Props) {
       setProgress(p => {
         if (p >= 100) {
           clearInterval(timerRef.current!)
-          setTimeout(() => { setResultImg('/resultat_style_1.jpg'); setLoading(false) }, 300)
+          setTimeout(() => { setResultImg('/resultat_style_1.webp'); setLoading(false) }, 300)
           return 100
         }
         return p + 3
@@ -232,7 +232,7 @@ export function StyleChangeSection({ generatedImg, face, style }: Props) {
               {uploadStep === 'done' && (
                 <div className="relative w-full h-full">
                   <ImgWithFallback
-                    src="/style_modif_1.jpeg"
+                    src="/style_modif_1.webp"
                     alt="Photo de référence"
                     className="w-full h-full object-cover"
                   />

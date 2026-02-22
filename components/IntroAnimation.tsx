@@ -132,7 +132,7 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               animation: showBefore ? 'introSlideUp 0.8s ease-out forwards' : undefined,
             }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/avant.jpeg?v=2" alt="Avant"
+              <img src="/avant.webp" alt="Avant"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <p style={{
@@ -180,7 +180,7 @@ export function IntroAnimation({ children }: IntroAnimationProps) {
               boxShadow: showAfter ? '0 0 40px rgba(230,57,70,0.35), 0 0 80px rgba(230,57,70,0.15)' : undefined,
             }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/apres.jpeg?v=2" alt="Après"
+              <img src="/apres.webp" alt="Après"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <p style={{

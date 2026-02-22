@@ -8,9 +8,9 @@ interface AppSelectorProps {
 }
 
 const APPS = [
-  { id: 'tinder' as const, logo: '/logotinder.png', alt: 'Tinder' },
-  { id: 'fruitz' as const, logo: '/logofruitz.png', alt: 'Fruitz' },
-  { id: 'hinge'  as const, logo: '/logohinge.png',  alt: 'Hinge'  },
+  { id: 'tinder' as const, logo: '/logotinder.webp', alt: 'Tinder' },
+  { id: 'fruitz' as const, logo: '/logofruitz.webp', alt: 'Fruitz' },
+  { id: 'hinge'  as const, logo: '/logohinge.webp',  alt: 'Hinge'  },
 ]
 
 export function AppSelector({ selectedApp, onSelectApp }: AppSelectorProps) {

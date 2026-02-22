@@ -28,12 +28,12 @@ function PlaceholderImg({ src, alt, className }: { src: string; alt: string; cla
 function TinderScreen() {
   const [idx, setIdx] = useState(0)
   const photos = [
-    '/resultats/night-style.jpeg',
-    '/resultats/urban-style.jpeg',
-    '/resultats/fitness-style.jpeg',
-    '/resultats/travel-style.jpeg',
-    '/resultats/food-style.jpeg',
-    '/resultats/hold-money.jpeg',
+    '/resultats/night-style.webp',
+    '/resultats/urban-style.webp',
+    '/resultats/fitness-style.webp',
+    '/resultats/travel-style.webp',
+    '/resultats/food-style.webp',
+    '/resultats/hold-money.webp',
   ]
 
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -82,12 +82,12 @@ function TinderScreen() {
 // ── Fruitz Screen ──────────────────────────────────────────────────────────
 function FruitzScreen() {
   const photos = [
-    '/resultats/summer-style.jpeg',
-    '/resultats/tennis-style.jpeg',
-    '/resultats/foot-style.jpeg',
-    '/resultats/basket-style.jpeg',
-    '/resultats/boy-lifestyle.jpeg',
-    '/resultats/man-lifestyle.jpeg',
+    '/resultats/summer-style.webp',
+    '/resultats/tennis-style.webp',
+    '/resultats/foot-style.webp',
+    '/resultats/basket-style.webp',
+    '/resultats/boy-lifestyle.webp',
+    '/resultats/man-lifestyle.webp',
   ]
   return (
     <div className="w-full h-full overflow-y-auto bg-white" style={{ scrollbarWidth: 'none' }}>
@@ -120,11 +120,11 @@ function FruitzScreen() {
 // ── Hinge Screen ──────────────────────────────────────────────────────────
 function HingeScreen() {
   const photos = [
-    '/resultats/night-style.jpeg',
-    '/resultats/urban-style.jpeg',
-    '/resultats/fitness-style.jpeg',
-    '/resultats/travel-style.jpeg',
-    '/resultats/food-style.jpeg',
+    '/resultats/night-style.webp',
+    '/resultats/urban-style.webp',
+    '/resultats/fitness-style.webp',
+    '/resultats/travel-style.webp',
+    '/resultats/food-style.webp',
   ]
   return (
     <div className="w-full h-full overflow-y-auto bg-white" style={{ scrollbarWidth: 'none' }}>

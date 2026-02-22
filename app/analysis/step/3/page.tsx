@@ -8,21 +8,21 @@ import { getOrCreateAnalysis } from '@/lib/actions/onboarding'
 import { saveAnalysisStep4 } from '@/lib/actions/analysis'
 
 const relationshipOptions = [
-  { label: 'Relation sérieuse', value: 'serious',   img: '/serieuse.jpeg' },
-  { label: 'Rien de sérieux',   value: 'casual',    img: '/casual.jpeg' },
-  { label: 'Ouvert à tout',     value: 'lt_open',   img: '/ouvert.jpeg' },
-  { label: 'Pas encore sûr',    value: 'undefined', img: '/incertain.jpeg' },
+  { label: 'Relation sérieuse', value: 'serious',   img: '/serieuse.webp' },
+  { label: 'Rien de sérieux',   value: 'casual',    img: '/casual.webp' },
+  { label: 'Ouvert à tout',     value: 'lt_open',   img: '/ouvert.webp' },
+  { label: 'Pas encore sûr',    value: 'undefined', img: '/incertain.webp' },
 ]
 
 const womenTypes = [
-  { label: 'Séduisante & confiante',   img: '/seduisante.jpeg' },
-  { label: 'Douce & féminine',         img: '/douce.jpeg' },
-  { label: 'Extravertie & solaire',    img: '/extravertie.jpeg' },
-  { label: 'Intelligente & cultivée',  img: '/intelligente.jpeg' },
-  { label: 'Sportive & disciplinée',   img: '/sportive.jpeg' },
-  { label: 'Créative & originale',     img: '/creative.jpeg' },
-  { label: 'Élégante & sophistiquée',  img: '/elegante.jpeg' },
-  { label: 'Aventurière',              img: '/aventuriere.jpeg' },
+  { label: 'Séduisante & confiante',   img: '/seduisante.webp' },
+  { label: 'Douce & féminine',         img: '/douce.webp' },
+  { label: 'Extravertie & solaire',    img: '/extravertie.webp' },
+  { label: 'Intelligente & cultivée',  img: '/intelligente.webp' },
+  { label: 'Sportive & disciplinée',   img: '/sportive.webp' },
+  { label: 'Créative & originale',     img: '/creative.webp' },
+  { label: 'Élégante & sophistiquée',  img: '/elegante.webp' },
+  { label: 'Aventurière',              img: '/aventuriere.webp' },
 ]
 
 export const dynamic = 'force-dynamic'
