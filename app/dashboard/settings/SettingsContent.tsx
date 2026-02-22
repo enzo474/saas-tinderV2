@@ -62,7 +62,7 @@ export function SettingsContent({
             {!isAdmin && (
               <button
                 onClick={() => setIsRechargeModalOpen(true)}
-                className="bg-[#6366f1] hover:bg-[#5558e3] text-white px-4 py-2 rounded-lg font-inter text-sm font-medium flex items-center gap-2 transition-colors"
+                className="bg-red-primary hover:bg-red-dark text-white px-4 py-2 rounded-lg font-inter text-sm font-medium flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Recharger
