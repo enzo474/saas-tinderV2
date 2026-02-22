@@ -6,11 +6,11 @@ type CrushTalkPlan = 'chill' | 'charo'
 
 const CRUSHTALK_PLANS = {
   chill: {
-    priceId: process.env.STRIPE_CRUSHTALK_CHILL_PRICE_ID,
+    priceId: process.env.STRIPE_CRUSHTALK_CHILL_PRICE_ID?.trim(),
     productType: 'crushtalk_chill',
   },
   charo: {
-    priceId: process.env.STRIPE_CRUSHTALK_CHARO_PRICE_ID,
+    priceId: process.env.STRIPE_CRUSHTALK_CHARO_PRICE_ID?.trim(),
     productType: 'crushtalk_charo',
   },
 } as const
