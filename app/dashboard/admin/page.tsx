@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AdminTools } from '@/components/admin/AdminTools'
 import { CreditManager } from '@/components/admin/CreditManager'
+import { CrushTalkCreditManager } from '@/components/admin/CrushTalkCreditManager'
 
 export default async function DashboardAdminPage() {
   const supabase = await createClient()
@@ -47,6 +48,8 @@ export default async function DashboardAdminPage() {
         />
 
         <CreditManager />
+
+        <CrushTalkCreditManager />
 
         <div className="bg-[#1f2128] border border-[#2a2d36] rounded-lg p-6">
           <h3 className="font-sora font-bold text-white text-lg mb-4">
