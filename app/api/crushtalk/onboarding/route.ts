@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 
-// 0 crédits à l'inscription — les users doivent acheter une recharge
-const INITIAL_CREDITS = 0
+// 5 crédits offerts à l'onboarding = 1 génération complète gratuite
+const INITIAL_CREDITS = 5
 
 export async function GET() {
   try {

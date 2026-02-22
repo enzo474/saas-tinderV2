@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { CheckCircle, Zap, Target, MessageSquare } from 'lucide-react'
 
 interface OnboardingData {
   gender: string
@@ -19,6 +20,48 @@ interface OnboardingFlowProps {
 const DATING_APPS = ['Tinder', 'Bumble', 'Hinge', 'Fruitz', 'Happn', 'Badoo', 'Meetic', 'OkCupid', 'Once', 'The League']
 
 const TOTAL_STEPS = 7
+
+function getPersonalizedInsights(data: OnboardingData) {
+  const insights: { icon: React.ReactNode; text: string }[] = []
+
+  if (data.matchesPerDay === "Même pas 1 par jour" || data.matchesPerDay === 'Entre 1 et 2 par jour') {
+    insights.push({
+      icon: <Target className="w-4 h-4 text-[#F77F00]" />,
+      text: "Tu matches peu — souvent c'est le premier message qui fait la différence, pas tes photos.",
+    })
+  } else {
+    insights.push({
+      icon: <Target className="w-4 h-4 text-[#F77F00]" />,
+      text: "Tu as des matchs. Le vrai enjeu : te démarquer parmi tous ceux qui les contactent aussi.",
+    })
+  }
+
+  if (data.matchQuality === "Aucun n'est mon type" || data.matchQuality === "Ça va, parfois sympa") {
+    insights.push({
+      icon: <MessageSquare className="w-4 h-4 text-[#F77F00]" />,
+      text: "Tes messages actuels n'accrochent pas les profils que tu vises vraiment.",
+    })
+  } else {
+    insights.push({
+      icon: <MessageSquare className="w-4 h-4 text-[#F77F00]" />,
+      text: "Tu as de bons matchs. Des messages personnalisés vont les convertir en vraies conversations.",
+    })
+  }
+
+  if (data.lookingFor === 'Une relation sérieuse') {
+    insights.push({
+      icon: <Zap className="w-4 h-4 text-[#F77F00]" />,
+      text: "Pour une relation sérieuse, on va calibrer tes messages pour montrer ta vraie valeur dès le premier contact.",
+    })
+  } else {
+    insights.push({
+      icon: <Zap className="w-4 h-4 text-[#F77F00]" />,
+      text: "On va générer des messages qui créent une vraie connexion et donnent envie de te répondre.",
+    })
+  }
+
+  return insights
+}
 
 function ProgressBar({ step }: { step: number }) {
   return (
@@ -61,6 +104,7 @@ function OptionButton({
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [analyzing, setAnalyzing] = useState(false)
   const [data, setData] = useState<OnboardingData>({
     gender: '',
     ageRange: '',
@@ -87,10 +131,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     }))
   }
 
-  const handleComplete = async () => {
-    setLoading(true)
-    try {
-      await fetch('/api/crushtalk/onboarding', {
+  // Quand on arrive à l'étape 8, on sauvegarde l'onboarding en fond (sans bloquer l'UI)
+  useEffect(() => {
+    if (step === 8 && data.satisfaction) {
+      setAnalyzing(true)
+      fetch('/api/crushtalk/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -102,13 +147,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
           matchQuality: data.matchQuality,
           satisfaction: data.satisfaction,
         }),
-      })
-      onComplete(data)
-    } catch (e) {
-      onComplete(data)
-    } finally {
-      setLoading(false)
+      }).finally(() => setAnalyzing(false))
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
+
+  const handleComplete = () => {
+    setLoading(true)
+    onComplete(data)
   }
 
   return (
@@ -239,29 +285,79 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-2">Étape 7 / {TOTAL_STEPS}</p>
             <h2 className="font-montserrat font-bold text-white text-xl md:text-2xl mb-2">Tu es satisfait de ton expérience ?</h2>
             <p className="text-text-secondary text-sm mb-6">Sur les apps de dating en général.</p>
-            <div className="space-y-3 mb-6">
+            <div className="space-y-3">
               {[
                 'Pas du tout satisfait',
                 "Bof, c'est compliqué",
                 'Plutôt oui',
                 'Oui, très satisfait',
               ].map(opt => (
-                <OptionButton key={opt} label={opt} selected={data.satisfaction === opt} onClick={() => setData(prev => ({ ...prev, satisfaction: opt }))} />
+                <OptionButton key={opt} label={opt} selected={data.satisfaction === opt} onClick={() => handleSelect('satisfaction', opt)} />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Étape 8 — Résumé personnalisé + CTA final */}
+        {step === 8 && (
+          <div>
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 rounded-full bg-[#F77F00]/15 border-2 border-[#F77F00]/40 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-7 h-7 text-[#F77F00]" />
+              </div>
+              <h2 className="font-montserrat font-bold text-white text-xl md:text-2xl mb-1">
+                On a tout ce qu'il faut.
+              </h2>
+              <p className="text-text-secondary text-sm">
+                Voici ce que CrushTalk va travailler pour toi.
+              </p>
+            </div>
+
+            {/* Insights personnalisés */}
+            <div className="space-y-3 mb-6">
+              {getPersonalizedInsights(data).map((insight, i) => (
+                <div key={i} className="flex items-start gap-3 bg-bg-primary/50 border border-border-primary rounded-xl p-4">
+                  <div className="w-7 h-7 rounded-lg bg-[#F77F00]/10 flex items-center justify-center shrink-0 mt-0.5">
+                    {insight.icon}
+                  </div>
+                  <p className="text-text-secondary text-sm leading-relaxed">{insight.text}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Cadeau : 5 crédits offerts */}
+            <div className="flex items-center gap-3 bg-[#F77F00]/10 border border-[#F77F00]/30 rounded-xl p-4 mb-6">
+              <div className="w-8 h-8 rounded-lg bg-[#F77F00]/20 flex items-center justify-center shrink-0">
+                <Zap className="w-4 h-4 text-[#F77F00]" />
+              </div>
+              <div>
+                <p className="text-white text-sm font-semibold">5 crédits offerts</p>
+                <p className="text-text-tertiary text-xs">Soit 1 génération complète gratuite pour commencer.</p>
+              </div>
+            </div>
+
+            {/* CTA */}
             <button
               onClick={handleComplete}
-              disabled={!data.satisfaction || loading}
-              className="w-full py-4 rounded-xl font-bold text-base text-white transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+              disabled={loading || analyzing}
+              className="w-full py-4 rounded-xl font-bold text-base text-white transition-all duration-200 disabled:opacity-70"
+              style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)', boxShadow: '0 4px 20px rgba(247,127,0,0.25)' }}
             >
-              {loading ? 'Préparation...' : 'Accéder à CrushTalk →'}
+              {loading || analyzing ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Préparation...
+                </span>
+              ) : (
+                'Accéder à CrushTalk →'
+              )}
             </button>
           </div>
         )}
 
         {/* Bouton retour */}
-        {step > 1 && step < 7 && (
+        {step > 1 && step < 8 && (
           <button
             onClick={() => setStep(s => s - 1)}
             className="mt-4 text-text-tertiary hover:text-text-secondary text-sm transition-colors"
