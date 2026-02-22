@@ -19,6 +19,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Crushmaxxing - Optimise ton profil Tinder",
   description: "Obtiens une analyse IA de ton profil et découvre exactement ce qui t'empêche d'avoir plus de matchs.",
+  other: {
+    'theme-color': '#0A0A0A',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  },
 };
 
 export default function RootLayout({
