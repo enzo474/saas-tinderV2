@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     // 2. Parser body
     const { sourcePhotos, styleId } = await req.json()
     
-    if (!sourcePhotos || !Array.isArray(sourcePhotos) || sourcePhotos.length < 4 || sourcePhotos.length > 6) {
-      return NextResponse.json({ error: '4-6 photos sources requises' }, { status: 400 })
+    if (!sourcePhotos || !Array.isArray(sourcePhotos) || sourcePhotos.length < 1 || sourcePhotos.length > 6) {
+      return NextResponse.json({ error: '1 à 6 photos sources requises' }, { status: 400 })
     }
 
     if (!styleId || typeof styleId !== 'string') {
