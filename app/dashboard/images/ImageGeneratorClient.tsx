@@ -178,6 +178,18 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
     setEditImageStep('upload-reference')
   }
 
+  const handleOwnPhotoStep1 = (file: File) => {
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const result = reader.result as string
+      setSourceImageUrl(result)
+      setSelectedGeneratedImage('')
+      setOwnPhotoMode(false)
+      setEditImageStep('edit-prompt')
+    }
+    reader.readAsDataURL(file)
+  }
+
   const handleReferenceFileChange = (file: File) => {
     setReferenceImageFile(file)
     const reader = new FileReader()
@@ -619,7 +631,35 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-border-primary">
+              {/* Séparateur OU + upload propre photo */}
+              <div className="mt-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px bg-border-primary" />
+                  <span className="text-text-tertiary text-xs font-medium px-2">OU</span>
+                  <div className="flex-1 h-px bg-border-primary" />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-3 border-2 border-dashed border-border-primary hover:border-red-primary/60 rounded-xl px-4 py-3 cursor-pointer transition-colors duration-200 group">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/jpg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) handleOwnPhotoStep1(file)
+                  }}
+                />
+                <div className="w-9 h-9 rounded-lg bg-red-primary/10 group-hover:bg-red-primary/20 flex items-center justify-center shrink-0 transition-colors">
+                  <Upload className="w-4 h-4 text-red-light" />
+                </div>
+                <div>
+                  <p className="text-white text-sm font-medium">Uploader ma propre photo</p>
+                  <p className="text-text-tertiary text-xs">JPG, PNG, WEBP — passer directement au prompt</p>
+                </div>
+              </label>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-4 border-t border-border-primary mt-4">
                 <Button
                   onClick={handleContinueFromGallery}
                   disabled={!selectedGeneratedImage}
@@ -737,7 +777,20 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
             <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-4 md:p-8">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="font-montserrat font-bold text-white text-lg md:text-xl">Décrivez vos modifications</h2>
-                <Button variant="secondary" size="sm" onClick={() => setEditImageStep('upload-reference')}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    // Si la source vient d'un upload step 1 (data URL, pas de generated image sélectionnée)
+                    // → retour à step 1 ; sinon → retour à step 2
+                    if (sourceImageUrl.startsWith('data:') && !selectedGeneratedImage) {
+                      setSourceImageUrl('')
+                      setEditImageStep('select-generated')
+                    } else {
+                      setEditImageStep('upload-reference')
+                    }
+                  }}
+                >
                   ← Retour
                 </Button>
               </div>
