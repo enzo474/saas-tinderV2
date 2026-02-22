@@ -185,7 +185,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
       setSourceImageUrl(result)
       setSelectedGeneratedImage('')
       setOwnPhotoMode(false)
-      setEditImageStep('edit-prompt')
+      setEditImageStep('upload-reference')
     }
     reader.readAsDataURL(file)
   }
@@ -777,20 +777,7 @@ export function ImageGeneratorClient({ userId, availableStyles, imageFolders, ge
             <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-4 md:p-8">
               <div className="flex items-center justify-between mb-1">
                 <h2 className="font-montserrat font-bold text-white text-lg md:text-xl">Décrivez vos modifications</h2>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    // Si la source vient d'un upload step 1 (data URL, pas de generated image sélectionnée)
-                    // → retour à step 1 ; sinon → retour à step 2
-                    if (sourceImageUrl.startsWith('data:') && !selectedGeneratedImage) {
-                      setSourceImageUrl('')
-                      setEditImageStep('select-generated')
-                    } else {
-                      setEditImageStep('upload-reference')
-                    }
-                  }}
-                >
+                <Button variant="secondary" size="sm" onClick={() => setEditImageStep('upload-reference')}>
                   ← Retour
                 </Button>
               </div>
