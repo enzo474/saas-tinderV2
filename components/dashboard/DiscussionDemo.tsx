@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { PresalePopup } from './PresalePopup'
+import { CountdownTimer } from './CountdownTimer'
 
 const DISPLAY_SLOTS = 50
 const REAL_SLOTS = 200
@@ -73,6 +74,24 @@ export function DiscussionDemo({ presaleCount }: DiscussionDemoProps) {
     <>
       <div className="max-w-6xl mx-auto space-y-8">
 
+        {/* Bannière countdown urgence */}
+        <div
+          className="rounded-xl px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap"
+          style={{ background: 'linear-gradient(135deg, rgba(247,127,0,0.15), rgba(247,127,0,0.05))', border: '1px solid rgba(247,127,0,0.4)' }}
+        >
+          <span className="text-gold-primary">🔥 Offre -50% expire dans</span>
+          <span className="font-montserrat font-bold text-lg text-white tabular-nums">
+            <CountdownTimer variant="inline" color="#F77F00" />
+          </span>
+          <button
+            onClick={() => setShowPopup(true)}
+            className="ml-2 px-3 py-1 rounded-lg text-xs font-bold text-black hover:scale-105 transition-transform"
+            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+          >
+            Réserver maintenant
+          </button>
+        </div>
+
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -98,6 +117,12 @@ export function DiscussionDemo({ presaleCount }: DiscussionDemoProps) {
             <p className="text-text-secondary text-sm">
               Sois parmi les {remaining} dernières places.
               <strong className="text-gold-primary"> -50% à vie</strong> tant que tu restes.
+            </p>
+            <p className="text-xs text-text-tertiary mt-1.5 flex items-center gap-1.5">
+              ⏱ Offre expire dans{' '}
+              <span className="font-bold tabular-nums">
+                <CountdownTimer variant="inline" color="#F77F00" />
+              </span>
             </p>
           </div>
           <button
