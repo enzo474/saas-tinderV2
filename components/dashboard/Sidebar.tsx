@@ -22,8 +22,8 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
   ]
 
   const crushTalkItems = [
-    { path: '/dashboard/hooks', label: 'Accroche', icon: MessageSquare },
-    { path: '/dashboard/discussion', label: 'Discussion', icon: MessageCircle },
+    { path: '/ct/accroche', label: 'Accroche', icon: MessageSquare },
+    { path: '/ct/discussion', label: 'Discussion', icon: MessageCircle },
   ]
 
   const navItemClass = (active: boolean, accent: 'red' | 'orange' = 'red') => `

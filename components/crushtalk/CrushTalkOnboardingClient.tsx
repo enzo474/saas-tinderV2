@@ -7,7 +7,7 @@ export function CrushTalkOnboardingClient() {
   const router = useRouter()
 
   const handleComplete = () => {
-    router.push('/dashboard/hooks')
+    router.push('/ct/accroche')
   }
 
   return <OnboardingFlow onComplete={handleComplete} />

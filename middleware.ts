@@ -73,6 +73,11 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // Routes CrushTalk app (/ct/) : juste auth, layout gère le reste
+  if (path.startsWith('/ct/') || path === '/ct') {
+    return response
+  }
+
   // Pour les routes onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
   if (
     path.startsWith('/onboarding') ||

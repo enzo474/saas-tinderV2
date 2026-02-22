@@ -53,7 +53,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [selectedTones, setSelectedTones] = useState<string[]>(['Direct', 'Drôle', 'Mystérieux', 'Compliment'])
+  const [selectedTones, setSelectedTones] = useState<string[]>(['Direct'])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)

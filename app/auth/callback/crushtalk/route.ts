@@ -21,7 +21,7 @@ export async function GET(request: Request) {
           .single()
 
         if (onboarding) {
-          return NextResponse.redirect(`${origin}/dashboard/hooks`)
+          return NextResponse.redirect(`${origin}/ct/accroche`)
         }
       }
 
