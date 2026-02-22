@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getPresaleCount } from '@/lib/presale'
 import { PresaleLandingCTA } from './PresaleLandingCTA'
+import { CountdownTimer } from '@/components/dashboard/CountdownTimer'
 
 const DISPLAY_SLOTS = 50
 const REAL_SLOTS = 200
@@ -73,7 +74,7 @@ export default async function TextGamePresalePage() {
           </div>
 
           <div className="flex items-center justify-center gap-8 mt-10 text-sm text-text-tertiary flex-wrap">
-            <span>✓ Sortie dans 2 semaines</span>
+            <span>✓ Sortie dans <CountdownTimer variant="days" /></span>
             <span>✓ -50% sur les packs</span>
             <span>✓ {remaining}/50 places</span>
           </div>
@@ -89,7 +90,7 @@ export default async function TextGamePresalePage() {
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-center pb-8">
                 <div className="bg-gold-primary text-black px-6 py-3 rounded-xl font-bold">
-                  Disponible dans 2 semaines
+                  Disponible dans <CountdownTimer variant="days" color="#000" />
                 </div>
               </div>
             </div>
@@ -300,7 +301,9 @@ export default async function TextGamePresalePage() {
                 </div>
                 <div>
                   <p className="text-white/70 text-sm mb-1">Sortie dans</p>
-                  <p className="font-montserrat font-bold text-3xl text-white">13 jours</p>
+                  <div className="font-montserrat font-bold text-3xl text-white">
+                    <CountdownTimer variant="inline" color="#ffffff" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -317,7 +320,7 @@ export default async function TextGamePresalePage() {
 
           <div className="space-y-4">
             {[
-              { q: "Quand est-ce que ça sort exactement ?", a: "La sortie est prévue dans 2 semaines. Les 50 premiers auront un accès anticipé avant tout le monde." },
+              { q: "Quand est-ce que ça sort exactement ?", a: "La sortie est prévue dans 4 jours, le 26 février. Les 50 premiers auront un accès anticipé avant tout le monde." },
               { q: "Comment l'IA analyse les profils et conversations ?", a: "L'IA analyse les photos, la bio, et le contexte de conversation pour générer des messages personnalisés en moins de 30 secondes." },
               { q: "Est-ce que c'est détectable par les apps de dating ?", a: "Non. Tu copies-colles les messages générés comme si tu les avais écrits. Aucune automatisation, aucune intégration avec les apps. 100% safe." },
               { q: "Est-ce que c'est un abonnement ou un achat unique ?", a: "C'est un abonnement mensuel à 19,90€/mois. Tant que tu restes abonné, tu as accès illimité aux deux features. Tu peux annuler à tout moment." },

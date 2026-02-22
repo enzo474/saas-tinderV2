@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { CountdownTimer } from './CountdownTimer'
 import { X } from 'lucide-react'
 import { createPresaleCheckoutSession } from '@/app/api/stripe/create-presale-checkout/actions'
 import { useRouter } from 'next/navigation'
@@ -77,7 +78,7 @@ export function PresalePopup({ isOpen, onClose, feature, presaleCount }: Presale
           Sois parmi les <strong style={{ color: '#F77F00' }}>50 premiers</strong> à réserver
           l'accès illimité pour{' '}
           <strong style={{ color: '#F77F00' }}>19,90€/mois</strong>.
-          Sortie dans <strong style={{ color: '#F77F00' }}>2 semaines</strong>.
+          Sortie dans <strong><CountdownTimer variant="days" /></strong>.
         </p>
 
         {/* Card pricing unique */}
@@ -144,7 +145,7 @@ export function PresalePopup({ isOpen, onClose, feature, presaleCount }: Presale
           <div className="w-px h-8 bg-border-primary" />
           <div>
             <p className="text-text-tertiary text-xs mb-0.5">Sortie dans</p>
-            <p className="font-montserrat font-bold text-lg" style={{ color: '#F77F00' }}>13 jours</p>
+            <p className="font-montserrat font-bold text-lg"><CountdownTimer variant="inline" /></p>
           </div>
         </div>
       </div>

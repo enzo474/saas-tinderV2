@@ -60,7 +60,7 @@ export function PresaleContent({ title, presaleCount }: PresaleContentProps) {
 
         <h1 className="font-sora font-bold text-white text-3xl mb-3">{title}</h1>
         <p className="font-inter text-[#9da3af] text-lg mb-6">
-          En cours de développement — sortie prévue dans 2 semaines
+          En cours de développement — sortie prévue dans 4 jours
         </p>
 
         <div className="bg-[#13151a] border border-[#2a2d36] rounded-lg p-6 mb-6 text-left">

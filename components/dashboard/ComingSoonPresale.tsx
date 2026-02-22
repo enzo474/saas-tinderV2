@@ -21,7 +21,7 @@ export function ComingSoonPresale({ title, icon: Icon }: ComingSoonPresaleProps)
           {title}
         </h1>
         <p className="font-inter text-[#9da3af] text-lg mb-6">
-          En cours de développement — sortie prévue dans 2 semaines
+          En cours de développement — sortie prévue dans 4 jours
         </p>
 
         <div className="bg-[#13151a] border border-[#2a2d36] rounded-lg p-6 mb-6 text-left">
