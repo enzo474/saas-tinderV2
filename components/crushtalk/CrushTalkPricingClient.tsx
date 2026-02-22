@@ -61,8 +61,9 @@ export function CrushTalkPricingClient() {
       if (result?.url) {
         window.location.href = result.url
       }
-    } catch {
-      setError('Une erreur est survenue. Réessaie.')
+    } catch (err: any) {
+      console.error('[pricing] catch:', err)
+      setError(err?.message || 'Erreur réseau. Réessaie.')
       setLoading(null)
     }
   }
