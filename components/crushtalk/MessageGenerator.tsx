@@ -200,18 +200,22 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         <div className="space-y-4">
 
           {/* Type de message */}
-          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
-            <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-3">Type de message</p>
+          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Type de message</p>
             <div className="grid grid-cols-2 gap-2">
               {(['accroche', 'reponse'] as const).map(type => (
                 <button
                   key={type}
                   onClick={() => { setActiveType(type); setResults(null); setError(null) }}
-                  className={`px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
-                    activeType === type
-                      ? 'border-red-primary bg-red-primary/10 text-white'
-                      : 'border-border-primary text-text-secondary hover:border-red-primary/40 hover:text-white'
-                  }`}
+                  className="px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                  style={activeType === type ? {
+                    borderColor: '#F77F00',
+                    background: 'rgba(247,127,0,0.1)',
+                    color: '#fff',
+                  } : {
+                    borderColor: '#1F1F1F',
+                    color: '#9da3af',
+                  }}
                 >
                   <div className="font-semibold">{type === 'accroche' ? 'Accroche' : 'Répondre'}</div>
                   <div className="text-xs mt-0.5 opacity-70">
@@ -223,18 +227,20 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           </div>
 
           {/* Upload screenshot */}
-          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
-            <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-3">
+          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>
               {activeType === 'accroche' ? 'Screenshot du profil' : 'Screenshot de la conversation'}
             </p>
 
             {!screenshotPreview ? (
               <label
-                className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 cursor-pointer transition-colors duration-200 ${
-                  isDragging
-                    ? 'border-red-primary bg-red-primary/10'
-                    : 'border-border-primary hover:border-red-primary/60 hover:bg-bg-primary/30'
-                }`}
+                className="flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 cursor-pointer transition-colors duration-200"
+                style={isDragging ? {
+                  borderColor: '#F77F00',
+                  background: 'rgba(247,127,0,0.08)',
+                } : {
+                  borderColor: '#2A2A2A',
+                }}
                 onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
@@ -246,13 +252,13 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                   className="hidden"
                   onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
                 />
-                <div className="w-12 h-12 rounded-xl bg-red-primary/10 flex items-center justify-center mb-3">
-                  <Upload className="w-6 h-6 text-red-light" />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-3" style={{ background: 'rgba(247,127,0,0.1)' }}>
+                  <Upload className="w-6 h-6" style={{ color: '#F77F00' }} />
                 </div>
                 <p className="text-white text-sm font-medium mb-1">
                   {activeType === 'accroche' ? 'Upload le profil à analyser' : 'Upload la conversation'}
                 </p>
-                <p className="text-text-tertiary text-xs text-center">
+                <p className="text-xs text-center" style={{ color: '#6b7280' }}>
                   Drag & drop ou cliquez · JPG, PNG, WEBP
                 </p>
               </label>
@@ -261,7 +267,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                 <img
                   src={screenshotPreview}
                   alt="Screenshot"
-                  className="w-full max-h-64 object-contain rounded-xl border-2 border-border-primary"
+                  className="w-full max-h-64 object-contain rounded-xl border"
+                  style={{ borderColor: '#2A2A2A' }}
                 />
                 <button
                   onClick={() => { setScreenshot(null); setScreenshotPreview(null); setResults(null) }}
@@ -275,18 +282,22 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
 
 
           {/* Sélecteur de tons */}
-          <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
-            <p className="text-text-tertiary text-xs font-semibold uppercase tracking-wider mb-3">Ton souhaité</p>
+          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
               {TONES.map(tone => (
                 <button
                   key={tone.label}
                   onClick={() => toggleTone(tone.label)}
-                  className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200 ${
-                    selectedTones.includes(tone.label)
-                      ? 'border-red-primary bg-red-primary/10 text-white'
-                      : 'border-border-primary text-text-secondary hover:border-red-primary/40 hover:text-white'
-                  }`}
+                  className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                  style={selectedTones.includes(tone.label) ? {
+                    borderColor: '#F77F00',
+                    background: 'rgba(247,127,0,0.1)',
+                    color: '#fff',
+                  } : {
+                    borderColor: '#1F1F1F',
+                    color: '#9da3af',
+                  }}
                 >
                   <span>{tone.emoji}</span>
                   <span>{tone.label}</span>
@@ -297,15 +308,15 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
 
           {/* Bouton générer */}
           {error && (
-            <div className="p-4 bg-red-primary/10 border border-red-primary/30 rounded-xl">
-              <p className="text-red-light text-sm">{error}</p>
+            <div className="p-4 rounded-xl border" style={{ background: 'rgba(247,127,0,0.08)', borderColor: 'rgba(247,127,0,0.25)' }}>
+              <p className="text-sm" style={{ color: '#FFAA33' }}>{error}</p>
             </div>
           )}
           <button
             onClick={handleGenerate}
             disabled={!screenshot || loading}
             className="w-full py-4 rounded-xl font-bold text-base text-white flex items-center justify-center gap-2 transition-all duration-200 hover:scale-[1.02] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
           >
             {loading ? (
               <>
@@ -322,32 +333,32 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
 
         {/* Colonne droite — Résultats */}
-        <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-5">
+        <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
           {!results && !loading && (
             <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
-              <div className="w-16 h-16 rounded-2xl bg-red-primary/10 flex items-center justify-center mb-4">
-                <MessageSquare className="w-8 h-8 text-red-light" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(247,127,0,0.1)' }}>
+                <MessageSquare className="w-8 h-8" style={{ color: '#F77F00' }} />
               </div>
               <h3 className="font-montserrat font-bold text-white text-lg mb-2">Tes messages apparaîtront ici</h3>
-              <p className="text-text-secondary text-sm max-w-xs">
-                Upload un screenshot et l'IA analyse le profil pour générer des messages ultra-personnalisés.
+              <p className="text-sm max-w-xs" style={{ color: '#6b7280' }}>
+                Upload un screenshot et l&apos;IA analyse le profil pour générer des messages ultra-personnalisés.
               </p>
             </div>
           )}
 
           {loading && (
             <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
-              <div className="w-16 h-16 rounded-2xl bg-red-primary/10 flex items-center justify-center mb-4 animate-pulse">
-                <MessageSquare className="w-8 h-8 text-red-light" />
+              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 animate-pulse" style={{ background: 'rgba(247,127,0,0.1)' }}>
+                <MessageSquare className="w-8 h-8" style={{ color: '#F77F00' }} />
               </div>
               <h3 className="font-montserrat font-bold text-white text-lg mb-2">Analyse en cours...</h3>
-              <p className="text-text-secondary text-sm">Claude analyse le profil et rédige tes messages</p>
+              <p className="text-sm" style={{ color: '#6b7280' }}>Claude analyse le profil et rédige tes messages</p>
               <div className="flex gap-1 mt-4">
                 {[0, 1, 2].map(i => (
                   <div
                     key={i}
-                    className="w-2 h-2 rounded-full bg-red-primary animate-bounce"
-                    style={{ animationDelay: `${i * 0.15}s` }}
+                    className="w-2 h-2 rounded-full animate-bounce"
+                    style={{ background: '#F77F00', animationDelay: `${i * 0.15}s` }}
                   />
                 ))}
               </div>
@@ -362,7 +373,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                 </h3>
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 text-text-tertiary hover:text-text-secondary text-xs transition-colors"
+                  className="flex items-center gap-1.5 text-xs transition-colors hover:text-white"
+                  style={{ color: '#6b7280' }}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   Nouvelle analyse
@@ -372,18 +384,20 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               {results.map((msg, idx) => (
                 <div
                   key={idx}
-                  className="bg-bg-primary/60 border border-border-primary rounded-xl p-4 group"
+                  className="rounded-xl p-4 border"
+                  style={{ background: 'rgba(255,255,255,0.03)', borderColor: '#2A2A2A' }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-base">{msg.emoji}</span>
-                      <span className="text-text-secondary text-xs font-semibold uppercase tracking-wider">
+                      <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#6b7280' }}>
                         {msg.tone}
                       </span>
                     </div>
                     <button
                       onClick={() => handleCopy(msg.content, idx)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-primary hover:border-red-primary/50 text-text-tertiary hover:text-white text-xs font-medium transition-all duration-200"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all duration-200 hover:text-white"
+                      style={{ borderColor: '#2A2A2A', color: '#6b7280' }}
                     >
                       {copiedIdx === idx ? (
                         <>
@@ -405,7 +419,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               <button
                 onClick={handleGenerate}
                 disabled={loading}
-                className="w-full py-3 rounded-xl border-2 border-border-primary hover:border-red-primary/50 text-text-secondary hover:text-white text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full py-3 rounded-xl border text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:text-white"
+                style={{ borderColor: '#2A2A2A', color: '#6b7280' }}
               >
                 <RefreshCw className="w-4 h-4" />
                 {isUnlimited ? 'Regénérer' : `Regénérer (${CREDITS_PER_GENERATION} crédits)`}

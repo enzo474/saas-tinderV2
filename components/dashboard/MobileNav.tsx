@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock, RefreshCw } from 'lucide-react'
-import { CrushPictureRechargeModal } from './CrushPictureRechargeModal'
+import { RechargeModal } from '@/components/credits/RechargeModal'
 
 interface MobileNavProps {
   userEmail: string
@@ -211,7 +211,13 @@ export function MobileNav({ userEmail, isAdmin = false, credits = 0, hasPlan = f
         </div>
       </div>
 
-      {showRecharge && <CrushPictureRechargeModal onClose={() => setShowRecharge(false)} />}
+      {showRecharge && (
+        <RechargeModal
+          isOpen={showRecharge}
+          onClose={() => setShowRecharge(false)}
+          currentCredits={credits}
+        />
+      )}
     </>
   )
 }

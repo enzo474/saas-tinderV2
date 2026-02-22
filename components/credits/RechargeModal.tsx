@@ -78,7 +78,7 @@ export function RechargeModal({ isOpen, onClose, currentCredits }: RechargeModal
             <ul className="space-y-2 text-sm text-text-secondary mb-6 flex-1">
               <li className="flex items-start gap-2">
                 <span className="text-success font-bold mt-0.5">✓</span>
-                5 sets de photos IA
+                5 générations de photos
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-success font-bold mt-0.5">✓</span>
@@ -112,7 +112,7 @@ export function RechargeModal({ isOpen, onClose, currentCredits }: RechargeModal
             <ul className="space-y-2 text-sm text-text-secondary mb-6 flex-1">
               <li className="flex items-start gap-2">
                 <span className="text-success font-bold mt-0.5">✓</span>
-                10 sets de photos IA
+                10 générations de photos
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-success font-bold mt-0.5">✓</span>
