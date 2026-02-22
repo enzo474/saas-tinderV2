@@ -1,7 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import Stripe from 'stripe'
-import { CRUSHTALK_PLANS, type CrushTalkPlan } from '@/app/api/stripe/crushtalk-checkout/actions'
+
+type CrushTalkPlan = 'chill' | 'charo'
+
+const CRUSHTALK_PLANS = {
+  chill: {
+    priceId: process.env.STRIPE_CRUSHTALK_CHILL_PRICE_ID,
+    productType: 'crushtalk_chill',
+  },
+  charo: {
+    priceId: process.env.STRIPE_CRUSHTALK_CHARO_PRICE_ID,
+    productType: 'crushtalk_charo',
+  },
+} as const
 
 export async function POST(req: NextRequest) {
   // #region agent log
