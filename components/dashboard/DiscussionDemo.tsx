@@ -111,30 +111,38 @@ export function DiscussionDemo({ presaleCount }: DiscussionDemoProps) {
 
         {/* Info banner */}
         <div className="bg-gold-primary/10 border border-gold-primary/30 rounded-xl p-4 md:p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 flex-1 min-w-0">
-              <span className="text-xl flex-shrink-0">⚡</span>
-              <div className="min-w-0">
-                <h3 className="font-semibold text-gold-light mb-1">Accès anticipé disponible</h3>
-                <p className="text-text-secondary text-sm">
-                  Sois parmi les {remaining} dernières places.
-                  <strong className="text-gold-primary"> -50% à vie</strong> tant que tu restes.
-                </p>
-                <p className="text-xs text-text-tertiary mt-1.5">
+          <div className="flex items-start gap-3">
+            <span className="text-xl flex-shrink-0">⚡</span>
+            <div className="flex-1">
+              <div className="flex items-start justify-between gap-3">
+                <h3 className="font-semibold text-gold-light">Accès anticipé disponible</h3>
+                <button
+                  onClick={() => setShowPopup(true)}
+                  className="hidden md:block flex-shrink-0 px-4 py-2 rounded-lg font-semibold text-sm text-black hover:scale-105 transition-transform"
+                  style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+                >
+                  Réserver (-50%)
+                </button>
+              </div>
+              <p className="text-text-secondary text-sm mt-1">
+                Sois parmi les {remaining} dernières places. <strong className="text-gold-primary">-50% à vie</strong> tant que tu restes.
+              </p>
+              <div className="flex items-center justify-between mt-2 gap-3">
+                <p className="text-xs text-text-tertiary">
                   ⏱ Expire dans{' '}
                   <span className="font-bold tabular-nums text-gold-primary">
                     <CountdownTimer variant="inline" color="#F77F00" />
                   </span>
                 </p>
+                <button
+                  onClick={() => setShowPopup(true)}
+                  className="md:hidden flex-shrink-0 px-3 py-1.5 rounded-lg font-semibold text-xs text-black hover:scale-105 transition-transform"
+                  style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+                >
+                  Réserver (-50%)
+                </button>
               </div>
             </div>
-            <button
-              onClick={() => setShowPopup(true)}
-              className="flex-shrink-0 px-3 py-2 rounded-lg font-semibold text-xs md:text-sm text-black hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
-            >
-              Réserver (-50%)
-            </button>
           </div>
         </div>
 
