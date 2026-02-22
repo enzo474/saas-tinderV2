@@ -57,7 +57,8 @@ export async function middleware(request: NextRequest) {
     path === '/crushtalk' ||
     path === '/crushtalk/login' ||
     path.startsWith('/api/nanobanana/') ||
-    path.startsWith('/api/stripe/')
+    path.startsWith('/api/stripe/') ||
+    path.startsWith('/api/crushtalk/checkout-session')
   ) {
     return response
   }

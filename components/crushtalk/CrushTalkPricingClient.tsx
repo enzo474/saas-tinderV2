@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { Check, Zap, Infinity, Star } from 'lucide-react'
-import { createCrushTalkCheckoutSession, type CrushTalkPlan } from '@/app/api/stripe/crushtalk-checkout/actions'
+
+type CrushTalkPlan = 'chill' | 'charo'
 
 const plans = [
   {
@@ -52,18 +53,22 @@ export function CrushTalkPricingClient() {
     setLoading(plan)
     setError(null)
     try {
-      const result = await createCrushTalkCheckoutSession(plan)
-      if (result?.error) {
-        setError(result.error)
+      const res = await fetch('/api/crushtalk/checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setError(data.error || 'Erreur lors de la création de la session.')
         setLoading(null)
         return
       }
-      if (result?.url) {
-        window.location.href = result.url
+      if (data.url) {
+        window.location.href = data.url
       }
     } catch (err: any) {
-      console.error('[pricing] catch:', err)
-      setError(err?.message || 'Erreur réseau. Réessaie.')
+      setError('Erreur réseau. Réessaie.')
       setLoading(null)
     }
   }
