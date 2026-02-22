@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, MessageCircle, Lightbulb } from 'lucide-react'
+import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb } from 'lucide-react'
 
 interface SidebarProps {
   userEmail: string
@@ -21,17 +21,10 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
     { path: '/dashboard/bio', label: 'Générateur Bio', icon: FileText },
   ]
 
-  const crushTalkItems = [
-    { path: '/ct/accroche', label: 'Accroche', icon: MessageSquare },
-    { path: '/ct/discussion', label: 'Discussion', icon: MessageCircle },
-  ]
-
-  const navItemClass = (active: boolean, accent: 'red' | 'orange' = 'red') => `
+  const navItemClass = (active: boolean) => `
     flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200
     ${active
-      ? accent === 'orange'
-        ? 'bg-[#F77F00]/10 text-white font-semibold border-l-2 border-[#F77F00] pl-2.5'
-        : 'bg-bg-tertiary text-white font-semibold border-l-2 border-red-primary pl-2.5'
+      ? 'bg-bg-tertiary text-white font-semibold border-l-2 border-red-primary pl-2.5'
       : 'text-text-secondary hover:bg-bg-tertiary hover:text-white'
     }
   `
@@ -46,51 +39,24 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
         >
           Crushmaxxing
         </h1>
-        <p className="text-text-tertiary text-xs mt-1">Dashboard</p>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border mt-1" style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)' }}>
+          <ImageIcon className="w-3 h-3" style={{ color: '#E63946' }} />
+          <span className="text-xs font-bold" style={{ color: '#E63946' }}>Photos Pro</span>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 flex flex-col gap-4 overflow-y-auto">
-
-        {/* ── Section Photos Pro ── */}
-        <div>
-          <div className="flex items-center gap-2 px-3 mb-2">
-            <div className="w-5 h-5 rounded-md bg-red-primary/15 flex items-center justify-center">
-              <ImageIcon className="w-3 h-3 text-red-light" />
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-red-light/80">Photos Pro</span>
-          </div>
-          <div className="space-y-0.5">
-            {photoProItems.map(({ path, label, icon: Icon }) => (
-              <Link key={path} href={path} className={navItemClass(isActive(path), 'red')}>
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Section CrushTalk ── */}
-        <div>
-          <div className="flex items-center gap-2 px-3 mb-2">
-            <div className="w-5 h-5 rounded-md bg-[#F77F00]/15 flex items-center justify-center">
-              <MessageSquare className="w-3 h-3 text-[#F77F00]" />
-            </div>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-[#F77F00]/80">CrushTalk</span>
-          </div>
-          <div className="space-y-0.5">
-            {crushTalkItems.map(({ path, label, icon: Icon }) => (
-              <Link key={path} href={path} className={navItemClass(isActive(path), 'orange')}>
-                <Icon className="w-4 h-4 flex-shrink-0" />
-                <span>{label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
+      <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
+        {photoProItems.map(({ path, label, icon: Icon }) => (
+          <Link key={path} href={path} className={navItemClass(isActive(path))}>
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            <span>{label}</span>
+          </Link>
+        ))}
 
         {/* Admin Panel */}
         {isAdmin && (
-          <div className="border-t border-border-primary pt-3">
+          <div className="border-t border-border-primary pt-3 mt-3">
             <Link
               href="/dashboard/admin"
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${
@@ -106,8 +72,24 @@ export function Sidebar({ userEmail, isAdmin = false }: SidebarProps) {
           </div>
         )}
 
-        {/* Feedback — en bas */}
-        <div className="mt-auto border-t border-border-primary pt-3">
+        {/* Spacer */}
+        <div className="mt-auto" />
+
+        {/* Switch vers CrushTalk */}
+        <div className="border-t border-border-primary pt-3 mt-2">
+          <Link
+            href="/ct/accroche"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+            style={{ color: '#6b7280' }}
+          >
+            <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
+            <span>CrushTalk</span>
+            <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>→</span>
+          </Link>
+        </div>
+
+        {/* Feedback */}
+        <div className="border-t border-border-primary pt-3 mt-1">
           <Link
             href="/dashboard/feedback"
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 ${

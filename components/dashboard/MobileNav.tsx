@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, MessageCircle, Lightbulb } from 'lucide-react'
+import { Menu, X, User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb } from 'lucide-react'
 
 interface MobileNavProps {
   userEmail: string
@@ -23,17 +23,10 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
     { path: '/dashboard/bio', label: 'Générateur Bio', icon: FileText },
   ]
 
-  const crushTalkItems = [
-    { path: '/ct/accroche', label: 'Accroche', icon: MessageSquare },
-    { path: '/ct/discussion', label: 'Discussion', icon: MessageCircle },
-  ]
-
-  const navItemClass = (active: boolean, accent: 'red' | 'orange' = 'red') => `
+  const navItemClass = (active: boolean) => `
     flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200
     ${active
-      ? accent === 'orange'
-        ? 'bg-[#F77F00]/10 text-white font-semibold border-l-2 border-[#F77F00] pl-2.5'
-        : 'bg-bg-tertiary text-white font-semibold border-l-2 border-red-primary pl-2.5'
+      ? 'bg-bg-tertiary text-white font-semibold border-l-2 border-red-primary pl-2.5'
       : 'text-text-secondary hover:bg-bg-tertiary hover:text-white'
     }
   `
@@ -42,12 +35,17 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
     <>
       {/* Top bar — mobile only */}
       <header className="md:hidden fixed top-0 left-0 right-0 z-40 h-14 bg-bg-secondary border-b border-border-primary flex items-center justify-between px-4">
-        <span
-          className="font-montserrat font-extrabold text-xl"
-          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
-        >
-          Crushmaxxing
-        </span>
+        <div className="flex items-center gap-2">
+          <span
+            className="font-montserrat font-extrabold text-xl"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+          >
+            Crushmaxxing
+          </span>
+          <div className="px-2 py-0.5 rounded-full border text-xs font-bold" style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)', color: '#E63946' }}>
+            Photos Pro
+          </div>
+        </div>
         <button
           onClick={() => setIsOpen(true)}
           className="w-9 h-9 flex items-center justify-center rounded-lg text-text-secondary hover:text-white hover:bg-bg-tertiary transition-colors"
@@ -74,7 +72,10 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
             >
               Crushmaxxing
             </h1>
-            <p className="text-text-tertiary text-xs mt-0.5">Dashboard</p>
+            <div className="mt-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border text-xs font-bold" style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)', color: '#E63946' }}>
+              <ImageIcon className="w-3 h-3" />
+              Photos Pro
+            </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
@@ -86,47 +87,17 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 flex flex-col gap-4 overflow-y-auto">
-
-          {/* ── Section Photos Pro ── */}
-          <div>
-            <div className="flex items-center gap-2 px-3 mb-2">
-              <div className="w-5 h-5 rounded-md bg-red-primary/15 flex items-center justify-center">
-                <ImageIcon className="w-3 h-3 text-red-light" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-red-light/80">Photos Pro</span>
-            </div>
-            <div className="space-y-0.5">
-              {photoProItems.map(({ path, label, icon: Icon }) => (
-                <Link key={path} href={path} onClick={() => setIsOpen(false)} className={navItemClass(isActive(path), 'red')}>
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span>{label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* ── Section CrushTalk ── */}
-          <div>
-            <div className="flex items-center gap-2 px-3 mb-2">
-              <div className="w-5 h-5 rounded-md bg-[#F77F00]/15 flex items-center justify-center">
-                <MessageSquare className="w-3 h-3 text-[#F77F00]" />
-              </div>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-[#F77F00]/80">CrushTalk</span>
-            </div>
-            <div className="space-y-0.5">
-              {crushTalkItems.map(({ path, label, icon: Icon }) => (
-                <Link key={path} href={path} onClick={() => setIsOpen(false)} className={navItemClass(isActive(path), 'orange')}>
-                  <Icon className="w-4 h-4 flex-shrink-0" />
-                  <span>{label}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <nav className="flex-1 p-3 flex flex-col gap-1 overflow-y-auto">
+          {photoProItems.map(({ path, label, icon: Icon }) => (
+            <Link key={path} href={path} onClick={() => setIsOpen(false)} className={navItemClass(isActive(path))}>
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span>{label}</span>
+            </Link>
+          ))}
 
           {/* Admin */}
           {isAdmin && (
-            <div className="border-t border-border-primary pt-3">
+            <div className="border-t border-border-primary pt-3 mt-3">
               <Link
                 href="/dashboard/admin"
                 onClick={() => setIsOpen(false)}
@@ -143,8 +114,24 @@ export function MobileNav({ userEmail, isAdmin = false }: MobileNavProps) {
             </div>
           )}
 
+          <div className="mt-auto" />
+
+          {/* Switch vers CrushTalk */}
+          <div className="border-t border-border-primary pt-3 mt-2">
+            <Link
+              href="/ct/accroche"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+              style={{ color: '#6b7280' }}
+            >
+              <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
+              <span>CrushTalk</span>
+              <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded font-bold" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>→</span>
+            </Link>
+          </div>
+
           {/* Feedback */}
-          <div className="mt-auto border-t border-border-primary pt-3">
+          <div className="border-t border-border-primary pt-3 mt-1">
             <Link
               href="/dashboard/feedback"
               onClick={() => setIsOpen(false)}
