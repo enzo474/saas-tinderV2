@@ -29,7 +29,8 @@ export function ImageGallery({ initialImages, userId }: ImageGalleryProps) {
 
   const handleDownload = async (imageUrl: string, fileName: string) => {
     try {
-      const response = await fetch(imageUrl)
+      const proxyUrl = `/api/download-image?url=${encodeURIComponent(imageUrl)}`
+      const response = await fetch(proxyUrl)
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
