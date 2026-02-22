@@ -79,7 +79,7 @@ export function AccrocheDemo({ presaleCount }: AccrocheDemoProps) {
 
         {/* Bannière countdown urgence */}
         <div
-          className="rounded-xl px-4 py-2.5 flex items-center justify-center gap-3 text-sm font-semibold flex-wrap"
+          className="rounded-xl px-4 py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-sm font-semibold text-center"
           style={{ background: 'linear-gradient(135deg, rgba(247,127,0,0.15), rgba(247,127,0,0.05))', border: '1px solid rgba(247,127,0,0.4)' }}
         >
           <span className="text-gold-primary">🔥 Offre -50% expire dans</span>
@@ -88,7 +88,7 @@ export function AccrocheDemo({ presaleCount }: AccrocheDemoProps) {
           </span>
           <button
             onClick={() => setShowPopup(true)}
-            className="ml-2 px-3 py-1 rounded-lg text-xs font-bold text-black hover:scale-105 transition-transform"
+            className="px-4 py-1.5 rounded-lg text-xs font-bold text-black hover:scale-105 transition-transform"
             style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
           >
             Réserver maintenant
@@ -113,28 +113,32 @@ export function AccrocheDemo({ presaleCount }: AccrocheDemoProps) {
         </div>
 
         {/* Info banner */}
-        <div className="bg-gold-primary/10 border border-gold-primary/30 rounded-xl p-5 flex items-start gap-4">
-          <span className="text-2xl">⚡</span>
-          <div className="flex-1">
-            <h3 className="font-semibold text-gold-light mb-1">Accès anticipé disponible</h3>
-            <p className="text-text-secondary text-sm">
-              Sois parmi les {remaining} dernières places.
-              <strong className="text-gold-primary"> -50% à vie</strong> tant que tu restes.
-            </p>
-            <p className="text-xs text-text-tertiary mt-1.5 flex items-center gap-1.5">
-              ⏱ Offre expire dans{' '}
-              <span className="font-bold tabular-nums">
-                <CountdownTimer variant="inline" color="#F77F00" />
-              </span>
-            </p>
+        <div className="bg-gold-primary/10 border border-gold-primary/30 rounded-xl p-4 md:p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <span className="text-xl flex-shrink-0">⚡</span>
+              <div className="min-w-0">
+                <h3 className="font-semibold text-gold-light mb-1">Accès anticipé disponible</h3>
+                <p className="text-text-secondary text-sm">
+                  Sois parmi les {remaining} dernières places.
+                  <strong className="text-gold-primary"> -50% à vie</strong> tant que tu restes.
+                </p>
+                <p className="text-xs text-text-tertiary mt-1.5">
+                  ⏱ Expire dans{' '}
+                  <span className="font-bold tabular-nums text-gold-primary">
+                    <CountdownTimer variant="inline" color="#F77F00" />
+                  </span>
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowPopup(true)}
+              className="flex-shrink-0 px-3 py-2 rounded-lg font-semibold text-xs md:text-sm text-black hover:scale-105 transition-transform"
+              style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
+            >
+              Réserver (-50%)
+            </button>
           </div>
-          <button
-            onClick={() => setShowPopup(true)}
-            className="flex-shrink-0 px-4 py-2 rounded-lg font-semibold text-sm text-black hover:scale-105 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
-          >
-            Réserver (-50%)
-          </button>
         </div>
 
         {/* Demo grid */}
