@@ -16,7 +16,7 @@ export default function CrushTalkLogin() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/crushtalk/onboarding`,
+        redirectTo: `${window.location.origin}/auth/callback/crushtalk`,
       },
     })
     if (error) {
