@@ -19,18 +19,19 @@ export default async function DashboardLayout({
     redirect('/auth')
   }
 
-  // Récupérer les crédits et le rôle de l'utilisateur
-  const isAdmin = await isUserAdmin(user.id)
-
-  // Les admins bypass la vérification de paiement
-  if (!isAdmin) {
-    // Vérifier que l'utilisateur a payé
-    const { data: analysis } = await supabase
+  // Lancer les deux queries en parallèle
+  const [isAdmin, { data: analysis }] = await Promise.all([
+    isUserAdmin(user.id),
+    supabase
       .from('analyses')
       .select('paid_at, stripe_session_id, id')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
-      .single()
+      .single(),
+  ])
+
+  // Les admins bypass la vérification de paiement
+  if (!isAdmin) {
 
     if (!analysis?.paid_at) {
       // Webhook peut ne pas encore être arrivé — vérifier directement avec Stripe

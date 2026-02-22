@@ -66,51 +66,43 @@ export async function middleware(request: NextRequest) {
     return copyCookiesToResponse(response, redirectResponse)
   }
 
-  // Admin routes - skip all checks for admin users
-  if (path.startsWith('/admin')) {
-    // Vérifier si l'utilisateur est admin
-    const { data: userProfile } = await supabase
+  // Routes dashboard : le layout gère lui-même auth + paiement — on évite les DB calls inutiles
+  if (path.startsWith('/dashboard')) {
+    return response
+  }
+
+  // Pour les routes onboarding/ob2/analysis : juste auth, pas de check DB
+  if (
+    path.startsWith('/onboarding') ||
+    path.startsWith('/ob2') ||
+    path.startsWith('/analysis') ||
+    path.startsWith('/start')
+  ) {
+    return response
+  }
+
+  // Routes nécessitant un check DB : /results, /pricing, /success + redirect /start
+  // On lance les deux queries en parallèle (une seule fois)
+  const [{ data: analysis }, { data: userProfile }] = await Promise.all([
+    supabase
+      .from('analyses')
+      .select('status, paid_at, ab_variant')
+      .eq('user_id', user.id)
+      .single(),
+    supabase
       .from('user_profiles')
       .select('role')
       .eq('id', user.id)
-      .single()
+      .single(),
+  ])
 
-    if (userProfile?.role === 'admin') {
-      return response // Admin bypass all checks
-    }
-  }
-
-  // Check analysis status for specific routes
-  const { data: analysis } = await supabase
-    .from('analyses')
-    .select('status, paid_at, ab_variant')
-    .eq('user_id', user.id)
-    .single()
-
-  // Check if user is admin (exempts from all redirects)
-  const { data: userProfile } = await supabase
-    .from('user_profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single()
-  
-  const isAdmin = userProfile?.role === 'admin'
-
-  // Admins bypass all analysis checks
-  if (isAdmin) {
+  // Admins bypass tout
+  if (userProfile?.role === 'admin') {
     return response
   }
 
   // Redirect authenticated users without analysis to /start
-  // Exclure /onboarding et /ob2 pour éviter la boucle : /start → /onboarding → /start → ...
-  if (
-    !analysis &&
-    !path.startsWith('/start') &&
-    !path.startsWith('/onboarding') &&
-    !path.startsWith('/ob2') &&
-    !path.startsWith('/analysis') &&
-    path !== '/auth/callback'
-  ) {
+  if (!analysis) {
     return copyCookiesToResponse(
       response,
       NextResponse.redirect(new URL('/start', request.url))
@@ -141,11 +133,6 @@ export async function middleware(request: NextRequest) {
       response,
       NextResponse.redirect(new URL('/pricing', request.url))
     )
-  }
-
-  // Routes ob2 - require auth (already verified above)
-  if (path.startsWith('/ob2')) {
-    return response
   }
 
   return response

@@ -12,47 +12,36 @@ export default async function DashboardProfilePage() {
     redirect('/auth')
   }
 
-  const [credits, isAdmin] = await Promise.all([getUserCredits(user.id), isUserAdmin(user.id)])
-
-  // Récupérer toutes les images générées
-  const { data: generatedImages } = await supabase
-    .from('generated_images')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  // Récupérer l'analyse pour generated_photos_urls
-  const { data: analysis } = await supabase
-    .from('analyses')
-    .select('generated_photos_urls')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .single()
+  // Toutes les queries en parallèle — analyses récupérée une seule fois avec tous les champs
+  const [credits, isAdmin, { data: generatedImages }, { data: analysisData }, { data: generatedBios }] = await Promise.all([
+    getUserCredits(user.id),
+    isUserAdmin(user.id),
+    supabase
+      .from('generated_images')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('analyses')
+      .select('generated_photos_urls, full_plan')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from('generated_bios')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(20),
+  ])
 
   // Combiner toutes les images disponibles
   const allImageUrls = [
-    ...(analysis?.generated_photos_urls || []),
+    ...(analysisData?.generated_photos_urls || []),
     ...(generatedImages?.map(img => img.image_url) || [])
   ].filter(url => url && !url.includes('placeholder.com'))
 
-  // Récupérer les bios générées manuellement
-  const { data: generatedBios } = await supabase
-    .from('generated_bios')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(20)
-
-  // Récupérer les bios optimisées depuis le plan d'analyse
-  const { data: analysisForBios } = await supabase
-    .from('analyses')
-    .select('full_plan')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
-
-  const fullPlan = analysisForBios?.full_plan as { optimized_bios?: Array<{ type: string; text: string }> } | null
   const optimizedBios = (fullPlan?.optimized_bios || []).map((bio, i) => ({
     id: `plan-bio-${i}`,
     bio_text: bio.text,

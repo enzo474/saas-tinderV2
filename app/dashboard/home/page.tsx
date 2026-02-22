@@ -12,22 +12,37 @@ export default async function DashboardHomePage() {
     redirect('/auth')
   }
 
-  // Récupérer l'analyse (avec full_plan pour les 4 bios)
-  let { data: analysesData } = await supabase
-    .from('analyses')
-    .select('id, full_plan, paid_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
+  // Lancer toutes les queries indépendantes en parallèle
+  const [analysesResult, imagesResult, biosResult, isAdmin, initialCredits] = await Promise.all([
+    supabase
+      .from('analyses')
+      .select('id, full_plan, paid_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1),
+    supabase
+      .from('generated_images')
+      .select('*, photo_styles(style_name)')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('generated_bios')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false }),
+    isUserAdmin(user.id),
+    getUserCredits(user.id),
+  ])
 
-  let analysis = analysesData?.[0]
+  let analysis = analysesResult.data?.[0]
+  const rawImages = imagesResult.data
+  const generatedBios = biosResult.data
 
   // Si aucune analyse : en créer une (admin peut arriver sans avoir fait l'onboarding)
   if (!analysis) {
     const created = await getOrCreateAnalysis()
     if (created) {
       analysis = { id: created.id, full_plan: created.full_plan, paid_at: created.paid_at }
-      const isAdmin = await isUserAdmin(user.id)
       if (isAdmin && !created.paid_at) {
         await supabase
           .from('analyses')
@@ -38,20 +53,6 @@ export default async function DashboardHomePage() {
       }
     }
   }
-
-  // Récupérer les images avec jointure photo_styles pour style_name
-  const { data: rawImages } = await supabase
-    .from('generated_images')
-    .select('*, photo_styles(style_name)')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  // Récupérer les bios générées
-  const { data: generatedBios } = await supabase
-    .from('generated_bios')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
 
   const fullPlan = analysis?.full_plan as { optimized_bios?: Array<{ type: string; text: string }> } | null
 
@@ -111,8 +112,6 @@ export default async function DashboardHomePage() {
   }
 
   const analysisId = analysis?.id ?? ''
-  const isAdmin = await isUserAdmin(user.id)
-  const initialCredits = await getUserCredits(user.id)
 
   return (
     <DashboardHomeClient

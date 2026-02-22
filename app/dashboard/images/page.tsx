@@ -13,23 +13,22 @@ export default async function DashboardImagesPage() {
     redirect('/auth')
   }
 
-  const [credits, isAdmin] = await Promise.all([getUserCredits(user.id), isUserAdmin(user.id)])
-
-  // Récupérer les styles actifs depuis la DB
-  const { data: styles } = await supabase
-    .from('photo_styles')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order', { ascending: true })
-
-  // Récupérer les images générées pour la galerie du mode "Reprendre"
-  const { data: generatedImages } = await supabase
-    .from('generated_images')
-    .select('id, image_url, photo_number, created_at')
-    .eq('user_id', user.id)
-    .not('image_url', 'like', '%placeholder.com%')
-    .order('created_at', { ascending: false })
-    .limit(20)
+  const [credits, isAdmin, { data: styles }, { data: generatedImages }] = await Promise.all([
+    getUserCredits(user.id),
+    isUserAdmin(user.id),
+    supabase
+      .from('photo_styles')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order', { ascending: true }),
+    supabase
+      .from('generated_images')
+      .select('id, image_url, photo_number, created_at')
+      .eq('user_id', user.id)
+      .not('image_url', 'like', '%placeholder.com%')
+      .order('created_at', { ascending: false })
+      .limit(20),
+  ])
 
   return (
     <div className="space-y-8">
