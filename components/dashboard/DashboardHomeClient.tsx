@@ -195,40 +195,6 @@ export function DashboardHomeClient({
         <BioFolderList folders={allBioFolders} />
       </section>
 
-      {/* Section Text Game (coming soon) */}
-      <section>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="font-montserrat font-bold text-white text-xl">
-            Text Game
-          </h2>
-          <span className="bg-gold-primary text-black text-xs font-bold px-3 py-1.5 rounded-full">
-            Bientôt
-          </span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {[
-            { emoji: '🪝', title: 'Messages Accroche', desc: 'Génère des accroches percutantes personnalisées' },
-            { emoji: '💬', title: 'Analyse de conversation', desc: 'Optimise tes échanges pour décrocher le rendez-vous' },
-          ].map((item, i) => (
-            <div
-              key={i}
-              className="relative bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-gold-primary/20 rounded-2xl overflow-hidden opacity-75"
-            >
-              <span className="absolute top-3 right-3 z-10 bg-gold-primary text-black px-3 py-1.5 rounded-full text-xs font-bold">
-                BIENTÔT
-              </span>
-              <div className="h-40 flex items-center justify-center bg-gradient-to-br from-gold-primary/5 to-gold-light/5">
-                <span className="text-4xl md:text-6xl">{item.emoji}</span>
-              </div>
-              <div className="p-5">
-                <h4 className="font-montserrat font-bold text-gold-light text-lg mb-1">{item.title}</h4>
-                <p className="text-text-secondary text-sm">{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* CTA Banner */}
       <section className="relative bg-gradient-to-br from-red-primary/10 to-red-dark/5 border-2 border-red-primary/30 rounded-2xl p-8 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none animate-pulse-glow"
