@@ -199,10 +199,21 @@ Exemple D — Elle dit "c'est pas comme ça qu'on approche une fille" :
 ❌ Mauvais : "Tu as raison, pardon... Bonjour, comment tu vas ?"
 ✅ Bon : "Peut-être. Mais c'est comme ça qu'on approche une femme."
 
-RAPPEL CRITIQUE SUR LA CONVERSATION :
-- Messages à DROITE = envoyés par L'UTILISATEUR (lui)
-- Messages à GAUCHE = envoyés par LA FEMME (elle)
-Tu dois répondre AU NOM DE L'UTILISATEUR en réaction au dernier message de LA FEMME (gauche).
+ANALYSE DE LA CONVERSATION — ÉTAPE OBLIGATOIRE AVANT DE RÉPONDRE :
+Avant de générer quoi que ce soit, tu dois analyser mentalement :
+1. Ce que L'UTILISATEUR (droite) a déjà dit — son angle d'attaque, son style, sa posture actuelle
+2. Ce que LA FEMME (gauche) a répondu à chaque fois — sa résistance, son intérêt, son niveau d'engagement
+3. La dynamique globale de l'échange — est-ce qu'il avance, stagne, recule ?
+4. Le dernier message de LA FEMME (gauche) — c'est CE message précis auquel tu dois répondre
+5. La prochaine étape logique selon l'escalade : connexion → appel/facetime → numéro → date
+
+RÈGLE ABSOLUE : tu génères un message que L'UTILISATEUR va envoyer à LA FEMME.
+Ce message doit s'inscrire dans la continuité naturelle de CE QU'IL A DÉJÀ DIT, en réponse à CE QU'ELLE VIENT DE DIRE.
+Ce n'est pas une réponse générique — c'est LA réponse parfaite pour CETTE conversation précise, à CE moment précis.
+
+INSPIRATION MAXIMALE : Colle au maximum au style des exemples fournis dans les 10 principes.
+Ces exemples ne sont pas des modèles à copier mot pour mot, mais le registre exact à reproduire :
+court, sûr, sans justification, qui avance toujours vers le réel.
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
@@ -210,12 +221,12 @@ Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
 ${tonesRequest.map(tone => `  { "tone": "${tone}", "emoji": "${TONES_CONFIG[tone]?.emoji || '💬'}", "content": "..." }`).join(',\n')}
 ]
 
-Pour chaque ton, applique les principes ci-dessus en adaptant le style :
-- Direct : affirmation nette, peu de mots, très sûr de lui
-- Drôle : humour absurde ou décalé, retournement de situation inattendu
-- Mystérieux : crée de l'intrigue, laisse inachevé, fait qu'elle demande la suite
-- Compliment : valorise un détail spécifique visible dans le screenshot, avec une pointe
-- CrushTalk : sélectionne automatiquement le meilleur style parmi les 10 principes selon le contexte exact de la conversation — la réponse optimale adaptée à cette situation précise, celle qui a le plus de chances de faire avancer vers un date
+Pour chaque ton, applique les principes en tenant compte de TOUTE la conversation :
+- Direct : affirmation nette, peu de mots, très sûr de lui — avance vers le concret
+- Drôle : humour décalé ou retournement inattendu de son dernier message
+- Mystérieux : crée de l'intrigue sur la suite, laisse inachevé, elle doit demander
+- Compliment : valorise un détail précis de ce qu'ELLE a dit ou de ce qui est visible, avec une pointe
+- CrushTalk : la réponse optimale — analyse tout le fil, applique le principe le plus pertinent parmi les 10, génère LA réponse qui fait le plus avancer vers un date dans ce contexte exact
 
 Rien d'autre que le JSON.`
 
@@ -258,7 +269,20 @@ Rien d'autre que le JSON.`
       {
         role: 'user',
         content: isReponse
-          ? `Voici ce que Claude Vision a extrait du screenshot de la conversation :\n${profileDesc}\n\nRappel : les messages à DROITE sont ceux de L'UTILISATEUR, les messages à GAUCHE sont ceux de LA FEMME.\nTu dois générer une réponse que L'UTILISATEUR va envoyer à LA FEMME, en réaction à son dernier message (gauche).\n\nEn te basant sur le screenshot analysé (vibe de la conversation, dernier message de la femme, stade de l'échange), génère ${tonesRequest.length} réponse(s) percutante(s) en suivant les 10 principes. Chaque réponse doit faire avancer vers un appel ou un date : ${tonesRequest.join(', ')}.`
+          ? `Voici l'analyse complète du screenshot de la conversation :
+${profileDesc}
+
+RAPPEL FONDAMENTAL :
+- Messages à DROITE = ce que L'UTILISATEUR a envoyé (son style, sa posture, son avancée)
+- Messages à GAUCHE = ce que LA FEMME a répondu (sa résistance ou son intérêt)
+
+MISSION : Génère ${tonesRequest.length} réponse(s) que L'UTILISATEUR va envoyer à LA FEMME.
+- Analyse d'abord tout ce que l'utilisateur a dit (droite) pour comprendre son angle et ne pas créer une rupture de style
+- Identifie précisément le dernier message de la femme (gauche) auquel tu dois répondre
+- Génère une réponse qui s'inscrit dans la continuité de cette conversation, qui répond à son dernier message, et qui fait avancer vers un appel ou un date
+- Inspire-toi au maximum des exemples fournis dans les 10 principes — c'est le registre exact à reproduire
+
+Tons demandés : ${tonesRequest.join(', ')}.`
           : `Profil analysé :\n${profileDesc}\n\nGénère maintenant ${tonesRequest.length} accroche(s) percutante(s) et personnalisée(s) pour ce profil : ${tonesRequest.join(', ')}.`,
       },
     ],
