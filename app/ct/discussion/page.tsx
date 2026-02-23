@@ -21,7 +21,6 @@ export default async function DiscussionPage() {
   return (
     <CrushTalkPage
       messageType="reponse"
-      hasOnboarding={true}
       initialCredits={credits?.balance ?? 0}
       initialSubscriptionType={subscriptionType}
       userId={user.id}

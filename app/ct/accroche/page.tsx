@@ -21,7 +21,6 @@ export default async function AccrochePage() {
   return (
     <CrushTalkPage
       messageType="accroche"
-      hasOnboarding={true}
       initialCredits={credits?.balance ?? 0}
       initialSubscriptionType={subscriptionType}
       userId={user.id}
