@@ -8,7 +8,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const MESSAGE_COUNTS: Record<string, string> = {
   short: '5 à 7',
   medium: '8 à 12',
-  long: '12 à 20',
+  long: '15 à 25',
 }
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
@@ -112,6 +112,7 @@ RÈGLES DE GÉNÉRATION :
 5. Langage jeune français authentique (abréviations ok)
 6. OBLIGATOIRE — La conversation se termine toujours par une victoire : "elle" donne son numéro (ex: "tiens 06XX...") ou accepte un rendez-vous (ex: "ok mercredi ?")
 7. EMOJIS : "lui" utilise ZÉRO emoji — ses messages sont secs, sûrs, sans fioriture. "elle" peut en utiliser librement
+8. ENCHAÎNEMENTS : parfois (3 à 4 fois dans la conversation), une personne envoie 2 messages consécutifs au lieu d'un seul. Exemple : "lui" envoie 2 messages d'affilée avant qu'elle réponde, ou "elle" répond en 2 messages courts séparés. Cela rend la conversation plus naturelle et vivante. Représente cela par 2 objets consécutifs avec le même "sender" dans le JSON.
 
 FORMAT DE SORTIE — JSON UNIQUEMENT, rien d'autre :
 {

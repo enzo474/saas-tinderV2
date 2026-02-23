@@ -128,8 +128,28 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           {/* Reste de la conversation */}
           {restMessages.map((msg, idx) => {
             const isSent = msg.sender === 'lui'
+            const prevMsg = restMessages[idx - 1]
             const nextMsg = restMessages[idx + 1]
+            const isFirstInGroup = !prevMsg || prevMsg.sender !== msg.sender
             const isLastInGroup = !nextMsg || nextMsg.sender !== msg.sender
+            const isSolo = isFirstInGroup && isLastInGroup
+            const S = 6  // petit rayon pour les coins intérieurs du groupe
+
+            // Calcul border-radius selon position dans le groupe
+            // Reçus (gauche) : le côté gauche se "resserre" entre messages consécutifs
+            // Envoyés (droite) : le côté droit se "resserre"
+            let borderRadius: string
+            if (isSolo) {
+              borderRadius = '22px'
+            } else if (isSent) {
+              if (isFirstInGroup)      borderRadius = `22px 22px ${S}px 22px`  // bas-droite petit
+              else if (isLastInGroup)  borderRadius = `22px ${S}px 22px 22px`  // haut-droite petit
+              else                     borderRadius = `22px ${S}px ${S}px 22px` // haut+bas droite petits
+            } else {
+              if (isFirstInGroup)      borderRadius = `22px 22px 22px ${S}px`  // bas-gauche petit
+              else if (isLastInGroup)  borderRadius = `${S}px 22px 22px 22px`  // haut-gauche petit
+              else                     borderRadius = `${S}px 22px 22px ${S}px` // haut+bas gauche petits
+            }
 
             return (
               <div key={idx} style={{ marginBottom: isLastInGroup ? 6 : 2 }}>
@@ -154,7 +174,7 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
                   <div style={{
                     padding: '10px 16px',
-                    borderRadius: 22,
+                    borderRadius,
                     maxWidth: '70%',
                     wordBreak: 'break-word',
                     fontSize: 15,
