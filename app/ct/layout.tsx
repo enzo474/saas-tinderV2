@@ -21,7 +21,7 @@ export default async function CrushTalkAppLayout({ children }: { children: React
   ])
 
   // Onboarding pas encore fait → page dédiée
-  if (!onboarding) redirect('/crushtalk/onboarding')
+  if (!onboarding) redirect('/crushtalk')
 
   // Auto-créer les crédits si manquants (ex : users créés avant la feature)
   if (!credits) {

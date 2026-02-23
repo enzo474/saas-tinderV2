@@ -29,7 +29,7 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
         <div className="flex items-center gap-2">
           <span
             className="font-montserrat font-extrabold text-xl"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
           >
             Crushmaxxing
           </span>
@@ -67,7 +67,7 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
         <div className="p-5 border-b flex items-center justify-between" style={{ borderColor: '#1F1F1F' }}>
           <div>
             <span className="font-montserrat font-extrabold text-xl"
-              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+              style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
             >
               Crushmaxxing
             </span>

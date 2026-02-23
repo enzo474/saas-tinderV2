@@ -3,9 +3,9 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { Sparkles } from 'lucide-react'
+import { Check } from 'lucide-react'
 
-export default function CrushTalkLogin() {
+export default function CrushTalkAuthGate() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -26,42 +26,59 @@ export default function CrushTalkLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#0A0A0A' }}>
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <Link href="/crushtalk">
+        <div className="text-center mb-8">
+          <Link href="/crushtalk" className="inline-flex items-center gap-2">
             <span
               className="font-montserrat font-extrabold text-2xl"
-              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+              style={{
+                background: 'linear-gradient(135deg, #F77F00, #FFAA33)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
             >
               Crushmaxxing
             </span>
+            <div
+              className="px-2.5 py-1 rounded-full border text-xs font-bold"
+              style={{ background: 'rgba(247,127,0,0.1)', borderColor: 'rgba(247,127,0,0.3)', color: '#F77F00' }}
+            >
+              CrushTalk
+            </div>
           </Link>
-          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#F77F00]/30 bg-[#F77F00]/10 text-[#F77F00] text-xs font-semibold">
-            <Sparkles className="w-3 h-3" />
-            CrushTalk
-          </div>
         </div>
 
-        <div className="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-8">
-          <h1 className="font-montserrat font-bold text-white text-2xl mb-2 text-center">
-            Connexion
-          </h1>
-          <p className="text-[#6b7280] text-sm text-center mb-8">
-            Connecte-toi pour accéder à CrushTalk
-          </p>
+        <div className="rounded-2xl p-8 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
+          {/* Header */}
+          <div className="text-center mb-7">
+            <div className="text-4xl mb-3">🎁</div>
+            <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
+              Ton analyse est prête !
+            </h1>
+            <p className="text-sm" style={{ color: '#9da3af' }}>
+              Connecte-toi pour obtenir{' '}
+              <strong className="text-white">5 crédits gratuits</strong>
+            </p>
+          </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-xl">
-              <p className="text-red-400 text-sm">{error}</p>
+            <div
+              className="mb-4 p-3 rounded-xl"
+              style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.3)' }}
+            >
+              <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
             </div>
           )}
 
+          {/* Google button */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl border-2 border-[#2A2A2A] hover:border-[#F77F00]/40 bg-[#0A0A0A] text-white font-semibold text-sm transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl border-2 font-semibold text-sm text-white transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+            style={{ borderColor: '#2A2A2A', background: '#0D0D0D' }}
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -75,13 +92,36 @@ export default function CrushTalkLogin() {
             )}
             {loading ? 'Connexion...' : 'Continuer avec Google'}
           </button>
+
+          {/* Benefits */}
+          <div className="space-y-3">
+            {[
+              'Pas de carte bancaire',
+              '5 crédits offerts = 1 génération gratuite',
+              'Inscription en 2 secondes',
+            ].map(benefit => (
+              <div key={benefit} className="flex items-center gap-3">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(247,127,0,0.15)' }}
+                >
+                  <Check className="w-3 h-3" style={{ color: '#F77F00' }} />
+                </div>
+                <span className="text-sm" style={{ color: '#9da3af' }}>{benefit}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        <p className="text-center text-[#6b7280] text-xs mt-6">
+        <p className="text-center text-xs mt-5" style={{ color: '#6b7280' }}>
           En continuant, tu acceptes nos{' '}
-          <Link href="/terms" className="text-[#9da3af] hover:text-white transition-colors">CGU</Link>
+          <Link href="/terms" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>
+            CGU
+          </Link>
           {' '}et notre{' '}
-          <Link href="/privacy" className="text-[#9da3af] hover:text-white transition-colors">Politique de confidentialité</Link>
+          <Link href="/privacy" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>
+            Politique de confidentialité
+          </Link>
         </p>
       </div>
     </div>

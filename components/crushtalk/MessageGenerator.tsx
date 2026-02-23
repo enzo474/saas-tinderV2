@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
-import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap, Infinity } from 'lucide-react'
-import { RechargeModal } from './RechargeModal'
-
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap, Infinity, X } from 'lucide-react'
 interface GeneratedMessage {
   tone: string
   emoji: string
@@ -51,6 +50,8 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: string 
 }
 
 export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId }: MessageGeneratorProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
@@ -60,13 +61,20 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
   const [credits, setCredits] = useState(initialCredits)
   const [subscriptionType, setSubscriptionType] = useState<string | null>(initialSubscriptionType ?? null)
-  const [showRechargeModal, setShowRechargeModal] = useState(false)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isUnlimited = subscriptionType === 'charo'
   const hasEnoughCredits = isUnlimited || credits >= CREDITS_PER_GENERATION
+
+  // Afficher le banner de bienvenue si ?welcome=true dans l'URL
+  useEffect(() => {
+    if (searchParams.get('welcome') === 'true') {
+      setShowWelcomeBanner(true)
+    }
+  }, [searchParams])
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -96,7 +104,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       return
     }
     if (!hasEnoughCredits) {
-      setShowRechargeModal(true)
+      router.push('/ct/pricing')
       return
     }
 
@@ -158,6 +166,31 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+
+      {/* Banner bienvenue — 5 crédits offerts */}
+      {showWelcomeBanner && (
+        <div
+          className="flex items-center justify-between rounded-xl p-4 border"
+          style={{ background: 'rgba(247,127,0,0.08)', borderColor: 'rgba(247,127,0,0.3)' }}
+        >
+          <div className="flex items-center gap-3">
+            <span className="text-xl">🎁</span>
+            <div>
+              <p className="text-white text-sm font-semibold">Bienvenue ! Tu as 5 crédits gratuits</p>
+              <p className="text-xs" style={{ color: '#9da3af' }}>
+                Upload un screenshot pour générer ton premier message. Coût : 5 crédits.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowWelcomeBanner(false)}
+            className="flex-shrink-0 ml-3 transition-colors"
+            style={{ color: '#6b7280' }}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Header avec crédits */}
       <div className="flex items-center justify-between">
@@ -453,29 +486,22 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
       </div>
 
-      {/* Bannière recharge quand crédits insuffisants */}
+      {/* Paywall — crédits insuffisants → redirection vers la page pricing */}
       {!isUnlimited && credits < CREDITS_PER_GENERATION && (
-        <div className="flex items-center justify-between bg-[#F77F00]/10 border border-[#F77F00]/30 rounded-xl p-4">
-          <p className="text-[#F77F00] text-sm font-medium">
-            Tu n'as plus assez de crédits ({credits} restants · {CREDITS_PER_GENERATION} requis).
+        <div className="flex items-center justify-between rounded-xl p-4 border" style={{ background: 'rgba(247,127,0,0.08)', borderColor: 'rgba(247,127,0,0.3)' }}>
+          <p className="text-sm font-medium" style={{ color: '#FFAA33' }}>
+            Tu as utilisé tes crédits gratuits ! Choisis un plan pour continuer.
           </p>
           <button
-            onClick={() => setShowRechargeModal(true)}
+            onClick={() => router.push('/ct/pricing')}
             className="ml-4 px-4 py-2 rounded-lg text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
           >
-            Recharger
+            Voir les offres
           </button>
         </div>
       )}
 
-      {/* Modal recharge */}
-      {showRechargeModal && (
-        <RechargeModal
-          onClose={() => setShowRechargeModal(false)}
-          currentBalance={credits}
-        />
-      )}
     </div>
   )
 }

@@ -27,7 +27,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
         <div className="flex items-center gap-2 mb-1">
           <h1
             className="font-montserrat font-extrabold text-2xl"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+            style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
           >
             Crushmaxxing
           </h1>

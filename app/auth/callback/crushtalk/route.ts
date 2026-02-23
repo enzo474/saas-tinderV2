@@ -13,7 +13,6 @@ export async function GET(request: Request) {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
-        // Si l'onboarding CrushTalk est déjà fait → dashboard hooks directement
         const { data: onboarding } = await supabase
           .from('crushtalk_onboarding')
           .select('id')
@@ -25,8 +24,8 @@ export async function GET(request: Request) {
         }
       }
 
-      // Sinon → onboarding CrushTalk
-      return NextResponse.redirect(`${origin}/crushtalk/onboarding`)
+      // Onboarding pas en DB → post-auth va lire le localStorage et sauvegarder
+      return NextResponse.redirect(`${origin}/crushtalk/post-auth`)
     }
   }
 

@@ -3,7 +3,7 @@ import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { analyzeProfileWithVision, generateMessages } from '@/lib/claude/generate-accroche'
 
 const CREDITS_PER_GENERATION = 5
-const INITIAL_CREDITS = 20
+const INITIAL_CREDITS = 5
 
 export async function POST(req: NextRequest) {
   try {

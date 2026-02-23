@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 
-// 5 crédits offerts à l'onboarding = 1 génération complète gratuite
 const INITIAL_CREDITS = 5
 
 export async function GET() {
@@ -31,19 +30,27 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
 
     const body = await req.json()
-    const { gender, ageRange, lookingFor, datingApps, matchesPerDay, matchQuality, satisfaction } = body
+    const {
+      struggle_point,
+      matching_behaviors,
+      response_rate,
+      goals,
+      preferred_style,
+      usage_preference,
+    } = body
 
-    // Upsert onboarding (une seule entrée par user)
-    await supabaseAdmin.from('crushtalk_onboarding').upsert({
-      user_id: user.id,
-      gender,
-      age_range: ageRange,
-      looking_for: lookingFor,
-      dating_apps: datingApps,
-      matches_per_day: matchesPerDay,
-      match_quality: matchQuality,
-      satisfaction,
-    }, { onConflict: 'user_id' })
+    await supabaseAdmin.from('crushtalk_onboarding').upsert(
+      {
+        user_id: user.id,
+        struggle_point,
+        matching_behaviors,
+        response_rate,
+        goals,
+        preferred_style,
+        usage_preference,
+      },
+      { onConflict: 'user_id' }
+    )
 
     // Créer les crédits si n'existent pas encore
     const { data: existing } = await supabaseAdmin
