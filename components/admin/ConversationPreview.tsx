@@ -104,10 +104,10 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
               {/* Bulle texte d'accroche */}
               <div style={{
-                background: 'linear-gradient(to bottom right, #9134BE, #C23584)',
+                background: '#8935f0',
                 color: '#fff',
                 padding: '10px 16px',
-                borderRadius: 22,
+                borderRadius: '22px 22px 4px 22px',
                 maxWidth: '75%',
                 wordBreak: 'break-word',
                 fontSize: 15,
@@ -125,10 +125,10 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
             const prevMsg = idx > 0 ? restMessages[idx - 1] : null
             const isLastInGroup = !nextMsg || nextMsg.sender !== msg.sender
 
-            // Coin bas coupé sur le dernier message de chaque groupe (comme Instagram)
+            // Coin bas quasi plat sur le dernier message du groupe (Instagram exact)
             const borderRadius = isSent
-              ? isLastInGroup ? '22px 22px 6px 22px' : '22px'
-              : isLastInGroup ? '22px 22px 22px 6px' : '22px'
+              ? isLastInGroup ? '22px 22px 4px 22px' : '22px'
+              : isLastInGroup ? '22px 22px 22px 4px' : '22px'
 
             return (
               <div key={idx} style={{ marginBottom: isLastInGroup ? 6 : 2 }}>
@@ -159,7 +159,7 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
                     fontSize: 15,
                     lineHeight: 1.4,
                     ...(isSent
-                      ? { background: 'linear-gradient(to bottom right, #9134BE, #C23584)', color: '#fff' }
+                      ? { background: '#8935f0', color: '#fff' }
                       : { background: '#ffffff', color: '#000', border: '1px solid #efefef' }
                     ),
                   }}>
