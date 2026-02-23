@@ -110,7 +110,10 @@ RÈGLES DE GÉNÉRATION :
 3. "elle" résiste, teste, remet en question — elle ne cède pas facilement. Les objections rendent la conversation virale
 4. "lui" applique les 10 principes ci-dessus à chaque échange — sûr de lui, jamais sur la défensive
 5. Langage jeune français authentique (abréviations ok)
-6. OBLIGATOIRE — La conversation se termine toujours par une victoire : "elle" donne son numéro (ex: "tiens 06XX...") ou accepte un rendez-vous (ex: "ok mercredi ?")
+6. FIN DE CONVERSATION — 3 scénarios possibles, choisis aléatoirement pour varier :
+   - Victoire totale (40% des cas) : "elle" donne son numéro ("tiens 06XX...") ou accepte un rendez-vous explicite ("ok mercredi soir")
+   - Victoire partielle (35% des cas) : "elle" résiste encore mais donne une alternative ("suis-moi sur insta et on verra", "si je te vois en vrai peut-être", "ajoute-moi sur snap", "demain j'ai le temps on verra") — "lui" accepte avec classe, sans supplier
+   - Résistance avec ouverture (25% des cas) : "elle" dit encore non mais laisse une porte ouverte ("je sais pas...", "pourquoi pas un jour", "t'es bizarre mais sympa") et "lui" termine avec une réplique sûre et courte qui la fait réfléchir — pas de victoire immédiate mais clairement un "à suivre"
 7. EMOJIS : "lui" utilise ZÉRO emoji — ses messages sont secs, sûrs, sans fioriture. "elle" peut en utiliser librement
 8. ENCHAÎNEMENTS : parfois (3 à 4 fois dans la conversation), une personne envoie 2 messages consécutifs au lieu d'un seul. Exemple : "lui" envoie 2 messages d'affilée avant qu'elle réponde, ou "elle" répond en 2 messages courts séparés. Cela rend la conversation plus naturelle et vivante. Représente cela par 2 objets consécutifs avec le même "sender" dans le JSON.
 
