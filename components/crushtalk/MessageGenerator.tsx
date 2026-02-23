@@ -18,10 +18,11 @@ interface MessageGeneratorProps {
 }
 
 const TONES = [
-  { label: 'Direct', emoji: '🎯' },
-  { label: 'Drôle', emoji: '😂' },
-  { label: 'Mystérieux', emoji: '🌙' },
-  { label: 'Compliment', emoji: '⚡' },
+  { label: 'CrushTalk', emoji: '🔥', description: 'Adapté par l\'IA' },
+  { label: 'Direct', emoji: '🎯', description: null },
+  { label: 'Drôle', emoji: '😂', description: null },
+  { label: 'Mystérieux', emoji: '🌙', description: null },
+  { label: 'Compliment', emoji: '⚡', description: null },
 ]
 
 const CREDITS_PER_GENERATION = 5
@@ -53,7 +54,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [selectedTones, setSelectedTones] = useState<string[]>(['Direct'])
+  const [selectedTone, setSelectedTone] = useState<string>('CrushTalk')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
@@ -85,12 +86,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
     if (file) handleFile(file)
   }, [handleFile])
 
-  const toggleTone = (tone: string) => {
-    setSelectedTones(prev =>
-      prev.includes(tone)
-        ? prev.length > 1 ? prev.filter(t => t !== tone) : prev
-        : [...prev, tone]
-    )
+  const selectTone = (tone: string) => {
+    setSelectedTone(tone)
   }
 
   const handleGenerate = async () => {
@@ -117,7 +114,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           imageBase64: base64,
           mediaType,
           messageType: activeType,
-          selectedTones,
+          selectedTones: [selectedTone],
         }),
       })
 
@@ -281,28 +278,39 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           </div>
 
 
-          {/* Sélecteur de tons */}
+          {/* Sélecteur de ton */}
           <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
-              {TONES.map(tone => (
-                <button
-                  key={tone.label}
-                  onClick={() => toggleTone(tone.label)}
-                  className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                  style={selectedTones.includes(tone.label) ? {
-                    borderColor: '#F77F00',
-                    background: 'rgba(247,127,0,0.1)',
-                    color: '#fff',
-                  } : {
-                    borderColor: '#1F1F1F',
-                    color: '#9da3af',
-                  }}
-                >
-                  <span>{tone.emoji}</span>
-                  <span>{tone.label}</span>
-                </button>
-              ))}
+              {TONES.map(tone => {
+                const isActive = selectedTone === tone.label
+                const isCrushTalk = tone.label === 'CrushTalk'
+                return (
+                  <button
+                    key={tone.label}
+                    onClick={() => selectTone(tone.label)}
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200 relative"
+                    style={isActive ? {
+                      borderColor: '#F77F00',
+                      background: 'rgba(247,127,0,0.1)',
+                      color: '#fff',
+                    } : {
+                      borderColor: '#1F1F1F',
+                      color: '#9da3af',
+                    }}
+                  >
+                    <span>{tone.emoji}</span>
+                    <div className="flex flex-col items-start">
+                      <span>{tone.label}</span>
+                      {isCrushTalk && (
+                        <span className="text-[10px] leading-none mt-0.5" style={{ color: isActive ? 'rgba(247,127,0,0.8)' : '#6b7280' }}>
+                          Adapté par l&apos;IA
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
