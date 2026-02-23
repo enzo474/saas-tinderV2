@@ -22,7 +22,6 @@ const plans = [
       '100 messages générés par mois',
       'Accroches + Relances',
       '500 crédits mensuels',
-      'Annule quand tu veux',
     ],
   },
   {
@@ -42,7 +41,6 @@ const plans = [
       'Tous les tons disponibles',
       'Jamais de limite',
       'Support prioritaire',
-      'Annule quand tu veux',
     ],
   },
 ]
