@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check } from 'lucide-react'
 
 interface OnboardingData {
   struggle_point: string
@@ -104,23 +103,13 @@ function MultiOptionButton({
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-5 py-4 rounded-xl border-2 text-sm font-medium transition-all duration-200 flex items-center gap-3"
+      className="w-full text-left px-5 py-4 rounded-xl border-2 text-sm font-medium transition-all duration-200"
       style={
         selected
           ? { borderColor: '#F77F00', background: 'rgba(247,127,0,0.1)', color: '#fff' }
           : { borderColor: '#1F1F1F', background: 'rgba(255,255,255,0.02)', color: '#9da3af' }
       }
     >
-      <div
-        className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0 border-2 transition-all"
-        style={
-          selected
-            ? { background: '#F77F00', borderColor: '#F77F00' }
-            : { borderColor: '#3A3A3A', background: 'transparent' }
-        }
-      >
-        {selected && <Check className="w-3 h-3 text-white" />}
-      </div>
       {label}
     </button>
   )
