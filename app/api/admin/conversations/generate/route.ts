@@ -112,13 +112,27 @@ RÈGLES DE GÉNÉRATION :
 2. JAMAIS de "Salut ça va" générique — l'accroche doit être immédiatement percutante et spécifique à la photo
 3. "elle" résiste, teste, remet en question — elle ne cède pas facilement. Les objections rendent la conversation virale
 4. "lui" applique les 10 principes ci-dessus à chaque échange — sûr de lui, jamais sur la défensive
-5. Langage jeune français authentique (abréviations ok)
+5. LANGAGE : jeune français authentique, naturel, simple. Pas de vocabulaire soutenu, pas de termes compliqués. Zéro tournures littéraires. On parle comme sur Snapchat ou Instagram, pas comme dans un roman.
 6. FIN DE CONVERSATION — 3 scénarios possibles, choisis aléatoirement pour varier :
    - Victoire totale (40% des cas) : "elle" donne son numéro ("tiens 06XX...") ou accepte un rendez-vous explicite ("ok mercredi soir")
    - Victoire partielle (35% des cas) : "elle" résiste encore mais donne une alternative ("suis-moi sur insta et on verra", "si je te vois en vrai peut-être", "ajoute-moi sur snap", "demain j'ai le temps on verra") — "lui" accepte avec classe, sans supplier
    - Résistance avec ouverture (25% des cas) : "elle" dit encore non mais laisse une porte ouverte ("je sais pas...", "pourquoi pas un jour", "t'es bizarre mais sympa") et "lui" termine avec une réplique sûre et courte qui la fait réfléchir — pas de victoire immédiate mais clairement un "à suivre"
 7. EMOJIS : "lui" utilise ZÉRO emoji — ses messages sont secs, sûrs, sans fioriture. "elle" peut en utiliser librement
 8. ENCHAÎNEMENTS : parfois (3 à 4 fois dans la conversation), une personne envoie 2 messages consécutifs au lieu d'un seul. Exemple : "lui" envoie 2 messages d'affilée avant qu'elle réponde, ou "elle" répond en 2 messages courts séparés. Cela rend la conversation plus naturelle et vivante. Représente cela par 2 objets consécutifs avec le même "sender" dans le JSON.
+
+COMPORTEMENT DE "elle" — RÉALISME ABSOLU :
+- Elle ne complimente JAMAIS le mec directement ("t'es ouf", "wow t'es sûr de toi", "j'aime ta façon de parler") → ça n'existe pas dans la vraie vie
+- Elle peut être curieuse MALGRÉ elle, mais elle montre pas que ça l'intéresse — c'est le sous-texte, pas le texte
+- Ses réponses courtes montrent l'intérêt (elle répond = elle est là), ses mots montrent la résistance
+- Elle utilise les vraies réactions d'une fille : "lol", "😂", "excuse moi ???", "t'es sérieux là", "nan mais attends", "je comprends même pas pourquoi je réponds"
+- Varier ses humeurs : parfois sèche ("ok"), parfois amusée ("😂 non"), parfois agacée ("franchement"), parfois piquée ("et tu crois que ça marche avec tout le monde ?")
+- JAMAIS de réponse enthousiaste ou flatteuse — elle garde toujours une distance cool
+
+COMPORTEMENT DE "lui" — STYLE NATUREL :
+- Phrases COURTES, langage familier — "t'as pas tort", "exactement", "bah voilà", "c'est ça"
+- Il ne parle pas comme un coach de développement personnel
+- Ses réponses percutantes viennent de leur SIMPLICITÉ, pas de leur complexité
+- Maximum 1 réplique "technique" toutes les 4-5 réponses — le reste c'est du naturel décontracté
 
 FORMAT DE SORTIE — JSON UNIQUEMENT, rien d'autre :
 {
