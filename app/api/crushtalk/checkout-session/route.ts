@@ -44,6 +44,44 @@ export async function POST(req: NextRequest) {
     }
 
     const stripe = new Stripe(stripeKey, { apiVersion: '2025-02-24.acacia' })
+
+    // ── Vérifier si l'user a déjà un abonnement CrushTalk actif ──
+    const { data: existingCredits } = await supabase
+      .from('crushtalk_credits')
+      .select('subscription_type, subscription_status, stripe_subscription_id')
+      .eq('user_id', user.id)
+      .single()
+
+    const hasActiveSub =
+      existingCredits?.subscription_status === 'active' &&
+      existingCredits?.stripe_subscription_id
+
+    // ── Upgrade Chill → Charo avec proration ──
+    if (hasActiveSub && existingCredits.subscription_type === 'chill' && plan === 'charo') {
+      const subscription = await stripe.subscriptions.retrieve(
+        existingCredits.stripe_subscription_id!
+      )
+      const currentItemId = subscription.items.data[0]?.id
+
+      if (!currentItemId) {
+        return NextResponse.json({ error: 'Abonnement introuvable sur Stripe.' }, { status: 400 })
+      }
+
+      // Stripe calcule automatiquement la différence au prorata
+      await stripe.subscriptions.update(existingCredits.stripe_subscription_id!, {
+        items: [{ id: currentItemId, price: planConfig.priceId }],
+        proration_behavior: 'create_prorations',
+        metadata: {
+          user_id: user.id,
+          plan: 'charo',
+          product_type: 'crushtalk_charo',
+        },
+      })
+
+      return NextResponse.json({ upgraded: true })
+    }
+
+    // ── Nouveau checkout Stripe (pas d'abonnement existant) ──
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://crushmaxxing.com'
 
     const session = await stripe.checkout.sessions.create({

@@ -64,6 +64,11 @@ export function CrushTalkPricingClient() {
         setLoading(null)
         return
       }
+      if (data.upgraded) {
+        // Upgrade Chill → Charo avec proration, pas de redirection Stripe
+        window.location.href = '/ct/accroche?subscription=upgraded'
+        return
+      }
       if (data.url) {
         window.location.href = data.url
       }

@@ -291,19 +291,34 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // ── Mise à jour statut (past_due, etc.) ──
+    // ── Mise à jour statut + upgrade de plan (Chill → Charo) ──
     if (event.type === 'customer.subscription.updated') {
       const subscription = event.data.object as Stripe.Subscription
-      const plan = subscription.metadata?.plan
+      const plan = subscription.metadata?.plan as 'chill' | 'charo' | undefined
       if (plan === 'chill' || plan === 'charo') {
         const newStatus = subscription.status === 'active' ? 'active'
           : subscription.status === 'past_due' ? 'past_due'
           : 'canceled'
+
+        // Récupérer l'abonnement actuel pour détecter un changement de plan
+        const { data: currentCredits } = await supabase
+          .from('crushtalk_credits')
+          .select('subscription_type, user_id')
+          .eq('stripe_subscription_id', subscription.id)
+          .single()
+
+        const planChanged = currentCredits && currentCredits.subscription_type !== plan
+
         await supabase.from('crushtalk_credits').update({
+          subscription_type: plan,
           subscription_status: newStatus,
           subscription_current_period_end: new Date(subscription.current_period_end * 1000).toISOString(),
           updated_at: new Date().toISOString(),
         }).eq('stripe_subscription_id', subscription.id)
+
+        if (planChanged) {
+          console.log(`[CrushTalk] Plan upgraded: ${currentCredits.subscription_type} → ${plan} for user ${currentCredits.user_id}`)
+        }
       }
     }
 
