@@ -38,11 +38,6 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
           </div>
         </div>
         <div className="flex items-center gap-3">
-          {/* Credits badge */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
-            {isUnlimited ? <Infinity className="w-3.5 h-3.5 text-white" /> : <Zap className="w-3.5 h-3.5 text-white" />}
-            <span className="text-white font-bold text-xs">{isUnlimited ? '∞' : credits}</span>
-          </div>
           <button
             onClick={() => setIsOpen(true)}
             className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"

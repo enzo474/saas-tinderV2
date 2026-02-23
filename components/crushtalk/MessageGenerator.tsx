@@ -424,8 +424,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           {results && (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-montserrat font-bold text-white text-lg">
-                  {results.length} messages générés
+                <h3 className="font-montserrat font-bold text-white text-lg whitespace-nowrap">
+                  {results.length} {results.length > 1 ? 'messages générés' : 'message généré'}
                 </h3>
                 <button
                   onClick={handleReset}
