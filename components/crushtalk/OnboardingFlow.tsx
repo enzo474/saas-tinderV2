@@ -417,7 +417,7 @@ export function OnboardingFlow() {
                 <div className="text-center">
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushPicture</p>
                   <h3 className="font-montserrat font-bold text-white text-lg mb-4">Photos IA professionnelles</h3>
-                  <div className="flex gap-2 mb-3" style={{ height: '180px' }}>
+                  <div className="flex gap-2 mb-3" style={{ height: '220px' }}>
                     <div className="relative flex-1 rounded-xl overflow-hidden">
                       <img src="/avant.webp" alt="Avant" className="w-full h-full object-cover object-center" />
                       <div
@@ -427,7 +427,7 @@ export function OnboardingFlow() {
                       </div>
                     </div>
                     <div className="relative flex-1 rounded-xl overflow-hidden">
-                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: '20% center' }} />
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: 'top center' }} />
                       <div
                         className="absolute bottom-2 left-0 right-0 flex justify-center"
                       >
@@ -539,7 +539,7 @@ export function OnboardingFlow() {
         <p className="text-center text-sm mt-5" style={{ color: '#6b7280' }}>
           Déjà un compte ?{' '}
           <Link
-            href="/crushtalk/login"
+            href="/crushtalk/login?returning=true"
             className="font-semibold transition-colors hover:text-white"
             style={{ color: '#F77F00' }}
           >

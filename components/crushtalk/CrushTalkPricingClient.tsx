@@ -11,17 +11,18 @@ const plans = [
     label: 'Pack Chill',
     price: '8,90',
     period: '/mois',
-    description: '500 crédits · 100 générations',
+    description: '500 crédits · 100 générations/mois',
     icon: Zap,
     accent: '#F77F00',
     accentBg: 'rgba(247,127,0,0.08)',
     accentBorder: 'rgba(247,127,0,0.25)',
     badge: null,
+    subPrice: null,
     features: [
-      '100 messages générés / mois',
-      'Accroche + Réponse',
+      '100 messages générés par mois',
+      'Accroches + Relances',
       '500 crédits mensuels',
-      'Renouvellement automatique',
+      'Annule quand tu veux',
     ],
   },
   {
@@ -34,13 +35,14 @@ const plans = [
     accent: '#FFAA33',
     accentBg: 'rgba(255,170,51,0.08)',
     accentBorder: 'rgba(255,170,51,0.35)',
-    badge: 'MEILLEURE VALEUR',
+    badge: 'MEILLEUR CHOIX',
+    subPrice: 'Soit 0,49€ par jour',
     features: [
-      'Générations illimitées',
-      'Accroche + Réponse',
-      'Crédits infinis',
+      'Messages illimités',
+      'Tous les tons disponibles',
+      'Jamais de limite',
       'Support prioritaire',
-      'Renouvellement automatique',
+      'Annule quand tu veux',
     ],
   },
 ]
@@ -65,7 +67,6 @@ export function CrushTalkPricingClient() {
         return
       }
       if (data.upgraded) {
-        // Upgrade Chill → Charo avec proration, pas de redirection Stripe
         window.location.href = '/ct/accroche?subscription=upgraded'
         return
       }
@@ -79,18 +80,18 @@ export function CrushTalkPricingClient() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
       {plans.map((plan) => {
         const Icon = plan.icon
         const isLoading = loading === plan.id
         return (
           <div
             key={plan.id}
-            className="relative rounded-2xl p-6 border transition-all duration-300"
+            className="relative rounded-2xl p-6 border flex flex-col transition-all duration-300"
             style={{ background: plan.accentBg, borderColor: plan.accentBorder }}
           >
             {plan.badge && (
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
                 <div className="flex items-center gap-1">
                   <Star className="w-3 h-3 fill-black" />
                   {plan.badge}
@@ -98,6 +99,7 @@ export function CrushTalkPricingClient() {
               </div>
             )}
 
+            {/* Icon + titre */}
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${plan.accent}20`, border: `1px solid ${plan.accent}40` }}>
                 <Icon className="w-5 h-5" style={{ color: plan.accent }} />
@@ -108,14 +110,19 @@ export function CrushTalkPricingClient() {
               </div>
             </div>
 
+            {/* Prix */}
             <div className="mb-6">
               <div className="flex items-baseline gap-1">
                 <span className="font-montserrat font-black text-4xl text-white">{plan.price}€</span>
                 <span className="text-sm" style={{ color: '#6b7280' }}>{plan.period}</span>
               </div>
+              {plan.subPrice && (
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,170,51,0.7)' }}>{plan.subPrice}</p>
+              )}
             </div>
 
-            <ul className="space-y-2.5 mb-7">
+            {/* Features — flex-1 pour pousser le bouton en bas */}
+            <ul className="space-y-2.5 mb-7 flex-1">
               {plan.features.map((feature, i) => (
                 <li key={i} className="flex items-center gap-2.5 text-sm" style={{ color: '#d1d5db' }}>
                   <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${plan.accent}20` }}>
@@ -126,10 +133,11 @@ export function CrushTalkPricingClient() {
               ))}
             </ul>
 
+            {/* Bouton — toujours en bas grâce à mt-auto */}
             <button
               onClick={() => handleSubscribe(plan.id)}
               disabled={!!loading}
-              className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60"
+              className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60 mt-auto"
               style={{ background: `linear-gradient(135deg, ${plan.accent}, ${plan.id === 'chill' ? '#FFAA33' : '#FFD700'})`, boxShadow: `0 4px 20px ${plan.accent}30` }}
             >
               {isLoading ? (

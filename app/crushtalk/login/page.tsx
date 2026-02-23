@@ -2,12 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Check } from 'lucide-react'
 
 export default function CrushTalkAuthGate() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+  const isReturning = searchParams.get('returning') === 'true'
 
   const handleGoogleLogin = async () => {
     setLoading(true)
@@ -52,17 +55,30 @@ export default function CrushTalkAuthGate() {
         </div>
 
         <div className="rounded-2xl p-8 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
-          {/* Header */}
-          <div className="text-center mb-7">
-            <div className="text-4xl mb-3">🎁</div>
-            <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
-              Ton analyse est prête !
-            </h1>
-            <p className="text-sm" style={{ color: '#9da3af' }}>
-              Connecte-toi pour obtenir{' '}
-              <strong className="text-white">5 crédits gratuits</strong>
-            </p>
-          </div>
+          {isReturning ? (
+            /* ── Returning user ── */
+            <div className="text-center mb-7">
+              <div className="text-4xl mb-3">👋</div>
+              <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
+                Content de te revoir !
+              </h1>
+              <p className="text-sm" style={{ color: '#9da3af' }}>
+                Connecte-toi pour accéder à ton compte CrushTalk
+              </p>
+            </div>
+          ) : (
+            /* ── New user ── */
+            <div className="text-center mb-7">
+              <div className="text-4xl mb-3">🎁</div>
+              <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
+                Ton analyse est prête !
+              </h1>
+              <p className="text-sm" style={{ color: '#9da3af' }}>
+                Connecte-toi pour obtenir{' '}
+                <strong className="text-white">5 crédits gratuits</strong>
+              </p>
+            </div>
+          )}
 
           {error && (
             <div
@@ -93,24 +109,26 @@ export default function CrushTalkAuthGate() {
             {loading ? 'Connexion...' : 'Continuer avec Google'}
           </button>
 
-          {/* Benefits */}
-          <div className="space-y-3">
-            {[
-              'Pas de carte bancaire',
-              '5 crédits offerts = 1 génération gratuite',
-              'Inscription en 2 secondes',
-            ].map(benefit => (
-              <div key={benefit} className="flex items-center gap-3">
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: 'rgba(247,127,0,0.15)' }}
-                >
-                  <Check className="w-3 h-3" style={{ color: '#F77F00' }} />
+          {/* Benefits — uniquement pour nouveaux users */}
+          {!isReturning && (
+            <div className="space-y-3">
+              {[
+                'Pas de carte bancaire',
+                '5 crédits offerts = 1 génération gratuite',
+                'Inscription en 2 secondes',
+              ].map(benefit => (
+                <div key={benefit} className="flex items-center gap-3">
+                  <div
+                    className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(247,127,0,0.15)' }}
+                  >
+                    <Check className="w-3 h-3" style={{ color: '#F77F00' }} />
+                  </div>
+                  <span className="text-sm" style={{ color: '#9da3af' }}>{benefit}</span>
                 </div>
-                <span className="text-sm" style={{ color: '#9da3af' }}>{benefit}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <p className="text-center text-xs mt-5" style={{ color: '#6b7280' }}>
@@ -123,6 +141,15 @@ export default function CrushTalkAuthGate() {
             Politique de confidentialité
           </Link>
         </p>
+
+        {!isReturning && (
+          <p className="text-center text-sm mt-3" style={{ color: '#6b7280' }}>
+            Déjà un compte ?{' '}
+            <Link href="/crushtalk/login?returning=true" className="font-semibold hover:text-white" style={{ color: '#F77F00' }}>
+              Se connecter →
+            </Link>
+          </p>
+        )}
       </div>
     </div>
   )
