@@ -187,7 +187,7 @@ async function makeSlideBlob(
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, W, TALL)
 
-  const PV_STORY = 28 * SC  // padding vertical plus grand pour les story slides
+  const PV_STORY = 48 * SC  // padding vertical généreux pour les story slides
   let y = storyData ? PV_STORY : PV
 
   if (storyData) {
@@ -198,17 +198,17 @@ async function makeSlideBlob(
     const labelTxt = 'Vous avez répondu à sa story'
     const labelW   = ctx.measureText(labelTxt).width
     ctx.fillText(labelTxt, W - PH - labelW, y)
-    y += LABEL_FS + 14 * SC  // plus d'espace entre label et image
+    y += LABEL_FS + 18 * SC  // espace entre label et image
 
     // Image story alignée à droite
     const imgW = 136 * SC
     const imgH = 172 * SC
     roundedImage(ctx, storyData.img, W - PH - imgW, y, imgW, imgH, 18 * SC)
-    y += imgH + 16 * SC  // plus d'espace entre image et bulle
+    y += imgH + 22 * SC  // espace entre image et bulle accroche
 
     // Bulle accroche (lui)
     const accH = drawBubble(ctx, storyData.msg.message, true, true, true, y, null)
-    y += accH + 16 * SC
+    y += accH + 22 * SC  // espace entre accroche et réponse
 
     // Réponse elle (slide 2 uniquement)
     if (storyData.withReply) {
@@ -229,7 +229,7 @@ async function makeSlideBlob(
   }
 
   // Hauteur finale = contenu + padding bas, avec minimum
-  const rawH   = y + (storyData ? PV_STORY : PV)
+  const rawH   = y + (storyData ? PV_STORY : PV * 2)
   const finalH = Math.max(Math.ceil(rawH), MIN_SLIDE_H)
 
   const cropped  = document.createElement('canvas')
