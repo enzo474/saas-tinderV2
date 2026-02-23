@@ -18,11 +18,11 @@ interface MessageGeneratorProps {
 }
 
 const TONES = [
-  { label: 'CrushTalk', emoji: '🔥', description: 'Adapté par l\'IA' },
   { label: 'Direct', emoji: '🎯', description: null },
   { label: 'Drôle', emoji: '😂', description: null },
   { label: 'Mystérieux', emoji: '🌙', description: null },
   { label: 'Compliment', emoji: '⚡', description: null },
+  { label: 'CrushTalk', emoji: '🔥', description: 'Adapté par l\'IA' },
 ]
 
 const CREDITS_PER_GENERATION = 5
@@ -282,14 +282,13 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
-              {TONES.map(tone => {
+              {TONES.filter(t => t.label !== 'CrushTalk').map(tone => {
                 const isActive = selectedTone === tone.label
-                const isCrushTalk = tone.label === 'CrushTalk'
                 return (
                   <button
                     key={tone.label}
                     onClick={() => selectTone(tone.label)}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200 relative"
+                    className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
                     style={isActive ? {
                       borderColor: '#F77F00',
                       background: 'rgba(247,127,0,0.1)',
@@ -300,17 +299,35 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                     }}
                   >
                     <span>{tone.emoji}</span>
-                    <div className="flex flex-col items-start">
-                      <span>{tone.label}</span>
-                      {isCrushTalk && (
-                        <span className="text-[10px] leading-none mt-0.5" style={{ color: isActive ? 'rgba(247,127,0,0.8)' : '#6b7280' }}>
-                          Adapté par l&apos;IA
-                        </span>
-                      )}
-                    </div>
+                    <span>{tone.label}</span>
                   </button>
                 )
               })}
+
+              {/* CrushTalk — pleine largeur en bas */}
+              {(() => {
+                const isActive = selectedTone === 'CrushTalk'
+                return (
+                  <button
+                    onClick={() => selectTone('CrushTalk')}
+                    className="col-span-2 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                    style={isActive ? {
+                      borderColor: '#F77F00',
+                      background: 'rgba(247,127,0,0.1)',
+                      color: '#fff',
+                    } : {
+                      borderColor: '#1F1F1F',
+                      color: '#9da3af',
+                    }}
+                  >
+                    <span>🔥</span>
+                    <span>CrushTalk</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: isActive ? 'rgba(247,127,0,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FFAA33' : '#6b7280' }}>
+                      Adapté par l&apos;IA
+                    </span>
+                  </button>
+                )
+              })()}
             </div>
           </div>
 
