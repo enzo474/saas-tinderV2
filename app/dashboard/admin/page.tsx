@@ -80,6 +80,12 @@ export default async function DashboardAdminPage() {
             >
               Styles photos
             </a>
+            <a
+              href="/dashboard/admin/conversations"
+              className="bg-[#16171b] hover:bg-[#1a1b20] border border-[#ff8c42]/30 text-white py-3 px-4 rounded-lg font-inter text-sm transition-colors text-center"
+            >
+              💬 Conversations Virales
+            </a>
           </div>
         </div>
       </div>
