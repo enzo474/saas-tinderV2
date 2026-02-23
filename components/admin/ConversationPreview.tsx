@@ -19,22 +19,22 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
         id="conversation-preview"
         style={{
           width: 393,
-          background: '#ffffff',
+          background: '#000000',
           overflow: 'hidden',
           fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif',
         }}
       >
         {/* ── HEADER ────────────────────────────────────────── */}
         <div style={{
-          background: '#ffffff',
+          background: '#000000',
           padding: '12px 16px 10px',
           display: 'flex',
           alignItems: 'center',
           gap: 0,
-          borderBottom: '0.5px solid #e5e5e5',
+          borderBottom: '0.5px solid #2a2a2a',
         }}>
           {/* Chevron gauche */}
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, flexShrink: 0 }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, flexShrink: 0 }}>
             <polyline points="15 18 9 12 15 6" />
           </svg>
 
@@ -47,27 +47,24 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
           {/* Nom + chevron droit */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
-            <span style={{ color: '#000', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>
+            <span style={{ color: '#ffffff', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>
               claraaa.study
             </span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </div>
 
           {/* Icônes droite : téléphone, vidéo, tag */}
           <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
-            {/* Téléphone */}
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 1.16 2 2 0 012.08 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.41-.41a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
             </svg>
-            {/* Caméra vidéo */}
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polygon points="23 7 16 12 23 17 23 7" />
               <rect x="1" y="5" width="15" height="14" rx="2" />
             </svg>
-            {/* Tag / étiquette */}
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
               <line x1="7" y1="7" x2="7.01" y2="7" />
             </svg>
@@ -76,7 +73,7 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
         {/* ── MESSAGES ──────────────────────────────────────── */}
         <div style={{
-          background: '#ffffff',
+          background: '#000000',
           padding: '14px 10px 10px',
           display: 'flex',
           flexDirection: 'column',
@@ -86,6 +83,16 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           {/* Story reply group */}
           {storyReplyMessage && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, marginBottom: 6 }}>
+
+              {/* Label "Vous avez répondu à sa story" */}
+              <span style={{
+                color: '#888',
+                fontSize: 12,
+                marginRight: 4,
+                marginBottom: 2,
+              }}>
+                Vous avez répondu à sa story
+              </span>
 
               {/* Photo story */}
               <div style={{
@@ -122,10 +129,7 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           {restMessages.map((msg, idx) => {
             const isSent = msg.sender === 'lui'
             const nextMsg = restMessages[idx + 1]
-            const prevMsg = idx > 0 ? restMessages[idx - 1] : null
             const isLastInGroup = !nextMsg || nextMsg.sender !== msg.sender
-
-            const borderRadius = '22px'
 
             return (
               <div key={idx} style={{ marginBottom: isLastInGroup ? 6 : 2 }}>
@@ -150,14 +154,14 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
                   <div style={{
                     padding: '10px 16px',
-                    borderRadius,
+                    borderRadius: 22,
                     maxWidth: '70%',
                     wordBreak: 'break-word',
                     fontSize: 15,
                     lineHeight: 1.4,
                     ...(isSent
                       ? { background: '#8935f0', color: '#fff' }
-                      : { background: '#ffffff', color: '#000', border: '1px solid #efefef' }
+                      : { background: '#262626', color: '#fff' }
                     ),
                   }}>
                     {msg.message}
@@ -170,8 +174,8 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
         {/* ── BARRE DE SAISIE ────────────────────────────────── */}
         <div style={{
-          background: '#ffffff',
-          borderTop: '0.5px solid #e5e5e5',
+          background: '#000000',
+          borderTop: '0.5px solid #2a2a2a',
           padding: '10px 14px 12px',
           display: 'flex',
           alignItems: 'center',
@@ -180,18 +184,18 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           {/* Champ texte */}
           <div style={{
             flex: 1,
-            border: '1px solid #dbdbdb',
+            border: '1px solid #333',
             borderRadius: 22,
             padding: '8px 16px',
-            color: '#8e8e8e',
+            color: '#555',
             fontSize: 14,
-            background: '#fff',
+            background: '#000',
           }}>
             Votre message...
           </div>
 
           {/* Micro */}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
             <path d="M19 10v2a7 7 0 01-14 0v-2" />
             <line x1="12" y1="19" x2="12" y2="23" />
@@ -199,14 +203,14 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           </svg>
 
           {/* Image */}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="2" />
             <circle cx="8.5" cy="8.5" r="1.5" />
             <polyline points="21 15 16 10 5 21" />
           </svg>
 
-          {/* Sticker + */}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round">
+          {/* + */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
             <circle cx="12" cy="12" r="10" />
             <line x1="12" y1="8" x2="12" y2="16" />
             <line x1="8" y1="12" x2="16" y2="12" />
