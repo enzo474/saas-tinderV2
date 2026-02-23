@@ -39,6 +39,7 @@ RÈGLES ABSOLUES :
 5. La conversation doit avoir une progression : tension → intérêt → pique → rebondissement
 6. Plus trash/osé que les vraies accroches utilisateur — c'est pour du CONTENU VIRAL
 7. Chaque message doit être crédible comme une vraie conversation
+8. OBLIGATOIRE — La conversation doit TOUJOURS se terminer par une victoire : soit "elle" donne son numéro de téléphone (ex: "okay c'est le 06XX..." ou "tiens 06..."), soit elle propose/accepte un rendez-vous (ex: "ok on se voit quand ?", "mercredi t'es dispo ?"). Le dernier échange doit clairement montrer cette victoire.
 
 FORMAT DE SORTIE — JSON UNIQUEMENT, rien d'autre :
 {
