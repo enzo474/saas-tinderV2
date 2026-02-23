@@ -15,22 +15,9 @@ interface OnboardingData {
 
 const TOTAL_QUESTIONS = 6
 
-const CAROUSEL_SLIDES = [
-  {
-    icon: '📸',
-    title: 'Photos IA professionnelles',
-    desc: 'Des photos lifestyle générées par IA pour ton profil dating. Fini les selfies pourris.',
-  },
-  {
-    icon: '📝',
-    title: 'Bio optimisée par l\'IA',
-    desc: '4 bios personnalisées selon ton style. L\'IA analyse ce qui fonctionne le mieux.',
-  },
-  {
-    icon: '💬',
-    title: 'Messages d\'accroche IA',
-    desc: "L'IA analyse son profil et te génère un message personnalisé qui fait matcher.",
-  },
+const BIO_EXAMPLES = [
+  "J'ai une règle pour les premiers verres : je choisis le lieu, tu choisis l'heure de fin. Jusqu'ici, personne n'est partie à l'heure prévue.",
+  "J'ai une théorie : les meilleures connexions commencent par un décalage horaire et finissent par un réveil qu'on veut pas entendre.\n\nSi t'es du genre à prendre l'avion sur un coup de tête, on va bien s'entendre. Sinon, je te convaincs en deux verres.",
 ]
 
 function getPersonalizedMessage(data: OnboardingData): string {
@@ -434,20 +421,60 @@ export function OnboardingFlow() {
 
           {/* Step 8 — Carousel */}
           {step === 8 && (
-            <div className="text-center">
-              <div className="min-h-[160px] flex flex-col items-center justify-center mb-4">
-                <div className="text-5xl mb-4">{CAROUSEL_SLIDES[carouselIdx].icon}</div>
-                <h3 className="font-montserrat font-bold text-white text-lg mb-2">
-                  {CAROUSEL_SLIDES[carouselIdx].title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#9da3af' }}>
-                  {CAROUSEL_SLIDES[carouselIdx].desc}
-                </p>
-              </div>
+            <div>
+              {/* Slide 1 — Photos IA avant/après */}
+              {carouselIdx === 0 && (
+                <div className="text-center">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushPicture</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-4">Photos IA professionnelles</h3>
+                  <div className="flex gap-2 rounded-xl overflow-hidden mb-3" style={{ height: '180px' }}>
+                    <div className="relative flex-1">
+                      <img src="/avant.webp" alt="Avant" className="w-full h-full object-cover" />
+                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,0,0,0.7)', color: '#9da3af' }}>Avant</div>
+                    </div>
+                    <div className="relative flex-1">
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" />
+                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,127,0,0.85)', color: '#fff' }}>Après</div>
+                    </div>
+                  </div>
+                  <p className="text-sm" style={{ color: '#9da3af' }}>Des photos lifestyle générées par IA. Fini les selfies pourris.</p>
+                </div>
+              )}
+
+              {/* Slide 2 — Bio exemples */}
+              {carouselIdx === 1 && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Bio IA</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-4">Bio optimisée par l&apos;IA</h3>
+                  <div className="space-y-3">
+                    {BIO_EXAMPLES.map((bio, i) => (
+                      <div
+                        key={i}
+                        className="rounded-xl p-4 text-sm leading-relaxed whitespace-pre-line text-left"
+                        style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#d1d5db' }}
+                      >
+                        {bio}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Slide 3 — Exemple rizz */}
+              {carouselIdx === 2 && (
+                <div className="text-center">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushTalk</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-4">Messages d&apos;accroche IA</h3>
+                  <div className="rounded-xl overflow-hidden mb-3">
+                    <img src="/exemplerizz.jpeg" alt="Exemple message" className="w-full object-cover rounded-xl" style={{ maxHeight: '240px' }} />
+                  </div>
+                  <p className="text-sm" style={{ color: '#9da3af' }}>L&apos;IA analyse son profil et génère un message personnalisé qui fait matcher.</p>
+                </div>
+              )}
 
               {/* Dots */}
-              <div className="flex items-center justify-center gap-2 mb-6">
-                {CAROUSEL_SLIDES.map((_, i) => (
+              <div className="flex items-center justify-center gap-2 mt-5 mb-5">
+                {[0, 1, 2].map(i => (
                   <button
                     key={i}
                     onClick={() => setCarouselIdx(i)}
@@ -471,7 +498,7 @@ export function OnboardingFlow() {
                     ←
                   </button>
                 )}
-                {carouselIdx < CAROUSEL_SLIDES.length - 1 ? (
+                {carouselIdx < 2 ? (
                   <button
                     onClick={() => setCarouselIdx(i => i + 1)}
                     className="flex-1 py-3.5 rounded-xl font-bold text-sm text-white"
