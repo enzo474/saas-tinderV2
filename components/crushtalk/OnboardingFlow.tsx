@@ -427,14 +427,22 @@ export function OnboardingFlow() {
                 <div className="text-center">
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushPicture</p>
                   <h3 className="font-montserrat font-bold text-white text-lg mb-4">Photos IA professionnelles</h3>
-                  <div className="flex gap-2 rounded-xl overflow-hidden mb-3" style={{ height: '180px' }}>
-                    <div className="relative flex-1">
-                      <img src="/avant.webp" alt="Avant" className="w-full h-full object-cover" />
-                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(0,0,0,0.7)', color: '#9da3af' }}>Avant</div>
+                  <div className="flex gap-2 mb-3" style={{ height: '180px' }}>
+                    <div className="relative flex-1 rounded-xl overflow-hidden">
+                      <img src="/avant.webp" alt="Avant" className="w-full h-full object-cover object-center" />
+                      <div
+                        className="absolute bottom-2 left-0 right-0 flex justify-center"
+                      >
+                        <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(0,0,0,0.75)', color: '#9da3af' }}>Avant</span>
+                      </div>
                     </div>
-                    <div className="relative flex-1">
-                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" />
-                      <div className="absolute bottom-2 left-2 text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,127,0,0.85)', color: '#fff' }}>Après</div>
+                    <div className="relative flex-1 rounded-xl overflow-hidden">
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover object-center" />
+                      <div
+                        className="absolute bottom-2 left-0 right-0 flex justify-center"
+                      >
+                        <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: 'rgba(247,127,0,0.9)', color: '#fff' }}>Après</span>
+                      </div>
                     </div>
                   </div>
                   <p className="text-sm" style={{ color: '#9da3af' }}>Des photos lifestyle générées par IA. Fini les selfies pourris.</p>
@@ -444,16 +452,21 @@ export function OnboardingFlow() {
               {/* Slide 2 — Bio exemples */}
               {carouselIdx === 1 && (
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>Bio IA</p>
-                  <h3 className="font-montserrat font-bold text-white text-lg mb-4">Bio optimisée par l&apos;IA</h3>
-                  <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(247,127,0,0.7)' }}>Bio IA</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-1">Bio optimisée par l&apos;IA</h3>
+                  <p className="text-xs mb-4" style={{ color: '#6b7280' }}>4 bios différentes générées selon ton style</p>
+                  <div className="space-y-2.5">
                     {BIO_EXAMPLES.map((bio, i) => (
-                      <div
-                        key={i}
-                        className="rounded-xl p-4 text-sm leading-relaxed whitespace-pre-line text-left"
-                        style={{ background: '#1A1A1A', border: '1px solid #2A2A2A', color: '#d1d5db' }}
-                      >
-                        {bio}
+                      <div key={i} className="rounded-xl p-4 text-left" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                            style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}
+                          >
+                            Bio {i + 1}
+                          </span>
+                        </div>
+                        <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: '#d1d5db' }}>{bio}</p>
                       </div>
                     ))}
                   </div>
@@ -462,13 +475,23 @@ export function OnboardingFlow() {
 
               {/* Slide 3 — Exemple rizz */}
               {carouselIdx === 2 && (
-                <div className="text-center">
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushTalk</p>
-                  <h3 className="font-montserrat font-bold text-white text-lg mb-4">Messages d&apos;accroche IA</h3>
-                  <div className="rounded-xl overflow-hidden mb-3">
-                    <img src="/exemplerizz.jpeg" alt="Exemple message" className="w-full object-cover rounded-xl" style={{ maxHeight: '240px' }} />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-center" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushTalk</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-4 text-center">Messages d&apos;accroche IA</h3>
+                  <div className="rounded-xl overflow-hidden mb-4">
+                    <img src="/exemplerizz.jpeg" alt="Exemple conversation" className="w-full object-cover rounded-xl" style={{ maxHeight: '200px', objectPosition: 'top' }} />
                   </div>
-                  <p className="text-sm" style={{ color: '#9da3af' }}>L&apos;IA analyse son profil et génère un message personnalisé qui fait matcher.</p>
+                  {/* Exemple de réponse CrushTalk */}
+                  <div className="rounded-xl p-4" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>
+                        Exemple de réponse générée
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>
+                      Parfait, moi non plus je cherche pas de couple... juste quelqu&apos;un qui apprécie mon talent légendaire en drague apparemment 😏
+                    </p>
+                  </div>
                 </div>
               )}
 
