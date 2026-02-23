@@ -98,7 +98,8 @@ function roundedImage(
   ctx.restore()
 }
 
-// Dessine une bulle et retourne sa hauteur totale
+// Dessine une bulle avec textBaseline='top' (appelé APRÈS avoir mis textBaseline='top' sur ctx)
+// Retourne la hauteur totale de la bulle
 function drawBubble(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -111,15 +112,14 @@ function drawBubble(
   ctx.font = `${FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
   const innerW = MAX_BUBBLE_W - BP_W * 2
   const lines  = wrapText(ctx, text, innerW)
-  const textH  = lines.length * LH - (LH - FS)
-  const bH     = textH + BP_H * 2
-  const bW     = Math.min(MAX_BUBBLE_W, Math.max(...lines.map(l => ctx.measureText(l).width)) + BP_W * 2)
+
+  // Avec textBaseline='top' : hauteur réelle = (n-1)*LH + FS + 2*BP_H
+  const bH = (lines.length - 1) * LH + FS + BP_H * 2
+  const bW = Math.min(MAX_BUBBLE_W, Math.max(...lines.map(l => ctx.measureText(l).width)) + BP_W * 2)
 
   // Position X
   const avatarSlot = !isSent ? AVATAR_SIZE + AVATAR_GAP : 0
-  const bX = isSent
-    ? W - PH - bW
-    : PH + avatarSlot
+  const bX = isSent ? W - PH - bW : PH + avatarSlot
 
   // Border radius selon groupe
   let tl = BR, tr = BR, br = BR, bl = BR
@@ -136,10 +136,10 @@ function drawBubble(
   roundedRect(ctx, bX, yStart, bW, bH, tl, tr, br, bl)
   ctx.fill()
 
-  // Texte
+  // Texte (textBaseline='top' → y est le haut de chaque ligne)
   ctx.fillStyle = '#ffffff'
   lines.forEach((line, i) => {
-    ctx.fillText(line, bX + BP_W, yStart + BP_H + FS + i * LH)
+    ctx.fillText(line, bX + BP_W, yStart + BP_H + i * LH)
   })
 
   // Avatar (last du groupe reçu)
@@ -161,18 +161,21 @@ function drawBubble(
 // Stratégie : render sur un canvas 3000px de haut, on track y en temps réel,
 // puis on recadre exactement à la hauteur du contenu + padding. Rien ne sera coupé.
 
+const MIN_SLIDE_H = 280 * SC  // hauteur minimum pour éviter les slides trop "fins"
+
 async function makeSlideBlob(
   messages: ConversationMessage[],
   avatar: HTMLImageElement,
   storyData?: { msg: ConversationMessage; img: HTMLImageElement; withReply?: ConversationMessage }
 ): Promise<Blob> {
   const TALL = 3000 * SC
-
-  // ── Passe de rendu ──────────────────────────────────────────────────────────
   const canvas  = document.createElement('canvas')
   canvas.width  = W
   canvas.height = TALL
   const ctx     = canvas.getContext('2d')!
+
+  // ⚠️ textBaseline='top' : le y passé à fillText est le HAUT de la ligne
+  ctx.textBaseline = 'top'
 
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, W, TALL)
@@ -181,18 +184,19 @@ async function makeSlideBlob(
 
   if (storyData) {
     // Label "Vous avez répondu à sa story"
-    ctx.font      = `${12 * SC}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
+    const LABEL_FS = 12 * SC
+    ctx.font      = `${LABEL_FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
     ctx.fillStyle = '#888888'
     const labelTxt = 'Vous avez répondu à sa story'
     const labelW   = ctx.measureText(labelTxt).width
-    ctx.fillText(labelTxt, W - PH - labelW, y + 12 * SC)
-    y += 16 * SC + 8 * SC
+    ctx.fillText(labelTxt, W - PH - labelW, y)
+    y += LABEL_FS + 8 * SC
 
     // Image story alignée à droite
     const imgW = 136 * SC
     const imgH = 172 * SC
     roundedImage(ctx, storyData.img, W - PH - imgW, y, imgW, imgH, 18 * SC)
-    y += imgH + 8 * SC
+    y += imgH + 10 * SC
 
     // Bulle accroche (lui)
     const accH = drawBubble(ctx, storyData.msg.message, true, true, true, y, null)
@@ -216,14 +220,20 @@ async function makeSlideBlob(
     y += bH + (isLast ? GRP_GAP : MSG_GAP)
   }
 
-  const contentH = y + PV  // hauteur réelle du contenu + padding bas
+  // Hauteur finale = contenu + padding bas, minimum MIN_SLIDE_H
+  const rawH   = y + PV
+  const finalH = Math.max(Math.ceil(rawH), MIN_SLIDE_H)
 
-  // ── Recadrage au contenu réel ───────────────────────────────────────────────
+  // Si contenu plus court que le minimum → centrer verticalement
+  const offsetY = finalH > Math.ceil(rawH) ? Math.floor((finalH - rawH) / 2) : 0
+
   const cropped  = document.createElement('canvas')
   cropped.width  = W
-  cropped.height = Math.ceil(contentH)
+  cropped.height = finalH
   const cc = cropped.getContext('2d')!
-  cc.drawImage(canvas, 0, 0, W, cropped.height, 0, 0, W, cropped.height)
+  cc.fillStyle = '#000000'
+  cc.fillRect(0, 0, W, finalH)
+  cc.drawImage(canvas, 0, 0, W, Math.ceil(rawH), 0, offsetY, W, Math.ceil(rawH))
 
   return new Promise(resolve => cropped.toBlob(b => resolve(b!), 'image/png'))
 }
