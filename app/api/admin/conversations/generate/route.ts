@@ -32,14 +32,15 @@ STYLE DEMANDÉ : ${styleInstruction}
 LONGUEUR : ${messageCount} messages au total (alternés lui/elle)
 
 RÈGLES ABSOLUES :
-1. Le premier message de "lui" doit TOUJOURS faire référence à quelque chose de visible sur la photo (vêtement, lieu, activité, expression, contexte)
-2. JAMAIS de "Salut ça va" générique — l'accroche doit être immédiatement différente
+1. Le PREMIER message de "lui" est une RÉPONSE À SA STORY — il commente directement ce qu'il voit sur la photo (vêtement, lieu, activité, expression, contexte). C'est le point de départ de la conv.
+2. JAMAIS de "Salut ça va" générique — l'accroche doit être immédiatement différente et percutante
 3. Les réponses de "elle" doivent être variées : parfois intriguée, parfois sur la défensive, parfois qui joue le jeu
-4. Langage jeune français authentique (abréviations ok, emojis ok mais pas trop)
+4. Langage jeune français authentique (abréviations ok)
 5. La conversation doit avoir une progression : tension → intérêt → pique → rebondissement
 6. Plus trash/osé que les vraies accroches utilisateur — c'est pour du CONTENU VIRAL
 7. Chaque message doit être crédible comme une vraie conversation
 8. OBLIGATOIRE — La conversation doit TOUJOURS se terminer par une victoire : soit "elle" donne son numéro de téléphone (ex: "okay c'est le 06XX..." ou "tiens 06..."), soit elle propose/accepte un rendez-vous (ex: "ok on se voit quand ?", "mercredi t'es dispo ?"). Le dernier échange doit clairement montrer cette victoire.
+9. EMOJIS : "lui" utilise ZÉRO emoji ou au maximum 1 seul par message uniquement si vraiment nécessaire. "elle" peut en utiliser librement. Les messages de "lui" doivent paraître sûrs d'eux et naturels, pas comme un fanboy.
 
 FORMAT DE SORTIE — JSON UNIQUEMENT, rien d'autre :
 {
