@@ -127,15 +127,14 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
             </Link>
           ))}
 
-          {hasPhotosPro && (
-            <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
-              <Link href="/dashboard/home" onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm" style={{ color: '#6b7280' }}>
-                <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-                <span>CrushPicture</span>
-              </Link>
-            </div>
-          )}
+          {/* Lien CrushPicture — toujours visible */}
+          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+            <Link href="/dashboard/home" onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm" style={{ color: '#6b7280' }}>
+              <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
+              <span>CrushPicture</span>
+            </Link>
+          </div>
         </nav>
 
         <div className="p-3 border-t" style={{ borderColor: '#1F1F1F' }}>

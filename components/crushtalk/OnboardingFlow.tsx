@@ -427,7 +427,7 @@ export function OnboardingFlow() {
                       </div>
                     </div>
                     <div className="relative flex-1 rounded-xl overflow-hidden">
-                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: '10% center' }} />
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: '30% center' }} />
                       <div
                         className="absolute bottom-2 left-0 right-0 flex justify-center"
                       >

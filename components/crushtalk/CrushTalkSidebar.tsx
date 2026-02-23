@@ -101,19 +101,17 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
           )
         })}
 
-        {/* Lien Photos Pro si applicable */}
-        {hasPhotosPro && (
-          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
-            <Link
-              href="/dashboard/home"
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
-              style={{ color: '#6b7280' }}
-            >
-              <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-              <span>CrushPicture</span>
-            </Link>
-          </div>
-        )}
+        {/* Lien CrushPicture — toujours visible */}
+        <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+          <Link
+            href="/dashboard/home"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+            style={{ color: '#6b7280' }}
+          >
+            <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
+            <span>CrushPicture</span>
+          </Link>
+        </div>
 
         {/* Spacer */}
         <div className="mt-auto" />
