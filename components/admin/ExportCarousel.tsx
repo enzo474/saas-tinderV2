@@ -157,102 +157,74 @@ function drawBubble(
 }
 
 // ─── Génération d'un slide canvas ─────────────────────────────────────────────
+// Stratégie : render sur un canvas 3000px de haut, on track y en temps réel,
+// puis on recadre exactement à la hauteur du contenu + padding. Rien ne sera coupé.
 
 async function makeSlideBlob(
   messages: ConversationMessage[],
   avatar: HTMLImageElement,
   storyData?: { msg: ConversationMessage; img: HTMLImageElement; withReply?: ConversationMessage }
 ): Promise<Blob> {
-  // Pré-calcul hauteur
-  const tmpCanvas = document.createElement('canvas')
-  tmpCanvas.width  = W
-  tmpCanvas.height = 2000 * SC
-  const tmp = tmpCanvas.getContext('2d')!
-  tmp.font = `${FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
+  const TALL = 3000 * SC
 
-  let totalH = PV
-
-  if (storyData) {
-    totalH += 16 * SC // label text
-    totalH += 4 * SC  // gap
-    totalH += 172 * SC // image story
-    totalH += 4 * SC  // gap
-    // accroche bubble height
-    const lines = wrapText(tmp, storyData.msg.message, MAX_BUBBLE_W - BP_W * 2)
-    totalH += lines.length * LH + BP_H * 2
-    totalH += 8 * SC
-    if (storyData.withReply) {
-      const lines2 = wrapText(tmp, storyData.withReply.message, MAX_BUBBLE_W - BP_W * 2)
-      totalH += lines2.length * LH + BP_H * 2
-      totalH += GRP_GAP
-    }
-  }
-
-  for (let i = 0; i < messages.length; i++) {
-    const msg  = messages[i]
-    const prev = messages[i - 1]
-    const next = messages[i + 1]
-    const isLast = !next || next.sender !== msg.sender
-    const lines = wrapText(tmp, msg.message, MAX_BUBBLE_W - BP_W * 2)
-    totalH += lines.length * LH + BP_H * 2
-    totalH += isLast ? GRP_GAP : MSG_GAP
-  }
-  totalH += PV
-
-  // Canvas final
+  // ── Passe de rendu ──────────────────────────────────────────────────────────
   const canvas  = document.createElement('canvas')
   canvas.width  = W
-  canvas.height = Math.ceil(totalH)
+  canvas.height = TALL
   const ctx     = canvas.getContext('2d')!
 
-  // Fond noir
   ctx.fillStyle = '#000000'
-  ctx.fillRect(0, 0, W, canvas.height)
+  ctx.fillRect(0, 0, W, TALL)
 
   let y = PV
 
-  // Story slides
   if (storyData) {
-    // Label
+    // Label "Vous avez répondu à sa story"
     ctx.font      = `${12 * SC}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
     ctx.fillStyle = '#888888'
     const labelTxt = 'Vous avez répondu à sa story'
     const labelW   = ctx.measureText(labelTxt).width
     ctx.fillText(labelTxt, W - PH - labelW, y + 12 * SC)
-    y += 16 * SC + 4 * SC
+    y += 16 * SC + 8 * SC
 
     // Image story alignée à droite
     const imgW = 136 * SC
     const imgH = 172 * SC
     roundedImage(ctx, storyData.img, W - PH - imgW, y, imgW, imgH, 18 * SC)
-    y += imgH + 4 * SC
+    y += imgH + 8 * SC
 
-    // Bulle accroche
-    ctx.font = `${FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
+    // Bulle accroche (lui)
     const accH = drawBubble(ctx, storyData.msg.message, true, true, true, y, null)
-    y += accH + 8 * SC
+    y += accH + 10 * SC
 
-    // Réponse elle (slide 2)
+    // Réponse elle (slide 2 uniquement)
     if (storyData.withReply) {
       const repH = drawBubble(ctx, storyData.withReply.message, false, true, true, y, avatar)
       y += repH + GRP_GAP
     }
   }
 
-  // Messages normaux
   for (let i = 0; i < messages.length; i++) {
-    const msg   = messages[i]
-    const prev  = messages[i - 1]
-    const next  = messages[i + 1]
+    const msg     = messages[i]
+    const prev    = messages[i - 1]
+    const next    = messages[i + 1]
     const isFirst = !prev || prev.sender !== msg.sender
     const isLast  = !next || next.sender !== msg.sender
     const isSent  = msg.sender === 'lui'
-    ctx.font = `${FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
     const bH = drawBubble(ctx, msg.message, isSent, isFirst, isLast, y, avatar)
     y += bH + (isLast ? GRP_GAP : MSG_GAP)
   }
 
-  return new Promise(resolve => canvas.toBlob(b => resolve(b!), 'image/png'))
+  const contentH = y + PV  // hauteur réelle du contenu + padding bas
+
+  // ── Recadrage au contenu réel ───────────────────────────────────────────────
+  const cropped  = document.createElement('canvas')
+  cropped.width  = W
+  cropped.height = Math.ceil(contentH)
+  const cc = cropped.getContext('2d')!
+  cc.drawImage(canvas, 0, 0, W, cropped.height, 0, 0, W, cropped.height)
+
+  return new Promise(resolve => cropped.toBlob(b => resolve(b!), 'image/png'))
 }
 
 // ─── Composant ────────────────────────────────────────────────────────────────
