@@ -15,10 +15,11 @@ export type GeneratedConversation = {
   profile_image_url?: string
   style: string
   length: string
+  storyImagePreview?: string  // preview locale de la photo story
 }
 
 interface ConversationGeneratorProps {
-  onGenerated: (result: GeneratedConversation & { imagePreview: string }) => void
+  onGenerated: (result: GeneratedConversation & { imagePreview: string; storyImagePreview: string }) => void
 }
 
 const STYLES = [
@@ -64,52 +65,125 @@ async function compressImage(file: File): Promise<{ base64: string; mediaType: s
   })
 }
 
+// ─── Zone d'upload réutilisable ───────────────────────────────────────────────
+function UploadZone({
+  preview, onFile, onClear, icon, label, hint,
+}: {
+  preview: string | null
+  onFile: (file: File) => void
+  onClear: () => void
+  icon: string
+  label: string
+  hint: string
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const pick = (file: File) => {
+    if (file.type.startsWith('image/')) onFile(file)
+  }
+
+  return (
+    <div>
+      <div
+        onClick={() => inputRef.current?.click()}
+        onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files?.[0]; if (f) pick(f) }}
+        onDragOver={(e) => e.preventDefault()}
+        style={{
+          border: '2px dashed',
+          borderColor: preview ? '#ff8c42' : '#444',
+          borderRadius: 14,
+          padding: '16px 12px',
+          cursor: 'pointer',
+          textAlign: 'center',
+          background: preview ? 'rgba(255,140,66,0.05)' : '#111',
+          transition: 'all 0.2s',
+          position: 'relative',
+          minHeight: 130,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        {preview ? (
+          <div style={{ position: 'relative' }}>
+            <img src={preview} alt="Preview" style={{ maxHeight: 160, maxWidth: '100%', borderRadius: 10, objectFit: 'cover' }} />
+            <button
+              onClick={(e) => { e.stopPropagation(); onClear() }}
+              style={{
+                position: 'absolute', top: -8, right: -8,
+                background: '#ff4444', border: 'none', borderRadius: '50%',
+                width: 22, height: 22, color: '#fff', cursor: 'pointer',
+                fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >×</button>
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize: 32, marginBottom: 6 }}>{icon}</div>
+            <p style={{ color: '#888', fontSize: 13 }}>{label}</p>
+            <p style={{ color: '#555', fontSize: 11, marginTop: 3 }}>{hint}</p>
+          </div>
+        )}
+      </div>
+      <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }}
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) pick(f) }} />
+    </div>
+  )
+}
+
 export default function ConversationGenerator({ onGenerated }: ConversationGeneratorProps) {
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  // Photo de profil (avatar dans les bulles)
+  const [profileFile, setProfileFile] = useState<File | null>(null)
+  const [profilePreview, setProfilePreview] = useState<string | null>(null)
+  // Photo de la story (analysée par Claude + affichée dans le slide 1)
+  const [storyFile, setStoryFile] = useState<File | null>(null)
+  const [storyPreview, setStoryPreview] = useState<string | null>(null)
+
   const [context, setContext] = useState('')
   const [style, setStyle] = useState('trash')
   const [length, setLength] = useState('medium')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setImageFile(file)
-    const reader = new FileReader()
-    reader.onload = (ev) => setImagePreview(ev.target?.result as string)
-    reader.readAsDataURL(file)
-  }, [])
-
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault()
-    const file = e.dataTransfer.files?.[0]
-    if (!file || !file.type.startsWith('image/')) return
-    setImageFile(file)
-    const reader = new FileReader()
-    reader.onload = (ev) => setImagePreview(ev.target?.result as string)
-    reader.readAsDataURL(file)
-  }, [])
+  const setFile = (setter: (f: File | null) => void, previewSetter: (p: string | null) => void) =>
+    (file: File) => {
+      setter(file)
+      const reader = new FileReader()
+      reader.onload = (ev) => previewSetter(ev.target?.result as string)
+      reader.readAsDataURL(file)
+    }
 
   const handleGenerate = async () => {
-    if (!imageFile) { setError('Uploade une photo d\'abord'); return }
+    if (!storyFile) { setError('Uploade la photo de la story d\'abord'); return }
     setLoading(true)
     setError(null)
     try {
-      const { base64, mediaType } = await compressImage(imageFile)
+      const story   = await compressImage(storyFile)
+      const profile = profileFile ? await compressImage(profileFile) : null
+
       const res = await fetch('/api/admin/conversations/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64, mediaType, context, style, length }),
+        body: JSON.stringify({
+          storyImageBase64:   story.base64,
+          storyMediaType:     story.mediaType,
+          profileImageBase64: profile?.base64 || null,
+          profileMediaType:   profile?.mediaType || null,
+          context, style, length,
+        }),
       })
       if (!res.ok) {
         const { error: apiError } = await res.json()
         throw new Error(apiError || 'Erreur lors de la génération')
       }
       const data = await res.json()
-      onGenerated({ ...data, style, length, imagePreview: imagePreview! })
+      onGenerated({
+        ...data,
+        style,
+        length,
+        imagePreview:       profilePreview || storyPreview!,  // avatar (profil ou story en fallback)
+        storyImagePreview:  storyPreview!,
+      })
     } catch (err: any) {
       setError(err.message || 'Erreur inconnue')
     } finally {
@@ -120,63 +194,39 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
 
-      {/* Upload */}
+      {/* Uploads côte à côte */}
       <div>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12 }}>
-          1. Photo de la meuf
+          1. Photos
         </h2>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          onDrop={handleDrop}
-          onDragOver={(e) => e.preventDefault()}
-          style={{
-            border: '2px dashed',
-            borderColor: imagePreview ? '#ff8c42' : '#444',
-            borderRadius: 16,
-            padding: 24,
-            cursor: 'pointer',
-            textAlign: 'center',
-            background: imagePreview ? 'rgba(255,140,66,0.05)' : '#111',
-            transition: 'all 0.2s',
-            position: 'relative',
-            minHeight: 160,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {imagePreview ? (
-            <div style={{ position: 'relative' }}>
-              <img
-                src={imagePreview}
-                alt="Preview"
-                style={{ maxHeight: 200, maxWidth: '100%', borderRadius: 12, objectFit: 'cover' }}
-              />
-              <button
-                onClick={(e) => { e.stopPropagation(); setImageFile(null); setImagePreview(null) }}
-                style={{
-                  position: 'absolute', top: -8, right: -8,
-                  background: '#ff4444', border: 'none', borderRadius: '50%',
-                  width: 24, height: 24, color: '#fff', cursor: 'pointer',
-                  fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}
-              >×</button>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize: 40, marginBottom: 8 }}>📸</div>
-              <p style={{ color: '#888', fontSize: 14 }}>Clique ou glisse une photo ici</p>
-              <p style={{ color: '#555', fontSize: 12, marginTop: 4 }}>Story, photo de profil, etc.</p>
-            </div>
-          )}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div>
+            <p style={{ color: '#888', fontSize: 12, marginBottom: 6, fontWeight: 600 }}>
+              👤 Photo de profil <span style={{ color: '#555', fontWeight: 400 }}>(avatar)</span>
+            </p>
+            <UploadZone
+              preview={profilePreview}
+              onFile={setFile(setProfileFile, setProfilePreview)}
+              onClear={() => { setProfileFile(null); setProfilePreview(null) }}
+              icon="👤"
+              label="Photo de profil"
+              hint="Avatar dans les bulles"
+            />
+          </div>
+          <div>
+            <p style={{ color: '#888', fontSize: 12, marginBottom: 6, fontWeight: 600 }}>
+              📸 Photo de la story <span style={{ color: '#ff8c42', fontWeight: 400 }}>(requis)</span>
+            </p>
+            <UploadZone
+              preview={storyPreview}
+              onFile={setFile(setStoryFile, setStoryPreview)}
+              onClear={() => { setStoryFile(null); setStoryPreview(null) }}
+              icon="📸"
+              label="Photo de la story"
+              hint="Analysée par l'IA · slide 1"
+            />
+          </div>
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
       </div>
 
       {/* Contexte */}
@@ -261,15 +311,15 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
       {/* Générer */}
       <button
         onClick={handleGenerate}
-        disabled={loading || !imageFile}
+        disabled={loading || !storyFile}
         style={{
           padding: '16px 32px',
-          background: loading || !imageFile
+          background: loading || !storyFile
             ? '#222'
             : 'linear-gradient(135deg, #ff8c42, #ff6a1a)',
           border: 'none', borderRadius: 14, color: '#fff',
-          fontSize: 16, fontWeight: 700, cursor: loading || !imageFile ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s', opacity: loading || !imageFile ? 0.5 : 1,
+          fontSize: 16, fontWeight: 700, cursor: loading || !storyFile ? 'not-allowed' : 'pointer',
+          transition: 'all 0.2s', opacity: loading || !storyFile ? 0.5 : 1,
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
         }}
       >

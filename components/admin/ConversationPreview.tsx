@@ -5,11 +5,13 @@ import type { ConversationMessage } from './ConversationGenerator'
 
 interface ConversationPreviewProps {
   conversation: ConversationMessage[]
-  profileImage: string
+  profileImage: string    // avatar (petite bulle circulaire)
+  storyImage?: string     // photo story (grande image slide 1)
 }
 
 const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>(
-  function ConversationPreview({ conversation, profileImage }, ref) {
+  function ConversationPreview({ conversation, profileImage, storyImage }, ref) {
+    const storyImg = storyImage || profileImage  // fallback si pas de story séparée
     const storyReplyMessage = conversation[0]?.sender === 'lui' ? conversation[0] : null
     const restMessages = storyReplyMessage ? conversation.slice(1) : conversation
 
@@ -103,7 +105,7 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
                 flexShrink: 0,
               }}>
                 <img
-                  src={profileImage}
+                  src={storyImg}
                   alt="Story"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />

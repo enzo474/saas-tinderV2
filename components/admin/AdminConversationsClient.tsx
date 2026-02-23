@@ -10,7 +10,7 @@ type ActiveView = 'generator' | 'history'
 
 export default function AdminConversationsClient() {
   const [activeView, setActiveView] = useState<ActiveView>('generator')
-  const [result, setResult] = useState<(GeneratedConversation & { imagePreview: string }) | null>(null)
+  const [result, setResult] = useState<(GeneratedConversation & { imagePreview: string; storyImagePreview?: string }) | null>(null)
   const previewRef = useRef<HTMLDivElement>(null)
 
   const handleGenerated = (data: GeneratedConversation & { imagePreview: string }) => {
@@ -90,6 +90,7 @@ export default function AdminConversationsClient() {
                       ref={previewRef}
                       conversation={result.conversation}
                       profileImage={result.imagePreview || result.profile_image_url || ''}
+                      storyImage={result.storyImagePreview || result.profile_image_url || result.imagePreview || ''}
                     />
                   </div>
                 </div>
@@ -99,6 +100,7 @@ export default function AdminConversationsClient() {
                   conversationId={result.id}
                   conversation={result.conversation}
                   profileImage={result.imagePreview || result.profile_image_url || ''}
+                  storyImage={result.storyImagePreview || result.profile_image_url || result.imagePreview || ''}
                   previewRef={previewRef}
                 />
 

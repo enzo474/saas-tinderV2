@@ -144,15 +144,15 @@ export async function POST(req: NextRequest) {
     const admin = await isUserAdmin(user.id)
     if (!admin) return NextResponse.json({ error: 'Accès refusé — Admin uniquement' }, { status: 403 })
 
-    const { imageBase64, mediaType, context, style, length } = await req.json()
+    const { storyImageBase64, storyMediaType, profileImageBase64, profileMediaType, context, style, length } = await req.json()
 
-    if (!imageBase64 || !style || !length) {
-      return NextResponse.json({ error: 'Paramètres manquants' }, { status: 400 })
+    if (!storyImageBase64 || !style || !length) {
+      return NextResponse.json({ error: 'Paramètres manquants (storyImage requis)' }, { status: 400 })
     }
 
     const userMessage = context
       ? `Contexte fourni par l'admin : ${context}\n\nGénère la conversation.`
-      : 'Analyse cette photo et génère une conversation virale basée dessus.'
+      : 'Analyse cette photo de story et génère une conversation virale basée dessus.'
 
     const claudeResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
@@ -166,8 +166,8 @@ export async function POST(req: NextRequest) {
               type: 'image',
               source: {
                 type: 'base64',
-                media_type: (mediaType || 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
-                data: imageBase64,
+                media_type: (storyMediaType || 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+                data: storyImageBase64,
               },
             },
             { type: 'text', text: userMessage },
@@ -178,7 +178,6 @@ export async function POST(req: NextRequest) {
 
     const rawText = claudeResponse.content[0].type === 'text' ? claudeResponse.content[0].text : ''
 
-    // Extraire le JSON même s'il est entouré de markdown ```json```
     const jsonMatch = rawText.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
       return NextResponse.json({ error: 'Réponse Claude invalide', raw: rawText }, { status: 500 })
@@ -186,30 +185,39 @@ export async function POST(req: NextRequest) {
 
     const parsed = JSON.parse(jsonMatch[0])
 
-    // Upload de l'image de profil dans Supabase Storage
-    let profileImageUrl: string | null = null
+    // Upload story image (utilisée pour slide 1)
+    let storyImageUrl: string | null = null
     try {
-      const imageBuffer = Buffer.from(imageBase64, 'base64')
-      const fileName = `admin/conversations/${Date.now()}.jpg`
-      const { data: uploadData } = await supabaseAdmin.storage
+      const buf = Buffer.from(storyImageBase64, 'base64')
+      const fn  = `admin/conversations/story-${Date.now()}.jpg`
+      const { data: up } = await supabaseAdmin.storage
         .from('uploads')
-        .upload(fileName, imageBuffer, { contentType: mediaType || 'image/jpeg', upsert: true })
-
-      if (uploadData) {
-        const { data: { publicUrl } } = supabaseAdmin.storage
-          .from('uploads')
-          .getPublicUrl(fileName)
-        profileImageUrl = publicUrl
+        .upload(fn, buf, { contentType: storyMediaType || 'image/jpeg', upsert: true })
+      if (up) {
+        storyImageUrl = supabaseAdmin.storage.from('uploads').getPublicUrl(fn).data.publicUrl
       }
-    } catch {
-      // Upload optionnel — on continue sans
+    } catch { /* optionnel */ }
+
+    // Upload profile image (avatar dans les bulles) si fournie
+    let profileImageUrl: string | null = null
+    if (profileImageBase64) {
+      try {
+        const buf = Buffer.from(profileImageBase64, 'base64')
+        const fn  = `admin/conversations/profile-${Date.now()}.jpg`
+        const { data: up } = await supabaseAdmin.storage
+          .from('uploads')
+          .upload(fn, buf, { contentType: profileMediaType || 'image/jpeg', upsert: true })
+        if (up) {
+          profileImageUrl = supabaseAdmin.storage.from('uploads').getPublicUrl(fn).data.publicUrl
+        }
+      } catch { /* optionnel */ }
     }
 
-    // Sauvegarder en DB
+    // Sauvegarder en DB (profile_image_url = story pour la rétrocompat historique)
     const { data: saved, error: dbError } = await supabaseAdmin
       .from('admin_generated_conversations')
       .insert({
-        profile_image_url: profileImageUrl,
+        profile_image_url: storyImageUrl,
         context: context || null,
         style,
         length,
@@ -227,7 +235,8 @@ export async function POST(req: NextRequest) {
       id: saved?.id,
       conversation: parsed.conversation,
       hook_explanation: parsed.hook_explanation,
-      profile_image_url: profileImageUrl,
+      profile_image_url: profileImageUrl || storyImageUrl,  // avatar
+      story_image_url: storyImageUrl,                        // story pour slide 1
     })
   } catch (error: any) {
     console.error('[Admin Conversations] Error:', error)

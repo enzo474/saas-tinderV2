@@ -6,7 +6,8 @@ import type { ConversationMessage } from './ConversationGenerator'
 interface ExportCarouselProps {
   conversationId?: string
   conversation: ConversationMessage[]
-  profileImage: string
+  profileImage: string   // avatar (petite bulle circulaire)
+  storyImage?: string    // photo story (grande image slide 1)
   previewRef: RefObject<HTMLDivElement | null>
 }
 
@@ -233,6 +234,7 @@ export default function ExportCarousel({
   conversationId,
   conversation,
   profileImage,
+  storyImage,
   previewRef,
 }: ExportCarouselProps) {
   const [exportingPng,      setExportingPng]      = useState(false)
@@ -264,9 +266,10 @@ export default function ExportCarousel({
   const exportAsCarousel = async () => {
     setExportingCarousel(true)
     try {
-      const JSZip  = (await import('jszip')).default
-      const zip    = new JSZip()
-      const avatar = await loadImg(profileImage)
+      const JSZip    = (await import('jszip')).default
+      const zip      = new JSZip()
+      const avatar   = await loadImg(profileImage)
+      const storyImg = storyImage ? await loadImg(storyImage) : avatar  // story séparée ou fallback avatar
 
       const hasStory = conversation[0]?.sender === 'lui'
       const storyMsg = hasStory ? conversation[0] : null
@@ -275,13 +278,13 @@ export default function ExportCarousel({
       let slideIdx = 0
 
       if (storyMsg) {
-        // Slide 1 : story + accroche
-        const blob1 = await makeSlideBlob([], avatar, { msg: storyMsg, img: avatar })
+        // Slide 1 : story + accroche (utilise storyImg pour la grande photo)
+        const blob1 = await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg })
         zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob1)
 
         // Slide 2 : story + accroche + 1ère réponse
         if (rest[0]) {
-          const blob2 = await makeSlideBlob([], avatar, { msg: storyMsg, img: avatar, withReply: rest[0] })
+          const blob2 = await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg, withReply: rest[0] })
           zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob2)
 
           // Slides suivants : 1 échange (2 messages) par slide
