@@ -207,8 +207,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         <div
           className="flex items-center gap-2 px-4 py-2 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
           style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
-          onClick={() => !isUnlimited && setShowRechargeModal(true)}
-          title={isUnlimited ? 'Pack Charo — Illimité' : 'Cliquer pour recharger'}
+          onClick={() => !isUnlimited && router.push('/ct/pricing')}
+          title={isUnlimited ? 'Pack Charo — Illimité' : 'Voir les offres'}
         >
           {isUnlimited ? (
             <>
