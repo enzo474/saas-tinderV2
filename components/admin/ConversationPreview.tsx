@@ -85,13 +85,13 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
           {/* Story reply group */}
           {storyReplyMessage && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, marginBottom: 6 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4, marginBottom: 6 }}>
 
-              {/* Photo story — juste l'image, comme un message image envoyé */}
+              {/* Photo story */}
               <div style={{
                 width: 136,
                 height: 172,
-                borderRadius: 16,
+                borderRadius: 18,
                 overflow: 'hidden',
                 flexShrink: 0,
               }}>
@@ -104,22 +104,17 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
 
               {/* Bulle texte d'accroche */}
               <div style={{
-                background: 'linear-gradient(to bottom right, #9B34B0, #C13584)',
+                background: 'linear-gradient(to bottom right, #9134BE, #C23584)',
                 color: '#fff',
-                padding: '10px 15px',
-                borderRadius: '20px 20px 5px 20px',
+                padding: '10px 16px',
+                borderRadius: 22,
                 maxWidth: '75%',
                 wordBreak: 'break-word',
-                fontSize: 14.5,
-                lineHeight: 1.45,
-                fontWeight: 400,
+                fontSize: 15,
+                lineHeight: 1.4,
               }}>
                 {storyReplyMessage.message}
               </div>
-
-              <span style={{ fontSize: 11, color: '#8e8e8e', marginRight: 2 }}>
-                {storyReplyMessage.timestamp}
-              </span>
             </div>
           )}
 
@@ -128,41 +123,28 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
             const isSent = msg.sender === 'lui'
             const nextMsg = restMessages[idx + 1]
             const prevMsg = idx > 0 ? restMessages[idx - 1] : null
-            const isFirstInGroup = !prevMsg || prevMsg.sender !== msg.sender
             const isLastInGroup = !nextMsg || nextMsg.sender !== msg.sender
 
-            // Border radius selon position dans le groupe
-            const getBorderRadius = () => {
-              if (isSent) {
-                if (isFirstInGroup && isLastInGroup) return '20px 20px 5px 20px'
-                if (isFirstInGroup) return '20px 20px 20px 20px'
-                if (isLastInGroup) return '20px 20px 5px 20px'
-                return '20px 20px 20px 20px'
-              } else {
-                if (isFirstInGroup && isLastInGroup) return '5px 20px 20px 20px'
-                if (isFirstInGroup) return '5px 20px 20px 20px'
-                if (isLastInGroup) return '20px 20px 20px 5px'
-                return '5px 20px 20px 5px'
-              }
-            }
+            // Coin bas coupé sur le dernier message de chaque groupe (comme Instagram)
+            const borderRadius = isSent
+              ? isLastInGroup ? '22px 22px 6px 22px' : '22px'
+              : isLastInGroup ? '22px 22px 22px 6px' : '22px'
 
             return (
-              <div key={idx}>
-                {/* Rangée message */}
+              <div key={idx} style={{ marginBottom: isLastInGroup ? 6 : 2 }}>
                 <div style={{
                   display: 'flex',
                   alignItems: 'flex-end',
                   justifyContent: isSent ? 'flex-end' : 'flex-start',
                   gap: 6,
-                  marginBottom: isLastInGroup ? 1 : 2,
                 }}>
-                  {/* Avatar elle — visible seulement dernier du groupe */}
+                  {/* Avatar elle — visible seulement sur le dernier du groupe */}
                   {!isSent && (
                     isLastInGroup ? (
                       <img
                         src={profileImage}
                         alt="elle"
-                        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginBottom: 2 }}
+                        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
                       />
                     ) : (
                       <div style={{ width: 26, flexShrink: 0 }} />
@@ -170,40 +152,20 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
                   )}
 
                   <div style={{
-                    padding: '9px 14px',
-                    borderRadius: getBorderRadius(),
+                    padding: '10px 16px',
+                    borderRadius,
                     maxWidth: '70%',
                     wordBreak: 'break-word',
-                    fontSize: 14.5,
-                    lineHeight: 1.45,
+                    fontSize: 15,
+                    lineHeight: 1.4,
                     ...(isSent
-                      ? {
-                          background: 'linear-gradient(to bottom right, #9B34B0, #C13584)',
-                          color: '#ffffff',
-                        }
-                      : {
-                          background: '#efefef',
-                          color: '#000000',
-                        }
+                      ? { background: 'linear-gradient(to bottom right, #9134BE, #C23584)', color: '#fff' }
+                      : { background: '#ffffff', color: '#000', border: '1px solid #efefef' }
                     ),
                   }}>
                     {msg.message}
                   </div>
                 </div>
-
-                {/* Timestamp — seulement fin de groupe */}
-                {isLastInGroup && (
-                  <div style={{
-                    textAlign: isSent ? 'right' : 'left',
-                    paddingLeft: isSent ? 0 : 32,
-                    paddingRight: isSent ? 4 : 0,
-                    marginBottom: 8,
-                  }}>
-                    <span style={{ fontSize: 11, color: '#8e8e8e' }}>
-                      {msg.timestamp}
-                    </span>
-                  </div>
-                )}
               </div>
             )
           })}
