@@ -62,7 +62,7 @@ export default function ExportCarousel({
         useCORS: true,
         allowTaint: true,
         logging: false,
-      })
+      } as Parameters<typeof html2canvas>[1])
       const link = document.createElement('a')
       link.download = `conversation-${conversationId || Date.now()}.png`
       link.href = canvas.toDataURL('image/png')
@@ -100,7 +100,7 @@ export default function ExportCarousel({
           useCORS: true,
           allowTaint: true,
           logging: false,
-        })
+        } as Parameters<typeof html2canvas>[1])
         document.body.removeChild(wrapper)
 
         const blob = await new Promise<Blob>((resolve) => {
