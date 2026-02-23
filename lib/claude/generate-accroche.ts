@@ -24,9 +24,10 @@ const TONES_CONFIG: Record<string, { emoji: string; label: string }> = {
   Drôle: { emoji: '😂', label: 'Drôle' },
   Mystérieux: { emoji: '🌙', label: 'Mystérieux' },
   Compliment: { emoji: '⚡', label: 'Compliment' },
+  CrushTalk: { emoji: '🔥', label: 'CrushTalk' },
 }
 
-const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment']
+const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushTalk']
 
 /**
  * Étape 1 : analyse le screenshot du profil avec Claude Vision
@@ -55,16 +56,23 @@ export async function analyzeProfileWithVision(
             text: `Analyse ce screenshot. Il peut s'agir soit d'un profil de dating app, soit d'une conversation (DM Instagram, Tinder, Bumble...).
 
 Si c'est un PROFIL : extrais les infos du profil.
-Si c'est une CONVERSATION : analyse le contenu de l'échange, le dernier message de la fille/femme, le ton de la conversation et le stade de l'échange (début / milieu / escalade vers date).
+
+Si c'est une CONVERSATION :
+⚠️ RÈGLE FONDAMENTALE DE LECTURE :
+- Les messages à DROITE (bulles à droite de l'écran) = messages envoyés par L'UTILISATEUR (l'homme qui veut séduire)
+- Les messages à GAUCHE (bulles à gauche de l'écran) = messages envoyés par LA FEMME qu'il veut séduire
+Cette règle est absolue : ne jamais l'inverser.
+
+Analyse : le dernier message visible de LA FEMME (gauche), le ton de la conversation, ce que L'UTILISATEUR (droite) a déjà envoyé, et le stade de l'échange (début / milieu / escalade vers date).
 
 Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
 {
-  "name": "prénom visible ou null",
+  "name": "prénom de la femme visible ou null",
   "age": "âge visible ou null",
-  "bio": "bio ou dernier(s) message(s) visible(s) ou null",
+  "bio": "dernier(s) message(s) de LA FEMME (gauche) ou bio ou null",
   "interests": ["info visible 1", "info visible 2"],
-  "vibe": "vibe du profil OU résumé du stade de la conversation (ex: 'elle résiste mais intéressée', 'elle a dit j'ai un mec', 'conversation bien engagée', 'elle veut du concret')",
-  "photo_context": "description de ce qui est visible (profil ou échange de messages)"
+  "vibe": "résumé du stade : ex 'elle résiste mais intéressée', 'elle a dit j ai un mec', 'conversation bien engagée', 'elle veut du concret', 'elle teste', 'elle est chaude'",
+  "photo_context": "résumé de l échange visible : ce que l utilisateur a dit (droite) et ce que la femme a répondu (gauche)"
 }
 
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
@@ -191,8 +199,10 @@ Exemple D — Elle dit "c'est pas comme ça qu'on approche une fille" :
 ❌ Mauvais : "Tu as raison, pardon... Bonjour, comment tu vas ?"
 ✅ Bon : "Peut-être. Mais c'est comme ça qu'on approche une femme."
 
-CONTEXTE VISUEL DISPONIBLE :
-Claude Vision a analysé le screenshot de la conversation. Utilise ce contexte pour adapter la réponse à là où en est la conversation (début, milieu, escalade vers un date).
+RAPPEL CRITIQUE SUR LA CONVERSATION :
+- Messages à DROITE = envoyés par L'UTILISATEUR (lui)
+- Messages à GAUCHE = envoyés par LA FEMME (elle)
+Tu dois répondre AU NOM DE L'UTILISATEUR en réaction au dernier message de LA FEMME (gauche).
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
@@ -205,6 +215,7 @@ Pour chaque ton, applique les principes ci-dessus en adaptant le style :
 - Drôle : humour absurde ou décalé, retournement de situation inattendu
 - Mystérieux : crée de l'intrigue, laisse inachevé, fait qu'elle demande la suite
 - Compliment : valorise un détail spécifique visible dans le screenshot, avec une pointe
+- CrushTalk : sélectionne automatiquement le meilleur style parmi les 10 principes selon le contexte exact de la conversation — la réponse optimale adaptée à cette situation précise, celle qui a le plus de chances de faire avancer vers un date
 
 Rien d'autre que le JSON.`
 
@@ -247,7 +258,7 @@ Rien d'autre que le JSON.`
       {
         role: 'user',
         content: isReponse
-          ? `Voici ce que Claude Vision a extrait du screenshot de la conversation :\n${profileDesc}\n\nEn te basant sur le screenshot analysé (vibe de la conversation, dernier message visible, stade de l'échange), génère ${tonesRequest.length} réponse(s) percutante(s) en suivant les 10 principes. Chaque réponse doit faire avancer vers un appel ou un date : ${tonesRequest.join(', ')}.`
+          ? `Voici ce que Claude Vision a extrait du screenshot de la conversation :\n${profileDesc}\n\nRappel : les messages à DROITE sont ceux de L'UTILISATEUR, les messages à GAUCHE sont ceux de LA FEMME.\nTu dois générer une réponse que L'UTILISATEUR va envoyer à LA FEMME, en réaction à son dernier message (gauche).\n\nEn te basant sur le screenshot analysé (vibe de la conversation, dernier message de la femme, stade de l'échange), génère ${tonesRequest.length} réponse(s) percutante(s) en suivant les 10 principes. Chaque réponse doit faire avancer vers un appel ou un date : ${tonesRequest.join(', ')}.`
           : `Profil analysé :\n${profileDesc}\n\nGénère maintenant ${tonesRequest.length} accroche(s) percutante(s) et personnalisée(s) pour ce profil : ${tonesRequest.join(', ')}.`,
       },
     ],
