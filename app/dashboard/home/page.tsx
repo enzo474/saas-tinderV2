@@ -122,6 +122,7 @@ export default async function DashboardHomePage() {
       userId={user.id}
       initialCredits={initialCredits}
       isAdmin={isAdmin}
+      hasPaid={!!analysis?.paid_at}
     />
   )
 }

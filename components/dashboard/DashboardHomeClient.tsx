@@ -14,6 +14,7 @@ interface DashboardHomeClientProps {
   userId: string
   initialCredits?: number
   isAdmin?: boolean
+  hasPaid?: boolean
 }
 
 export function DashboardHomeClient({
@@ -24,6 +25,7 @@ export function DashboardHomeClient({
   userId,
   initialCredits = 0,
   isAdmin = false,
+  hasPaid = false,
 }: DashboardHomeClientProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(!analysisFullPlan)
@@ -50,7 +52,7 @@ export function DashboardHomeClient({
 
   useEffect(() => {
     if (!analysisFullPlan) {
-      if (!analysisId) {
+      if (!analysisId || (!hasPaid && !isAdmin)) {
         setLoading(false)
         return
       }
