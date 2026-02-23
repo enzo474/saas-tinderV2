@@ -17,12 +17,17 @@ export default async function BioGeneratorPage() {
   // Récupérer l'analyse (formulaire + full_plan pour les 4 bios optimisées)
   const { data: analysesData } = await supabase
     .from('analyses')
-    .select('job, sport, lifestyle, vibe, anecdotes, passions, current_bio, personality, full_plan')
+    .select('job, sport, lifestyle, vibe, anecdotes, passions, current_bio, personality, full_plan, paid_at')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
     .limit(1)
 
   const analysis = analysesData?.[0]
+
+  // Vérifier que le user a payé CrushPicture — sinon rediriger vers pricing
+  if (!isAdmin && !analysis?.paid_at) {
+    redirect('/pricing')
+  }
 
   const analysisData = analysis ? {
     job: analysis.job || '',
