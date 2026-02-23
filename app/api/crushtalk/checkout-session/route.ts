@@ -56,21 +56,51 @@ export async function POST(req: NextRequest) {
       existingCredits?.subscription_status === 'active' &&
       existingCredits?.stripe_subscription_id
 
-    // ── Upgrade Chill → Charo avec proration ──
+    // ── Upgrade Chill → Charo : différence fixe de 6€ (14,90 - 8,90) ──
     if (hasActiveSub && existingCredits.subscription_type === 'chill' && plan === 'charo') {
       const subscription = await stripe.subscriptions.retrieve(
         existingCredits.stripe_subscription_id!
       )
       const currentItemId = subscription.items.data[0]?.id
+      const customerId = subscription.customer as string
 
-      if (!currentItemId) {
+      if (!currentItemId || !customerId) {
         return NextResponse.json({ error: 'Abonnement introuvable sur Stripe.' }, { status: 400 })
       }
 
-      // Stripe calcule automatiquement la différence au prorata
+      // 1. Créer un invoice item pour la différence fixe : 6,00€ = 600 centimes
+      await stripe.invoiceItems.create({
+        customer: customerId,
+        amount: 600,
+        currency: 'eur',
+        description: 'Mise à niveau Pack Chill → Pack Charo (différence)',
+      })
+
+      // 2. Créer la facture et la payer immédiatement sur la carte déjà enregistrée
+      const invoice = await stripe.invoices.create({
+        customer: customerId,
+        auto_advance: false,
+      })
+      await stripe.invoices.finalizeInvoice(invoice.id)
+
+      let paidInvoice: Stripe.Invoice
+      try {
+        paidInvoice = await stripe.invoices.pay(invoice.id)
+      } catch {
+        return NextResponse.json(
+          { error: 'Paiement refusé. Vérifie ta carte bancaire.' },
+          { status: 402 }
+        )
+      }
+
+      if (paidInvoice.status !== 'paid') {
+        return NextResponse.json({ error: 'Paiement échoué.' }, { status: 402 })
+      }
+
+      // 3. Paiement OK → mise à jour de l'abonnement sans proration
       await stripe.subscriptions.update(existingCredits.stripe_subscription_id!, {
         items: [{ id: currentItemId, price: planConfig.priceId }],
-        proration_behavior: 'create_prorations',
+        proration_behavior: 'none',
         metadata: {
           user_id: user.id,
           plan: 'charo',
