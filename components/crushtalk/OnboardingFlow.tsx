@@ -16,7 +16,6 @@ const TOTAL_QUESTIONS = 6
 
 const BIO_EXAMPLES = [
   "J'ai une règle pour les premiers verres : je choisis le lieu, tu choisis l'heure de fin. Jusqu'ici, personne n'est partie à l'heure prévue.",
-  "J'ai une théorie : les meilleures connexions commencent par un décalage horaire et finissent par un réveil qu'on veut pas entendre.\n\nSi t'es du genre à prendre l'avion sur un coup de tête, on va bien s'entendre. Sinon, je te convaincs en deux verres.",
 ]
 
 function getPersonalizedMessage(data: OnboardingData): string {
@@ -426,7 +425,7 @@ export function OnboardingFlow() {
                       </div>
                     </div>
                     <div className="relative flex-1 rounded-xl overflow-hidden">
-                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover object-center" />
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: 'top center' }} />
                       <div
                         className="absolute bottom-2 left-0 right-0 flex justify-center"
                       >
@@ -444,20 +443,11 @@ export function OnboardingFlow() {
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(247,127,0,0.7)' }}>Bio IA</p>
                   <h3 className="font-montserrat font-bold text-white text-lg mb-1">Bio optimisée par l&apos;IA</h3>
                   <p className="text-xs mb-4" style={{ color: '#6b7280' }}>4 bios différentes générées selon ton style</p>
-                  <div className="space-y-2.5">
-                    {BIO_EXAMPLES.map((bio, i) => (
-                      <div key={i} className="rounded-xl p-4 text-left" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span
-                            className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                            style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}
-                          >
-                            Bio {i + 1}
-                          </span>
-                        </div>
-                        <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: '#d1d5db' }}>{bio}</p>
-                      </div>
-                    ))}
+                  <div
+                    className="rounded-xl p-5 text-left"
+                    style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
+                  >
+                    <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>{BIO_EXAMPLES[0]}</p>
                   </div>
                 </div>
               )}
