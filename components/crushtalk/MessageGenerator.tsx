@@ -18,11 +18,11 @@ interface MessageGeneratorProps {
 }
 
 const TONES = [
-  { label: 'Direct', emoji: '🎯', description: null },
-  { label: 'Drôle', emoji: '😂', description: null },
-  { label: 'Mystérieux', emoji: '🌙', description: null },
-  { label: 'Compliment', emoji: '⚡', description: null },
-  { label: 'CrushTalk', emoji: '🔥', description: 'Adapté par l\'IA' },
+  { label: 'Direct', description: null },
+  { label: 'Drôle', description: null },
+  { label: 'Mystérieux', description: null },
+  { label: 'Compliment', description: null },
+  { label: 'CrushTalk', description: 'Adapté par l\'IA' },
 ]
 
 const CREDITS_PER_GENERATION = 5
@@ -288,7 +288,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                   <button
                     key={tone.label}
                     onClick={() => selectTone(tone.label)}
-                    className="flex items-center gap-2 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                    className="flex items-center justify-center px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
                     style={isActive ? {
                       borderColor: '#F77F00',
                       background: 'rgba(247,127,0,0.1)',
@@ -298,7 +298,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                       color: '#9da3af',
                     }}
                   >
-                    <span>{tone.emoji}</span>
                     <span>{tone.label}</span>
                   </button>
                 )
@@ -320,7 +319,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                       color: '#9da3af',
                     }}
                   >
-                    <span>🔥</span>
                     <span>CrushTalk</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: isActive ? 'rgba(247,127,0,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FFAA33' : '#6b7280' }}>
                       Adapté par l&apos;IA
