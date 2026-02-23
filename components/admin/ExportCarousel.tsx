@@ -10,9 +10,9 @@ interface ExportCarouselProps {
   previewRef: RefObject<HTMLDivElement | null>
 }
 
-const W = 393      // largeur slide
-const PAD = 12     // padding horizontal
-const S = 6        // petit radius pour groupes consécutifs
+const W = 393       // largeur slide (iPhone 14 Pro)
+const PAD = 14      // padding horizontal
+const S = 6         // petit radius pour groupes consécutifs
 
 function getBubbleRadius(isSent: boolean, isFirst: boolean, isLast: boolean): string {
   if (isFirst && isLast) return '22px'
