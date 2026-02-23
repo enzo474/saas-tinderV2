@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { CrushTalkPricingClient } from '@/components/crushtalk/CrushTalkPricingClient'
@@ -7,6 +7,18 @@ export default async function CrushTalkPricingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/crushtalk/login')
+
+  const supabaseAdmin = createServiceRoleClient()
+  const { data: credits } = await supabaseAdmin
+    .from('crushtalk_credits')
+    .select('subscription_type, subscription_status')
+    .eq('user_id', user.id)
+    .single()
+
+  const currentPlan =
+    credits?.subscription_status === 'active' && (credits.subscription_type === 'chill' || credits.subscription_type === 'charo')
+      ? (credits.subscription_type as 'chill' | 'charo')
+      : null
 
   return (
     <div className="min-h-screen" style={{ background: '#0A0A0A' }}>
@@ -44,7 +56,7 @@ export default async function CrushTalkPricingPage() {
             </p>
           </div>
 
-          <CrushTalkPricingClient />
+          <CrushTalkPricingClient currentPlan={currentPlan} />
 
           <div className="text-center mt-8 space-y-2">
             <p className="text-xs" style={{ color: '#6b7280' }}>

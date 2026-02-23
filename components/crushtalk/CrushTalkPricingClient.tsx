@@ -45,7 +45,7 @@ const plans = [
   },
 ]
 
-export function CrushTalkPricingClient() {
+export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' | 'charo' | null }) {
   const [loading, setLoading] = useState<CrushTalkPlan | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -82,20 +82,40 @@ export function CrushTalkPricingClient() {
       {plans.map((plan) => {
         const Icon = plan.icon
         const isLoading = loading === plan.id
+        const isCurrentPlan = currentPlan === plan.id
         return (
           <div
             key={plan.id}
             className="relative rounded-2xl p-6 border flex flex-col transition-all duration-300"
-            style={{ background: plan.accentBg, borderColor: plan.accentBorder }}
+            style={{
+              background: plan.accentBg,
+              borderColor: isCurrentPlan ? plan.accent : plan.accentBorder,
+              borderWidth: isCurrentPlan ? '2px' : '1px',
+            }}
           >
-            {plan.badge && (
+            {/* Badge plan actuel OU meilleur choix */}
+            {isCurrentPlan ? (
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-white" style={{ background: plan.accent }}>
+                <div className="flex items-center gap-1">
+                  <Check className="w-3 h-3" />
+                  TON PLAN ACTUEL
+                </div>
+              </div>
+            ) : plan.badge && !currentPlan ? (
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
                 <div className="flex items-center gap-1">
                   <Star className="w-3 h-3 fill-black" />
                   {plan.badge}
                 </div>
               </div>
-            )}
+            ) : plan.badge && currentPlan && !isCurrentPlan ? (
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-black" />
+                  {plan.badge}
+                </div>
+              </div>
+            ) : null}
 
             {/* Icon + titre */}
             <div className="flex items-center gap-3 mb-4">
@@ -132,21 +152,30 @@ export function CrushTalkPricingClient() {
             </ul>
 
             {/* Bouton — toujours en bas grâce à mt-auto */}
-            <button
-              onClick={() => handleSubscribe(plan.id)}
-              disabled={!!loading}
-              className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60 mt-auto"
-              style={{ background: `linear-gradient(135deg, ${plan.accent}, ${plan.id === 'chill' ? '#FFAA33' : '#FFD700'})`, boxShadow: `0 4px 20px ${plan.accent}30` }}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Redirection...
-                </span>
-              ) : (
-                `Choisir ${plan.label}`
-              )}
-            </button>
+            {isCurrentPlan ? (
+              <div
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-center mt-auto"
+                style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${plan.accent}40`, color: plan.accent }}
+              >
+                ✓ Plan actuel
+              </div>
+            ) : (
+              <button
+                onClick={() => handleSubscribe(plan.id)}
+                disabled={!!loading}
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60 mt-auto"
+                style={{ background: `linear-gradient(135deg, ${plan.accent}, ${plan.id === 'chill' ? '#FFAA33' : '#FFD700'})`, boxShadow: `0 4px 20px ${plan.accent}30` }}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                    Redirection...
+                  </span>
+                ) : (
+                  plan.id === 'charo' && currentPlan === 'chill' ? 'Passer au Pack Charo (+6€)' : `Choisir ${plan.label}`
+                )}
+              </button>
+            )}
           </div>
         )
       })}
