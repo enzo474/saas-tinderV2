@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Check } from 'lucide-react'
 
-export default function CrushTalkAuthGate() {
+function LoginContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const searchParams = useSearchParams()
@@ -56,7 +56,6 @@ export default function CrushTalkAuthGate() {
 
         <div className="rounded-2xl p-8 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
           {isReturning ? (
-            /* ── Returning user ── */
             <div className="text-center mb-7">
               <div className="text-4xl mb-3">👋</div>
               <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
@@ -67,7 +66,6 @@ export default function CrushTalkAuthGate() {
               </p>
             </div>
           ) : (
-            /* ── New user ── */
             <div className="text-center mb-7">
               <div className="text-4xl mb-3">🎁</div>
               <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
@@ -89,7 +87,6 @@ export default function CrushTalkAuthGate() {
             </div>
           )}
 
-          {/* Google button */}
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
@@ -109,7 +106,6 @@ export default function CrushTalkAuthGate() {
             {loading ? 'Connexion...' : 'Continuer avec Google'}
           </button>
 
-          {/* Benefits — uniquement pour nouveaux users */}
           {!isReturning && (
             <div className="space-y-3">
               {[
@@ -133,13 +129,9 @@ export default function CrushTalkAuthGate() {
 
         <p className="text-center text-xs mt-5" style={{ color: '#6b7280' }}>
           En continuant, tu acceptes nos{' '}
-          <Link href="/terms" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>
-            CGU
-          </Link>
+          <Link href="/terms" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>CGU</Link>
           {' '}et notre{' '}
-          <Link href="/privacy" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>
-            Politique de confidentialité
-          </Link>
+          <Link href="/privacy" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>Politique de confidentialité</Link>
         </p>
 
         {!isReturning && (
@@ -152,5 +144,17 @@ export default function CrushTalkAuthGate() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function CrushTalkLoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0A0A0A' }}>
+        <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(247,127,0,0.2)', borderTopColor: '#F77F00' }} />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
