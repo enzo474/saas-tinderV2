@@ -34,6 +34,28 @@ La fille peut être choquée, amusée ou agacée — les 3 créent de l'engageme
   direct: 'DIRECT / OSÉ : Droit au but, honnête sur ses intentions, sans détour. Efficace et court. Chaque message va à l\'essentiel.',
   mysterieux: 'MYSTÉRIEUX / INTRIGUANT : Messages qui laissent des questions en suspens. La fille doit se demander qui il est. Crée de l\'intrigue et de la tension.',
   flirt: 'FLIRT HEAVY : Flirt intense et constant, sous-entendus permanents, jeu de séduction élaboré. Chaque message est une invitation voilée.',
+
+  viral_choc: `ACCROCHE VIRALE / CHOC :
+
+L'accroche N'A AUCUN RAPPORT avec la photo. C'est un message ultra-direct, décalé ou provoc qui crée un choc immédiat.
+Le but : elle répond par réflexe, même si elle veut pas. Le message est tellement inattendu qu'elle peut pas s'en empêcher.
+
+EXEMPLES D'ACCROCHES VIRALES SANS RAPPORT AVEC LA PHOTO :
+→ "Quelle heure demain pour le date"
+→ "Tu me dragues ?"
+→ "Je sais pas encore si je vais te garder"
+→ "T'es libre quand cette semaine"
+→ "Tu corresponds pas à mes critères mais je fais une exception"
+→ "Fais-moi une description de toi en 3 mots"
+→ "J'aurais besoin de toi pour quelque chose"
+→ "T'as l'air du genre à être compliquée. Je prends le risque quand même"
+→ "Je vais être honnête : j'ai pas encore décidé si tu m'intéresses"
+→ "Je cherche quelqu'un capable de me tenir tête. Postule"
+→ "Dis-moi quelque chose que je saurais pas en regardant tes photos"
+→ "T'as une tête à avoir un caractère. C'est vrai ?"
+
+TON : surprenant, assumé, jamais expliqué. Il pose le message et attend. C'est ELLE qui doit se justifier, pas lui.
+La fille réagit par surprise, confusion, amusement ou agacement — tout ça génère de l'engagement viral.`,
 }
 
 function buildSystemPrompt(style: string, length: string): string {
@@ -175,15 +197,20 @@ export async function POST(req: NextRequest) {
     const admin = await isUserAdmin(user.id)
     if (!admin) return NextResponse.json({ error: 'Accès refusé — Admin uniquement' }, { status: 403 })
 
-    const { storyImageBase64, storyMediaType, profileImageBase64, profileMediaType, context, style, length } = await req.json()
+    const { storyImageBase64, storyMediaType, profileImageBase64, profileMediaType, context, style, length, customAccroche } = await req.json()
 
     if (!storyImageBase64 || !style || !length) {
       return NextResponse.json({ error: 'Paramètres manquants (storyImage requis)' }, { status: 400 })
     }
 
+    // Si une accroche personnalisée est fournie, elle devient le 1er message de "lui" — Claude génère la suite
+    const accrocheLine = customAccroche?.trim()
+      ? `\n\n⚠️ ACCROCHE PERSONNALISÉE — OBLIGATOIRE : Le PREMIER message de "lui" dans le JSON doit être EXACTEMENT : "${customAccroche.trim()}"\nNe modifie pas ce texte d'un seul caractère. Génère la réaction de "elle" et la suite de la conversation à partir de cette accroche.`
+      : ''
+
     const userMessage = context
-      ? `Contexte fourni par l'admin : ${context}\n\nGénère la conversation.`
-      : 'Analyse cette photo de story et génère une conversation virale basée dessus.'
+      ? `Contexte fourni par l'admin : ${context}${accrocheLine}\n\nGénère la conversation.`
+      : `Analyse cette photo de story et génère une conversation virale basée dessus.${accrocheLine}`
 
     const claudeResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
