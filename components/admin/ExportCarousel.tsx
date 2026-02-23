@@ -281,8 +281,8 @@ export default function ExportCarousel({
   storyImage,
   previewRef,
 }: ExportCarouselProps) {
-  const [exportingPng,      setExportingPng]      = useState(false)
-  const [exportingCarousel, setExportingCarousel] = useState(false)
+  const [exportingPng, setExportingPng]   = useState(false)
+  const [exportingPdf, setExportingPdf]   = useState(false)
 
   const exportAsImage = async () => {
     if (!previewRef.current) return
@@ -307,52 +307,76 @@ export default function ExportCarousel({
     }
   }
 
-  const exportAsCarousel = async () => {
-    setExportingCarousel(true)
+  const exportAsPdf = async () => {
+    setExportingPdf(true)
     try {
-      const JSZip    = (await import('jszip')).default
-      const zip      = new JSZip()
-      const avatar   = await loadImg(profileImage)
-      const storyImg = storyImage ? await loadImg(storyImage) : avatar  // story séparée ou fallback avatar
+      const { jsPDF }  = await import('jspdf')
+      const avatar     = await loadImg(profileImage)
+      const storyImg   = storyImage ? await loadImg(storyImage) : avatar
 
       const hasStory = conversation[0]?.sender === 'lui'
       const storyMsg = hasStory ? conversation[0] : null
       const rest     = hasStory ? conversation.slice(1) : conversation
 
-      let slideIdx = 0
+      // Génère tous les blobs dans l'ordre
+      const blobs: Blob[] = []
 
       if (storyMsg) {
-        // Slide 1 : story + accroche (utilise storyImg pour la grande photo)
-        const blob1 = await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg })
-        zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob1)
-
-        // Slide 2 : story + accroche + 1ère réponse
+        blobs.push(await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg }))
         if (rest[0]) {
-          const blob2 = await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg, withReply: rest[0] })
-          zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob2)
-
-          // Slides suivants : 1 échange (2 messages) par slide
+          blobs.push(await makeSlideBlob([], avatar, { msg: storyMsg, img: storyImg, withReply: rest[0] }))
           for (let i = 1; i < rest.length; i += 2) {
-            const blob = await makeSlideBlob(rest.slice(i, i + 2), avatar)
-            zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob)
+            blobs.push(await makeSlideBlob(rest.slice(i, i + 2), avatar))
           }
         }
       } else {
         for (let i = 0; i < conversation.length; i += 2) {
-          const blob = await makeSlideBlob(conversation.slice(i, i + 2), avatar)
-          zip.file(`slide-${String(++slideIdx).padStart(2, '0')}.png`, blob)
+          blobs.push(await makeSlideBlob(conversation.slice(i, i + 2), avatar))
         }
       }
 
-      const zipBlob = await zip.generateAsync({ type: 'blob' })
-      const link = document.createElement('a')
-      link.download = `carousel-${conversationId || Date.now()}.zip`
-      link.href = URL.createObjectURL(zipBlob)
-      link.click()
+      // Convertit chaque blob en dataURL puis l'ajoute au PDF
+      const toDataUrl = (blob: Blob): Promise<string> =>
+        new Promise(res => {
+          const r = new FileReader()
+          r.onload = () => res(r.result as string)
+          r.readAsDataURL(blob)
+        })
+
+      // Toutes les images du PDF ont la même largeur (W px canvas = W/SC px @1x)
+      let pdf: InstanceType<typeof jsPDF> | null = null
+
+      for (let i = 0; i < blobs.length; i++) {
+        const dataUrl = await toDataUrl(blobs[i])
+
+        // Crée un img temporaire pour connaître les dimensions réelles
+        const dim = await new Promise<{ w: number; h: number }>(res => {
+          const img = new Image()
+          img.onload = () => res({ w: img.naturalWidth / SC, h: img.naturalHeight / SC })
+          img.src = dataUrl
+        })
+
+        if (!pdf) {
+          pdf = new jsPDF({
+            orientation: dim.h > dim.w ? 'portrait' : 'landscape',
+            unit: 'px',
+            format: [dim.w, dim.h],
+            hotfixes: ['px_scaling'],
+          })
+        } else {
+          pdf.addPage([dim.w, dim.h], dim.h > dim.w ? 'portrait' : 'landscape')
+        }
+
+        pdf.addImage(dataUrl, 'PNG', 0, 0, dim.w, dim.h)
+      }
+
+      if (pdf) {
+        pdf.save(`carrousel-${conversationId || Date.now()}.pdf`)
+      }
     } catch (err) {
-      console.error('Export carousel error:', err)
+      console.error('Export PDF error:', err)
     } finally {
-      setExportingCarousel(false)
+      setExportingPdf(false)
     }
   }
 
@@ -365,11 +389,11 @@ export default function ExportCarousel({
 
   return (
     <div style={{ display: 'flex', gap: 12 }}>
-      <button onClick={exportAsImage}      disabled={exportingPng}      style={btn(exportingPng,      '#1a1a2e')}>
-        {exportingPng      ? <><Spinner /> Export...</> : '📸 Image PNG'}
+      <button onClick={exportAsImage} disabled={exportingPng} style={btn(exportingPng, '#1a1a2e')}>
+        {exportingPng ? <><Spinner /> Export...</> : '📸 Image PNG'}
       </button>
-      <button onClick={exportAsCarousel}   disabled={exportingCarousel} style={btn(exportingCarousel, '#0a0a1a')}>
-        {exportingCarousel ? <><Spinner /> ZIP...</>    : '📱 Carrousel ZIP'}
+      <button onClick={exportAsPdf} disabled={exportingPdf} style={btn(exportingPdf, '#1a0a2e')}>
+        {exportingPdf ? <><Spinner /> PDF...</> : '📄 Carrousel PDF'}
       </button>
     </div>
   )
