@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 interface OnboardingData {
   struggle_point: string
@@ -185,6 +186,7 @@ export function OnboardingFlow() {
           className="rounded-2xl p-6 md:p-8 border"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
+
           {/* Progress bar for Q1-Q6 */}
           {step <= TOTAL_QUESTIONS && <ProgressBar step={step} />}
 
@@ -425,7 +427,7 @@ export function OnboardingFlow() {
                       </div>
                     </div>
                     <div className="relative flex-1 rounded-xl overflow-hidden">
-                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: 'top center' }} />
+                      <img src="/apres.webp" alt="Après" className="w-full h-full object-cover" style={{ objectPosition: '10% center' }} />
                       <div
                         className="absolute bottom-2 left-0 right-0 flex justify-center"
                       >
@@ -532,6 +534,18 @@ export function OnboardingFlow() {
             </button>
           )}
         </div>
+
+        {/* Lien connexion compte existant */}
+        <p className="text-center text-sm mt-5" style={{ color: '#6b7280' }}>
+          Déjà un compte ?{' '}
+          <Link
+            href="/crushtalk/login"
+            className="font-semibold transition-colors hover:text-white"
+            style={{ color: '#F77F00' }}
+          >
+            Se connecter →
+          </Link>
+        </p>
       </div>
     </div>
   )
