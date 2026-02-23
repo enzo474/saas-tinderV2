@@ -8,51 +8,9 @@ interface ConversationPreviewProps {
   profileImage: string
 }
 
-// SVG icons inline pour éviter les dépendances
-const ChevronLeft = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="15 18 9 12 15 6" />
-  </svg>
-)
-const Phone = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 1.16 2 2 0 012.08.001h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.41-.41a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
-  </svg>
-)
-const Video = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polygon points="23 7 16 12 23 17 23 7" />
-    <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-  </svg>
-)
-const Info = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <line x1="12" y1="16" x2="12" y2="12" />
-    <line x1="12" y1="8" x2="12.01" y2="8" />
-  </svg>
-)
-const Image = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-    <circle cx="8.5" cy="8.5" r="1.5" />
-    <polyline points="21 15 16 10 5 21" />
-  </svg>
-)
-const Mic = () => (
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
-    <path d="M19 10v2a7 7 0 01-14 0v-2" />
-    <line x1="12" y1="19" x2="12" y2="23" />
-    <line x1="8" y1="23" x2="16" y2="23" />
-  </svg>
-)
-
 const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>(
   function ConversationPreview({ conversation, profileImage }, ref) {
-    // Séparer le premier message "lui" du reste pour l'afficher comme story reply
-    const firstLuiIdx = conversation.findIndex(m => m.sender === 'lui')
-    const storyReplyMessage = firstLuiIdx === 0 ? conversation[0] : null
+    const storyReplyMessage = conversation[0]?.sender === 'lui' ? conversation[0] : null
     const restMessages = storyReplyMessage ? conversation.slice(1) : conversation
 
     return (
@@ -60,110 +18,106 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
         ref={ref}
         id="conversation-preview"
         style={{
-          width: 390,
-          background: '#fff',
-          borderRadius: 0,
+          width: 393,
+          background: '#ffffff',
           overflow: 'hidden',
-          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif',
         }}
       >
-        {/* Header Instagram DM — fond blanc */}
+        {/* ── HEADER ────────────────────────────────────────── */}
         <div style={{
-          background: '#fff',
-          padding: '10px 12px 10px 8px',
+          background: '#ffffff',
+          padding: '12px 16px 10px',
           display: 'flex',
           alignItems: 'center',
-          gap: 4,
-          borderBottom: '1px solid #efefef',
+          gap: 0,
+          borderBottom: '0.5px solid #e5e5e5',
         }}>
-          {/* Flèche retour */}
-          <span style={{ color: '#000', display: 'flex', alignItems: 'center', padding: '0 4px' }}>
-            <ChevronLeft />
-          </span>
+          {/* Chevron gauche */}
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 4, flexShrink: 0 }}>
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
 
-          {/* Avatar sans point vert */}
+          {/* Avatar */}
           <img
             src={profileImage}
             alt="Profile"
-            style={{
-              width: 44,
-              height: 44,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              display: 'block',
-              marginRight: 8,
-            }}
+            style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginRight: 10 }}
           />
 
-          {/* Nom + chevron */}
-          <div style={{ flex: 1 }}>
-            <div style={{ color: '#000', fontWeight: 700, fontSize: 15, display: 'flex', alignItems: 'center', gap: 2 }}>
+          {/* Nom + chevron droit */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 3 }}>
+            <span style={{ color: '#000', fontWeight: 700, fontSize: 15, letterSpacing: '-0.2px' }}>
               claraaa.study
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5" style={{ marginLeft: 2 }}>
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
-            </div>
+            </span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </div>
 
-          {/* Icônes droite — noir */}
-          <div style={{ display: 'flex', gap: 14, color: '#000' }}>
-            <Phone />
-            <Video />
-            <Info />
+          {/* Icônes droite : téléphone, vidéo, tag */}
+          <div style={{ display: 'flex', gap: 18, alignItems: 'center' }}>
+            {/* Téléphone */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.1 1.16 2 2 0 012.08 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.41-.41a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" />
+            </svg>
+            {/* Caméra vidéo */}
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="23 7 16 12 23 17 23 7" />
+              <rect x="1" y="5" width="15" height="14" rx="2" />
+            </svg>
+            {/* Tag / étiquette */}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" />
+              <line x1="7" y1="7" x2="7.01" y2="7" />
+            </svg>
           </div>
         </div>
 
-        {/* Zone messages */}
+        {/* ── MESSAGES ──────────────────────────────────────── */}
         <div style={{
-          background: '#fff',
-          padding: '12px 12px 8px',
+          background: '#ffffff',
+          padding: '14px 10px 10px',
           display: 'flex',
           flexDirection: 'column',
-          gap: 6,
-          minHeight: 400,
+          gap: 3,
         }}>
 
-          {/* Story reply — premier message "lui" */}
+          {/* Story reply group */}
           {storyReplyMessage && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, marginBottom: 4 }}>
-              {/* Image story */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3, marginBottom: 6 }}>
+
+              {/* Photo story — juste l'image, comme un message image envoyé */}
               <div style={{
-                borderRadius: 18,
+                width: 136,
+                height: 172,
+                borderRadius: 16,
                 overflow: 'hidden',
-                width: 160,
-                height: 200,
-                position: 'relative',
-                border: '1px solid #efefef',
+                flexShrink: 0,
               }}>
                 <img
                   src={profileImage}
                   alt="Story"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                 />
-                {/* Overlay "Story" label */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  background: 'linear-gradient(transparent, rgba(0,0,0,0.5))',
-                  padding: '20px 10px 8px',
-                  color: '#fff', fontSize: 11, textAlign: 'center',
-                }}>
-                  A répondu à ta story
-                </div>
               </div>
-              {/* Bulle message d'accroche */}
+
+              {/* Bulle texte d'accroche */}
               <div style={{
-                background: 'linear-gradient(135deg, #833AB4, #C13584)',
+                background: 'linear-gradient(to bottom right, #9B34B0, #C13584)',
                 color: '#fff',
-                padding: '10px 14px',
-                borderRadius: '18px 18px 4px 18px',
-                maxWidth: '72%',
+                padding: '10px 15px',
+                borderRadius: '20px 20px 5px 20px',
+                maxWidth: '75%',
                 wordBreak: 'break-word',
-                fontSize: 15,
-                lineHeight: 1.4,
+                fontSize: 14.5,
+                lineHeight: 1.45,
+                fontWeight: 400,
               }}>
                 {storyReplyMessage.message}
               </div>
-              <span style={{ fontSize: 11, color: '#aaa', marginRight: 4 }}>
+
+              <span style={{ fontSize: 11, color: '#8e8e8e', marginRight: 2 }}>
                 {storyReplyMessage.timestamp}
               </span>
             </div>
@@ -172,105 +126,132 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
           {/* Reste de la conversation */}
           {restMessages.map((msg, idx) => {
             const isSent = msg.sender === 'lui'
-
-            // Grouper les avatars : montrer l'avatar seulement sur le dernier message consécutif de "elle"
             const nextMsg = restMessages[idx + 1]
+            const prevMsg = idx > 0 ? restMessages[idx - 1] : null
+            const isFirstInGroup = !prevMsg || prevMsg.sender !== msg.sender
             const isLastInGroup = !nextMsg || nextMsg.sender !== msg.sender
 
+            // Border radius selon position dans le groupe
+            const getBorderRadius = () => {
+              if (isSent) {
+                if (isFirstInGroup && isLastInGroup) return '20px 20px 5px 20px'
+                if (isFirstInGroup) return '20px 20px 20px 20px'
+                if (isLastInGroup) return '20px 20px 5px 20px'
+                return '20px 20px 20px 20px'
+              } else {
+                if (isFirstInGroup && isLastInGroup) return '5px 20px 20px 20px'
+                if (isFirstInGroup) return '5px 20px 20px 20px'
+                if (isLastInGroup) return '20px 20px 20px 5px'
+                return '5px 20px 20px 5px'
+              }
+            }
+
             return (
-              <div
-                key={idx}
-                style={{
+              <div key={idx}>
+                {/* Rangée message */}
+                <div style={{
                   display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: isSent ? 'flex-end' : 'flex-start',
-                  gap: 2,
-                }}
-              >
-                {!isSent ? (
-                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 6 }}>
-                    {/* Avatar visible seulement sur dernier message du groupe */}
-                    {isLastInGroup ? (
+                  alignItems: 'flex-end',
+                  justifyContent: isSent ? 'flex-end' : 'flex-start',
+                  gap: 6,
+                  marginBottom: isLastInGroup ? 1 : 2,
+                }}>
+                  {/* Avatar elle — visible seulement dernier du groupe */}
+                  {!isSent && (
+                    isLastInGroup ? (
                       <img
                         src={profileImage}
                         alt="elle"
-                        style={{ width: 28, height: 28, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                        style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, marginBottom: 2 }}
                       />
                     ) : (
-                      <div style={{ width: 28, flexShrink: 0 }} />
-                    )}
-                    <div style={{
-                      background: '#efefef',
-                      color: '#000',
-                      padding: '10px 14px',
-                      borderRadius: isLastInGroup ? '18px 18px 18px 4px' : '18px',
-                      maxWidth: '68%',
-                      wordBreak: 'break-word',
-                      fontSize: 15,
-                      lineHeight: 1.4,
-                    }}>
-                      {msg.message}
-                    </div>
-                  </div>
-                ) : (
+                      <div style={{ width: 26, flexShrink: 0 }} />
+                    )
+                  )}
+
                   <div style={{
-                    background: 'linear-gradient(135deg, #833AB4, #C13584)',
-                    color: '#fff',
-                    padding: '10px 14px',
-                    borderRadius: isLastInGroup ? '18px 18px 4px 18px' : '18px',
-                    maxWidth: '68%',
+                    padding: '9px 14px',
+                    borderRadius: getBorderRadius(),
+                    maxWidth: '70%',
                     wordBreak: 'break-word',
-                    fontSize: 15,
-                    lineHeight: 1.4,
+                    fontSize: 14.5,
+                    lineHeight: 1.45,
+                    ...(isSent
+                      ? {
+                          background: 'linear-gradient(to bottom right, #9B34B0, #C13584)',
+                          color: '#ffffff',
+                        }
+                      : {
+                          background: '#efefef',
+                          color: '#000000',
+                        }
+                    ),
                   }}>
                     {msg.message}
                   </div>
-                )}
+                </div>
 
-                {/* Timestamp discret, seulement en fin de groupe */}
+                {/* Timestamp — seulement fin de groupe */}
                 {isLastInGroup && (
-                  <span style={{
-                    fontSize: 11,
-                    color: '#aaa',
-                    marginLeft: isSent ? 0 : 34,
-                    marginRight: isSent ? 4 : 0,
-                    marginBottom: 4,
+                  <div style={{
+                    textAlign: isSent ? 'right' : 'left',
+                    paddingLeft: isSent ? 0 : 32,
+                    paddingRight: isSent ? 4 : 0,
+                    marginBottom: 8,
                   }}>
-                    {msg.timestamp}
-                  </span>
+                    <span style={{ fontSize: 11, color: '#8e8e8e' }}>
+                      {msg.timestamp}
+                    </span>
+                  </div>
                 )}
               </div>
             )
           })}
         </div>
 
-        {/* Barre de saisie Instagram */}
+        {/* ── BARRE DE SAISIE ────────────────────────────────── */}
         <div style={{
-          background: '#fff',
-          borderTop: '1px solid #efefef',
-          padding: '10px 12px',
+          background: '#ffffff',
+          borderTop: '0.5px solid #e5e5e5',
+          padding: '10px 14px 12px',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
         }}>
-          {/* Icône camera/media gauche */}
-          <span style={{ color: '#000' }}><Image /></span>
-
           {/* Champ texte */}
           <div style={{
             flex: 1,
             border: '1px solid #dbdbdb',
             borderRadius: 22,
-            padding: '9px 16px',
-            color: '#aaa',
+            padding: '8px 16px',
+            color: '#8e8e8e',
             fontSize: 14,
             background: '#fff',
           }}>
-            Message...
+            Votre message...
           </div>
 
-          {/* Micro + sticker droite */}
-          <span style={{ color: '#000' }}><Mic /></span>
+          {/* Micro */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+            <path d="M19 10v2a7 7 0 01-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
+
+          {/* Image */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+
+          {/* Sticker + */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="16" />
+            <line x1="8" y1="12" x2="16" y2="12" />
+          </svg>
         </div>
       </div>
     )
