@@ -195,10 +195,10 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       {/* Header avec crédits */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-montserrat font-bold text-white text-2xl md:text-3xl">
+          <h1 className="font-montserrat font-bold text-white text-xl md:text-3xl whitespace-nowrap">
             {activeType === 'accroche' ? 'Messages d\'accroche' : 'Répondre à un message'}
           </h1>
-          <p className="text-text-secondary text-sm mt-1">
+          <p className="text-text-secondary text-sm mt-1 line-clamp-2">
             {activeType === 'accroche'
               ? 'Upload un profil, l\'IA génère 4 messages personnalisés pour toi.'
               : 'Upload la conversation, l\'IA génère des réponses percutantes.'}
