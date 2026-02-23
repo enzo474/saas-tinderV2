@@ -12,7 +12,24 @@ const MESSAGE_COUNTS: Record<string, string> = {
 }
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
-  trash: 'TRASH / PROVOCANT : Accroche frontale, provocante, avec une pointe d\'audace assumée. Pas vulgaire mais clairement osé. Le mec est sûr de lui à l\'extrême.',
+  trash: `TRASH / PROVOCANT :
+
+L'accroche est la clé — elle doit être FRONTALE, DIRECTE et basée sur quelque chose de visible sur la photo.
+Pas vulgaire. Pas agressif. Mais clairement osé, avec un sous-entendu assumé et une confiance totale.
+
+EXEMPLES D'ACCROCHES TRASH QUI ONT MARCHÉ (inspirées de vraies conversations virales) :
+→ Sur une photo au lac avec des jambes : "Cette photo au lac... tu cherches à rendre les mecs fous ou c'est naturel chez toi"
+→ Sur une photo miroir : "Cette façon de tenir ton téléphone... tu sais exactement ce que tu fais"
+→ Sur une photo en tenue de sport : "Ce genre de photo c'est interdit le soir. T'as pas de scrupules toi"
+→ Sur une photo en soirée : "T'as l'air du genre à être la raison pour laquelle les mecs rentrent plus chez eux"
+→ Sur une photo en maillot/plage : "Je suis censé dire quelque chose d'intelligent mais franchement je peux pas"
+→ Sur une photo normale : "T'as dû briser pas mal de concentrations avec cette story"
+→ Sur une photo souriante : "Ce sourire là c'est clairement un piège"
+→ Sur une photo à l'étranger/voyage : "Je sais pas ce qui m'attire le plus, le paysage ou toi. Bon si"
+
+TON GLOBAL TRASH : direct, sûr de lui, jamais sur la défensive, légèrement provocateur. Il assume tout ce qu'il dit.
+La fille peut être choquée, amusée ou agacée — les 3 créent de l'engagement viral.`,
+
   drole: 'DRÔLE / ABSURDE : Humour décalé, répliques inattendues, situations absurdes. Fait sourire en lisant. Le mec utilise l\'humour comme arme de séduction.',
   direct: 'DIRECT / OSÉ : Droit au but, honnête sur ses intentions, sans détour. Efficace et court. Chaque message va à l\'essentiel.',
   mysterieux: 'MYSTÉRIEUX / INTRIGUANT : Messages qui laissent des questions en suspens. La fille doit se demander qui il est. Crée de l\'intrigue et de la tension.',
