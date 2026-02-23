@@ -205,21 +205,21 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           </p>
         </div>
         <div
-          className="flex items-center gap-2 px-4 py-2 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
           style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}
           onClick={() => !isUnlimited && router.push('/ct/pricing')}
           title={isUnlimited ? 'Pack Charo — Illimité' : 'Voir les offres'}
         >
           {isUnlimited ? (
             <>
-              <Infinity className="w-4 h-4 text-white" />
-              <span className="font-montserrat font-bold text-white text-sm">Illimité</span>
+              <Infinity className="w-3.5 h-3.5 text-white" />
+              <span className="font-montserrat font-bold text-white text-xs">Illimité</span>
             </>
           ) : (
             <>
-              <Zap className="w-4 h-4 text-white" />
-              <span className="font-montserrat font-bold text-white text-sm">{credits}</span>
-              <span className="text-white/80 text-xs">crédits</span>
+              <Zap className="w-3.5 h-3.5 text-white" />
+              <span className="font-montserrat font-bold text-white text-xs">{credits}</span>
+              <span className="text-white/80 text-[10px]">crédits</span>
             </>
           )}
         </div>
