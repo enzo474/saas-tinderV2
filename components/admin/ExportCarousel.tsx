@@ -167,9 +167,10 @@ function drawBubble(
 // Stratégie : render sur un canvas 3000px de haut, on track y en temps réel,
 // puis on recadre exactement à la hauteur du contenu + padding. Rien ne sera coupé.
 
-// Hauteur minimum : 220px @1x (440 @2x) pour éviter les slides trop "fins"
-// On ne centre PAS verticalement — le contenu part toujours du haut
-const MIN_SLIDE_H = 220 * SC
+// Hauteur minimum pour les slides normaux : 220px @1x
+const MIN_SLIDE_H  = 220 * SC
+// Format 9:16 FIXE pour les slides story (Instagram/TikTok)
+const STORY_SLIDE_H = Math.round(W * 16 / 9)  // ≈ 1397px @2x
 
 async function makeSlideBlob(
   messages: ConversationMessage[],
@@ -182,35 +183,63 @@ async function makeSlideBlob(
   canvas.height = TALL
   const ctx     = canvas.getContext('2d')!
 
-  // textBaseline='top' : le y passé à fillText est le HAUT de la ligne
   ctx.textBaseline = 'top'
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, W, TALL)
 
-  const PV_STORY = 48 * SC  // padding vertical généreux pour les story slides
-  let y = storyData ? PV_STORY : PV
+  // ── Mesure du contenu à partir de y=0 pour calculer l'offset ───────────────
+  let contentY = 0  // on simule le rendu depuis 0 pour calculer la hauteur totale
 
   if (storyData) {
-    // Label "Vous avez répondu à sa story"
+    const LABEL_FS = 12 * SC
+    contentY += LABEL_FS + 14 * SC   // label height + gap
+
+    const imgH = 172 * SC
+    contentY += imgH + 20 * SC       // image + gap
+
+    // mesure bulle accroche
+    ctx.font = `${FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
+    const innerW = MAX_BUBBLE_W - BP_W * 2
+    const accLines = wrapText(ctx, storyData.msg.message, innerW)
+    const accH = (accLines.length - 1) * LH + FS + BP_H * 2
+    contentY += accH + 20 * SC
+
+    if (storyData.withReply) {
+      const repLines = wrapText(ctx, storyData.withReply.message, innerW)
+      const repH = (repLines.length - 1) * LH + FS + BP_H * 2
+      contentY += repH + GRP_GAP
+    }
+  }
+
+  // Pour les slides story : hauteur fixe 9:16, contenu centré verticalement
+  // Pour les slides normaux : hauteur adaptée au contenu
+  const isStory  = !!storyData
+  const finalH   = isStory ? STORY_SLIDE_H : Math.max(MIN_SLIDE_H, TALL)
+
+  // Offset vertical pour centrer le contenu story dans le 9:16
+  const startY = isStory
+    ? Math.round((STORY_SLIDE_H - contentY) / 2)  // centrage vertical
+    : PV                                            // padding normal en haut
+
+  let y = startY
+
+  if (storyData) {
     const LABEL_FS = 12 * SC
     ctx.font      = `${LABEL_FS}px -apple-system, BlinkMacSystemFont, 'SF Pro Text', Helvetica, sans-serif`
     ctx.fillStyle = '#888888'
     const labelTxt = 'Vous avez répondu à sa story'
     const labelW   = ctx.measureText(labelTxt).width
     ctx.fillText(labelTxt, W - PH - labelW, y)
-    y += LABEL_FS + 18 * SC  // espace entre label et image
+    y += LABEL_FS + 14 * SC
 
-    // Image story alignée à droite
     const imgW = 136 * SC
     const imgH = 172 * SC
     roundedImage(ctx, storyData.img, W - PH - imgW, y, imgW, imgH, 18 * SC)
-    y += imgH + 22 * SC  // espace entre image et bulle accroche
+    y += imgH + 20 * SC
 
-    // Bulle accroche (lui)
     const accH = drawBubble(ctx, storyData.msg.message, true, true, true, y, null)
-    y += accH + 22 * SC  // espace entre accroche et réponse
+    y += accH + 20 * SC
 
-    // Réponse elle (slide 2 uniquement)
     if (storyData.withReply) {
       const repH = drawBubble(ctx, storyData.withReply.message, false, true, true, y, avatar)
       y += repH + GRP_GAP
@@ -228,18 +257,17 @@ async function makeSlideBlob(
     y += bH + (isLast ? GRP_GAP : MSG_GAP)
   }
 
-  // Hauteur finale = contenu + padding bas, avec minimum
-  const rawH   = y + (storyData ? PV_STORY : PV * 2)
-  const finalH = Math.max(Math.ceil(rawH), MIN_SLIDE_H)
+  // Hauteur du canvas de destination
+  const rawH   = y + PV * 2
+  const destH  = isStory ? STORY_SLIDE_H : Math.max(Math.ceil(rawH), MIN_SLIDE_H)
 
   const cropped  = document.createElement('canvas')
   cropped.width  = W
-  cropped.height = finalH
+  cropped.height = destH
   const cc = cropped.getContext('2d')!
   cc.fillStyle = '#000000'
-  cc.fillRect(0, 0, W, finalH)
-  // Pas de centrage vertical : contenu part toujours du haut
-  cc.drawImage(canvas, 0, 0, W, Math.ceil(rawH), 0, 0, W, Math.ceil(rawH))
+  cc.fillRect(0, 0, W, destH)
+  cc.drawImage(canvas, 0, 0, W, Math.min(Math.ceil(rawH), TALL), 0, 0, W, Math.min(Math.ceil(rawH), TALL))
 
   return new Promise(resolve => cropped.toBlob(b => resolve(b!), 'image/png'))
 }
