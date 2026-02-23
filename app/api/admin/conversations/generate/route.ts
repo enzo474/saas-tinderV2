@@ -8,7 +8,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 const MESSAGE_COUNTS: Record<string, string> = {
   short: '5 à 7',
   medium: '8 à 12',
-  long: '15 à 25',
+  long: '30 à 50',
 }
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
@@ -102,7 +102,10 @@ PARAMÈTRES DE CETTE GÉNÉRATION
 
 STYLE DEMANDÉ : ${styleInstruction}
 
-LONGUEUR : ${messageCount} messages au total (alternés lui/elle)
+LONGUEUR : ${messageCount} messages au total.
+Une "slide" = 1 message de "lui" + 1 réponse de "elle" (= 1 échange).
+Pour l'option longue : vise 15 à 25 slides/échanges, donc 30 à 50 messages.
+Ne te limite pas à atteindre un chiffre exact — arrête uniquement quand la conversation est naturellement terminée (numéro, rdv, alternative, ou porte ouverte).
 
 RÈGLES DE GÉNÉRATION :
 1. Le PREMIER message de "lui" est une RÉPONSE À SA STORY — il commente directement ce qu'il voit sur la photo (vêtement, lieu, activité, expression, contexte)
@@ -153,7 +156,7 @@ export async function POST(req: NextRequest) {
 
     const claudeResponse = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: buildSystemPrompt(style, length),
       messages: [
         {

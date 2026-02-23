@@ -10,7 +10,8 @@ interface ExportCarouselProps {
   previewRef: RefObject<HTMLDivElement | null>
 }
 
-const MESSAGES_PER_SLIDE = 4
+// 1 slide = 1 échange (message lui + réponse elle), soit environ 2-4 messages
+const MESSAGES_PER_SLIDE = 2
 
 export default function ExportCarousel({
   conversationId,
