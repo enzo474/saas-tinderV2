@@ -73,6 +73,12 @@ function roundedRect(
   x: number, y: number, w: number, h: number,
   tl: number, tr: number, br: number, bl: number
 ) {
+  // Clamp identique au comportement CSS : les rayons ne peuvent pas dépasser la moitié
+  // de la plus petite dimension, sinon les arcs se chevauchent (bug visuel)
+  const maxR = Math.min(w, h) / 2
+  tl = Math.min(tl, maxR); tr = Math.min(tr, maxR)
+  br = Math.min(br, maxR); bl = Math.min(bl, maxR)
+
   ctx.beginPath()
   ctx.moveTo(x + tl, y)
   ctx.lineTo(x + w - tr, y)
@@ -161,7 +167,9 @@ function drawBubble(
 // Stratégie : render sur un canvas 3000px de haut, on track y en temps réel,
 // puis on recadre exactement à la hauteur du contenu + padding. Rien ne sera coupé.
 
-const MIN_SLIDE_H = 280 * SC  // hauteur minimum pour éviter les slides trop "fins"
+// Hauteur minimum : 220px @1x (440 @2x) pour éviter les slides trop "fins"
+// On ne centre PAS verticalement — le contenu part toujours du haut
+const MIN_SLIDE_H = 220 * SC
 
 async function makeSlideBlob(
   messages: ConversationMessage[],
@@ -174,13 +182,13 @@ async function makeSlideBlob(
   canvas.height = TALL
   const ctx     = canvas.getContext('2d')!
 
-  // ⚠️ textBaseline='top' : le y passé à fillText est le HAUT de la ligne
+  // textBaseline='top' : le y passé à fillText est le HAUT de la ligne
   ctx.textBaseline = 'top'
-
   ctx.fillStyle = '#000000'
   ctx.fillRect(0, 0, W, TALL)
 
-  let y = PV
+  const PV_STORY = 28 * SC  // padding vertical plus grand pour les story slides
+  let y = storyData ? PV_STORY : PV
 
   if (storyData) {
     // Label "Vous avez répondu à sa story"
@@ -190,17 +198,17 @@ async function makeSlideBlob(
     const labelTxt = 'Vous avez répondu à sa story'
     const labelW   = ctx.measureText(labelTxt).width
     ctx.fillText(labelTxt, W - PH - labelW, y)
-    y += LABEL_FS + 8 * SC
+    y += LABEL_FS + 14 * SC  // plus d'espace entre label et image
 
     // Image story alignée à droite
     const imgW = 136 * SC
     const imgH = 172 * SC
     roundedImage(ctx, storyData.img, W - PH - imgW, y, imgW, imgH, 18 * SC)
-    y += imgH + 10 * SC
+    y += imgH + 16 * SC  // plus d'espace entre image et bulle
 
     // Bulle accroche (lui)
     const accH = drawBubble(ctx, storyData.msg.message, true, true, true, y, null)
-    y += accH + 10 * SC
+    y += accH + 16 * SC
 
     // Réponse elle (slide 2 uniquement)
     if (storyData.withReply) {
@@ -220,12 +228,9 @@ async function makeSlideBlob(
     y += bH + (isLast ? GRP_GAP : MSG_GAP)
   }
 
-  // Hauteur finale = contenu + padding bas, minimum MIN_SLIDE_H
-  const rawH   = y + PV
+  // Hauteur finale = contenu + padding bas, avec minimum
+  const rawH   = y + (storyData ? PV_STORY : PV)
   const finalH = Math.max(Math.ceil(rawH), MIN_SLIDE_H)
-
-  // Si contenu plus court que le minimum → centrer verticalement
-  const offsetY = finalH > Math.ceil(rawH) ? Math.floor((finalH - rawH) / 2) : 0
 
   const cropped  = document.createElement('canvas')
   cropped.width  = W
@@ -233,7 +238,8 @@ async function makeSlideBlob(
   const cc = cropped.getContext('2d')!
   cc.fillStyle = '#000000'
   cc.fillRect(0, 0, W, finalH)
-  cc.drawImage(canvas, 0, 0, W, Math.ceil(rawH), 0, offsetY, W, Math.ceil(rawH))
+  // Pas de centrage vertical : contenu part toujours du haut
+  cc.drawImage(canvas, 0, 0, W, Math.ceil(rawH), 0, 0, W, Math.ceil(rawH))
 
   return new Promise(resolve => cropped.toBlob(b => resolve(b!), 'image/png'))
 }
