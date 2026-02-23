@@ -1,0 +1,6 @@
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"handleSubscribe called","data":{"plan":"chill","endpoint":"/api/crushtalk/checkout-session"},"timestamp":1771804603065,"hypothesisId":"A"}
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"API response received","data":{"status":200,"ok":true,"hasUrl":true},"timestamp":1771804604358,"hypothesisId":"B"}
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"handleSubscribe called","data":{"plan":"charo","endpoint":"/api/crushtalk/checkout-session"},"timestamp":1771804623628,"hypothesisId":"A"}
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"API response received","data":{"status":200,"ok":true,"hasUrl":true},"timestamp":1771804624282,"hypothesisId":"B"}
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"handleSubscribe called","data":{"plan":"chill","endpoint":"/api/crushtalk/checkout-session"},"timestamp":1771804641040,"hypothesisId":"A"}
+{"location":"CrushTalkPricingClient.tsx:handleSubscribe","message":"API response received","data":{"status":200,"ok":true,"hasUrl":true},"timestamp":1771804641936,"hypothesisId":"B"}
