@@ -52,7 +52,7 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: string 
 export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId }: MessageGeneratorProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const [activeType, setActiveType] = useState<'accroche' | 'reponse'>(initialType)
+  const activeType = initialType
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
   const [selectedTone, setSelectedTone] = useState<string>('CrushTalk')
@@ -196,7 +196,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-montserrat font-bold text-white text-xl md:text-3xl whitespace-nowrap">
-            {activeType === 'accroche' ? 'Messages d\'accroche' : 'Répondre à un message'}
+            {activeType === 'accroche' ? 'Disquettes' : 'Conversation'}
           </h1>
           <p className="text-text-secondary text-sm mt-1 line-clamp-2">
             {activeType === 'accroche'
@@ -228,33 +228,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       <div className="grid md:grid-cols-2 gap-6">
         {/* Colonne gauche — Inputs */}
         <div className="space-y-4">
-
-          {/* Type de message */}
-          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>Type de message</p>
-            <div className="grid grid-cols-2 gap-2">
-              {(['accroche', 'reponse'] as const).map(type => (
-                <button
-                  key={type}
-                  onClick={() => { setActiveType(type); setResults(null); setError(null) }}
-                  className="px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                  style={activeType === type ? {
-                    borderColor: '#E63946',
-                    background: 'rgba(230,57,70,0.1)',
-                    color: '#fff',
-                  } : {
-                    borderColor: '#1F1F1F',
-                    color: '#9da3af',
-                  }}
-                >
-                  <div className="font-semibold">{type === 'accroche' ? 'Accroche' : 'Répondre'}</div>
-                  <div className="text-xs mt-0.5 opacity-70">
-                    {type === 'accroche' ? 'Premier message' : 'Continuer la conv'}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
 
           {/* Upload screenshot */}
           <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
