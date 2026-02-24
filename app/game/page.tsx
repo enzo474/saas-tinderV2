@@ -1,7 +1,8 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Trophy, Target, Star, Dumbbell, Lock } from 'lucide-react'
+import { Trophy, Target, Star, Dumbbell, Lock, RefreshCw } from 'lucide-react'
 
 const LEVEL_NAMES: Record<number, string> = {
   0: 'Le Raté',
@@ -13,20 +14,52 @@ const LEVEL_NAMES: Record<number, string> = {
   6: "L'Alpha",
 }
 
-const GIRLS = [
-  { name: 'Léa',      color: '#4CAF50', locked: false },
-  { name: 'Clara',    color: '#FF9800', locked: true  },
-  { name: 'Victoria', color: '#F44336', locked: true  },
-]
+interface GirlData {
+  id: string
+  name: string
+  personality_type: string
+  difficulty_level: number
+  required_xp: number
+  badge_color: string
+  badge_text: string
+  locked: boolean
+}
+
+interface ProgressionData {
+  currentLevel: number
+  levelName: string
+  totalXP: number
+  xpToNextLevel: number
+  progressPercent: number
+  girls: GirlData[]
+  stats: {
+    totalConversations: number
+    totalCompletedConversations: number
+    totalDates: number
+    bestScore: number
+    averageRizz: number
+    successRate: number
+  }
+}
 
 export default function GameDashboard() {
-  const level     = 0
-  const xp        = 0
-  const xpNext    = 50
-  const convos    = 0
-  const dates     = 0
-  const bestScore = 0
-  const xpPct     = Math.min((xp / xpNext) * 100, 100)
+  const [data, setData] = useState<ProgressionData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/progression')
+      .then(r => r.json())
+      .then(d => { setData(d); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  const level      = data?.currentLevel ?? 0
+  const levelName  = data?.levelName ?? LEVEL_NAMES[0]
+  const xp         = data?.totalXP ?? 0
+  const xpNext     = data?.xpToNextLevel ?? 50
+  const xpPct      = data?.progressPercent ?? 0
+  const stats      = data?.stats
+  const girls      = data?.girls ?? []
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -38,41 +71,36 @@ export default function GameDashboard() {
       </div>
 
       {/* Mascotte + XP */}
-      <div
-        className="rounded-2xl p-8 text-center border"
-        style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
-      >
-        {/* Mascotte placeholder */}
+      <div className="rounded-2xl p-8 text-center border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
         <div
           className="w-32 h-32 mx-auto mb-5 rounded-full flex items-center justify-center text-5xl"
           style={{ background: '#252525', border: '3px solid #E63946' }}
         >
-          🧍
+          {loading ? <RefreshCw size={28} className="animate-spin" style={{ color: '#E63946' }} /> : '🧍'}
         </div>
 
         <h2 className="font-montserrat text-2xl font-bold text-white mb-1">Niveau {level}</h2>
-        <p className="text-lg font-semibold mb-6" style={{ color: '#E63946' }}>
-          {LEVEL_NAMES[level]}
-        </p>
+        <p className="text-lg font-semibold mb-6" style={{ color: '#E63946' }}>{levelName}</p>
 
         {/* Barre XP */}
         <div className="mb-7">
           <div className="flex justify-between text-xs mb-2" style={{ color: '#9da3af' }}>
-            <span>XP : {xp} / {xpNext}</span>
-            <span>{Math.round(xpPct)}%</span>
+            <span>XP : {xp} / {level < 6 ? xp + xpNext : '∞'}</span>
+            <span>{xpPct}%</span>
           </div>
           <div className="h-3 rounded-full overflow-hidden" style={{ background: '#252525' }}>
             <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${xpPct}%`,
-                background: 'linear-gradient(90deg, #E63946, #FF4757)',
-              }}
+              className="h-full rounded-full transition-all duration-700"
+              style={{ width: `${xpPct}%`, background: 'linear-gradient(90deg, #E63946, #FF4757)' }}
             />
           </div>
+          {level < 6 && (
+            <p className="text-xs mt-1.5 text-right" style={{ color: '#555' }}>
+              {xpNext} XP pour le prochain niveau
+            </p>
+          )}
         </div>
 
-        {/* CTA */}
         <Link
           href="/game/training"
           className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
@@ -85,37 +113,30 @@ export default function GameDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
-        <div
-          className="rounded-xl p-5 border"
-          style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
-        >
+        <div className="rounded-xl p-5 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
           <div className="flex items-center gap-2 mb-3">
             <Trophy size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Conversations</span>
           </div>
-          <p className="font-montserrat text-3xl font-bold text-white">{convos}</p>
+          <p className="font-montserrat text-3xl font-bold text-white">
+            {stats?.totalCompletedConversations ?? 0}
+          </p>
         </div>
 
-        <div
-          className="rounded-xl p-5 border"
-          style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
-        >
+        <div className="rounded-xl p-5 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
           <div className="flex items-center gap-2 mb-3">
             <Target size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Dates obtenus</span>
           </div>
           <p className="font-montserrat text-3xl font-bold text-white">
-            {dates}
+            {stats?.totalDates ?? 0}
             <span className="text-sm ml-1" style={{ color: '#9da3af' }}>
-              ({convos > 0 ? Math.round((dates / convos) * 100) : 0}%)
+              ({stats?.successRate ?? 0}%)
             </span>
           </p>
         </div>
 
-        <div
-          className="col-span-2 rounded-xl p-5 border"
-          style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
-        >
+        <div className="col-span-2 rounded-xl p-5 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
           <div className="flex items-center gap-2 mb-3">
             <Star size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Meilleur score</span>
@@ -125,7 +146,7 @@ export default function GameDashboard() {
               <Star
                 key={star}
                 size={28}
-                style={star <= bestScore
+                style={star <= (stats?.bestScore ?? 0)
                   ? { color: '#E63946', fill: '#E63946' }
                   : { color: '#333' }
                 }
@@ -136,27 +157,28 @@ export default function GameDashboard() {
       </div>
 
       {/* Meufs débloquées */}
-      <div
-        className="rounded-2xl p-6 border"
-        style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
-      >
+      <div className="rounded-2xl p-6 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
         <h3 className="font-montserrat text-lg font-bold text-white mb-5">
-          Meufs débloquées (1/{GIRLS.length})
+          Meufs débloquées ({girls.filter(g => !g.locked).length}/{girls.length || 3})
         </h3>
         <div className="grid grid-cols-3 gap-4">
-          {GIRLS.map(({ name, color, locked }) => (
-            <div key={name} style={{ opacity: locked ? 0.45 : 1 }}>
+          {(girls.length > 0 ? girls : [
+            { id: '1', name: 'Léa',      badge_color: '#4CAF50', locked: false },
+            { id: '2', name: 'Clara',    badge_color: '#FF9800', locked: true  },
+            { id: '3', name: 'Victoria', badge_color: '#F44336', locked: true  },
+          ] as any[]).map((girl) => (
+            <div key={girl.id} style={{ opacity: girl.locked ? 0.45 : 1 }}>
               <div
                 className="aspect-square rounded-xl mb-2 flex items-center justify-center text-4xl"
                 style={{
-                  background: locked ? '#252525' : `${color}22`,
-                  border: `2px solid ${locked ? '#2A2A2A' : color}`,
+                  background: girl.locked ? '#252525' : `${girl.badge_color}22`,
+                  border: `2px solid ${girl.locked ? '#2A2A2A' : girl.badge_color}`,
                 }}
               >
-                {locked ? <Lock size={28} style={{ color: '#555' }} /> : '👤'}
+                {girl.locked ? <Lock size={28} style={{ color: '#555' }} /> : '👤'}
               </div>
-              <p className="text-sm text-center" style={{ color: locked ? '#555' : '#9da3af' }}>
-                {name}
+              <p className="text-sm text-center" style={{ color: girl.locked ? '#555' : '#9da3af' }}>
+                {girl.name}
               </p>
             </div>
           ))}
