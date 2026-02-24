@@ -51,6 +51,7 @@ export async function middleware(request: NextRequest) {
   if (
     path === '/' ||
     path === '/crushpicture' ||
+    path === '/game/onboarding' ||
     path === '/auth' ||
     path.startsWith('/auth/callback') ||
     path === '/privacy' ||

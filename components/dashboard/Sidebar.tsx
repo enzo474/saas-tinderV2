@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock, RefreshCw } from 'lucide-react'
+import { User, Shield, Home, UserCircle, ImageIcon, Wand2, FileText, MessageSquare, Lightbulb, Zap, ArrowUpRight, Lock, RefreshCw, Dumbbell } from 'lucide-react'
 import { RechargeModal } from '@/components/credits/RechargeModal'
 
 interface SidebarProps {
@@ -101,7 +101,7 @@ export function Sidebar({ userEmail, isAdmin = false, credits = 0, hasPlan = fal
             )
           })}
 
-          {/* Switch vers CrushTalk */}
+          {/* Switch vers CrushTalk + Training */}
           <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
             <Link
               href="/ct/accroche"
@@ -110,6 +110,14 @@ export function Sidebar({ userEmail, isAdmin = false, credits = 0, hasPlan = fal
             >
               <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
               <span>CrushTalk</span>
+            </Link>
+            <Link
+              href="/game"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
+              style={{ color: '#6b7280' }}
+            >
+              <Dumbbell className="w-4 h-4 flex-shrink-0" style={{ color: '#FF8C42' }} />
+              <span>Training Mode</span>
             </Link>
           </div>
 
