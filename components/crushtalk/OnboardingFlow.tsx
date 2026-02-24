@@ -412,8 +412,30 @@ export function OnboardingFlow() {
           {/* Step 8 — Carousel */}
           {step === 8 && (
             <div>
-              {/* Slide 1 — Photos IA avant/après */}
+              {/* Slide 1 — CrushTalk exemple rizz */}
               {carouselIdx === 0 && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-center" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushTalk</p>
+                  <h3 className="font-montserrat font-bold text-white text-lg mb-4 text-center">Messages d&apos;accroche IA</h3>
+                  <div className="rounded-xl overflow-hidden mb-4">
+                    <img src="/exemplerizz.jpeg" alt="Exemple conversation" className="w-full object-cover rounded-xl" style={{ maxHeight: '200px', objectPosition: 'top' }} />
+                  </div>
+                  {/* Exemple de réponse CrushTalk */}
+                  <div className="rounded-xl p-4" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>
+                        Exemple de réponse générée
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>
+                      Parfait, moi non plus je cherche pas de couple... juste quelqu&apos;un qui apprécie mon talent légendaire en drague apparemment 😏
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Slide 2 — Photos IA avant/après */}
+              {carouselIdx === 1 && (
                 <div className="text-center">
                   <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushPicture</p>
                   <h3 className="font-montserrat font-bold text-white text-lg mb-4">Photos IA professionnelles</h3>
@@ -439,8 +461,8 @@ export function OnboardingFlow() {
                 </div>
               )}
 
-              {/* Slide 2 — Bio exemples */}
-              {carouselIdx === 1 && (
+              {/* Slide 3 — Bio exemples */}
+              {carouselIdx === 2 && (
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-wider mb-2" style={{ color: 'rgba(247,127,0,0.7)' }}>Bio IA</p>
                   <h3 className="font-montserrat font-bold text-white text-lg mb-1">Bio optimisée par l&apos;IA</h3>
@@ -450,28 +472,6 @@ export function OnboardingFlow() {
                     style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
                   >
                     <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>{BIO_EXAMPLES[0]}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Slide 3 — Exemple rizz */}
-              {carouselIdx === 2 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider mb-2 text-center" style={{ color: 'rgba(247,127,0,0.7)' }}>CrushTalk</p>
-                  <h3 className="font-montserrat font-bold text-white text-lg mb-4 text-center">Messages d&apos;accroche IA</h3>
-                  <div className="rounded-xl overflow-hidden mb-4">
-                    <img src="/exemplerizz.jpeg" alt="Exemple conversation" className="w-full object-cover rounded-xl" style={{ maxHeight: '200px', objectPosition: 'top' }} />
-                  </div>
-                  {/* Exemple de réponse CrushTalk */}
-                  <div className="rounded-xl p-4" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(247,127,0,0.15)', color: '#F77F00' }}>
-                        Exemple de réponse générée
-                      </span>
-                    </div>
-                    <p className="text-sm leading-relaxed" style={{ color: '#d1d5db' }}>
-                      Parfait, moi non plus je cherche pas de couple... juste quelqu&apos;un qui apprécie mon talent légendaire en drague apparemment 😏
-                    </p>
                   </div>
                 </div>
               )}
