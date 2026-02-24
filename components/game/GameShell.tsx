@@ -8,7 +8,6 @@ import {
   MessageSquare,
   MessageCircle,
   User,
-  LayoutDashboard,
   ImageIcon,
 } from 'lucide-react'
 
@@ -18,11 +17,11 @@ interface GameShellProps {
 }
 
 const NAV_ITEMS = [
-  { href: '/game',           label: 'Dashboard',    icon: Home          },
-  { href: '/ct/accroche',    label: 'Disquettes',   icon: MessageSquare },
-  { href: '/ct/discussion',  label: 'Conversation', icon: MessageCircle },
-  { href: '/game/training',  label: 'Training',     icon: Dumbbell      },
-  { href: '/game/profile',   label: 'Profil',       icon: User          },
+  { href: '/game',              label: 'Dashboard',    icon: Home          },
+  { href: '/game/accroche',     label: 'Disquettes',   icon: MessageSquare },
+  { href: '/game/discussion',   label: 'Conversation', icon: MessageCircle },
+  { href: '/game/training',     label: 'Training',     icon: Dumbbell      },
+  { href: '/game/profile',      label: 'Profil',       icon: User          },
 ]
 
 export function GameShell({ children, userEmail }: GameShellProps) {
@@ -80,27 +79,18 @@ export function GameShell({ children, userEmail }: GameShellProps) {
           )
         })}
 
-        {/* Lien CrushPicture */}
+        {/* Lien CrushPicture — bientôt disponible */}
         <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
-          <p className="text-xs uppercase tracking-wider mb-2 px-3" style={{ color: '#555' }}>
-            Autres outils
-          </p>
-          <Link
-            href="/dashboard/home"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
-            style={{ color: '#6b7280' }}
+          <div
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-not-allowed"
+            style={{ color: '#555' }}
           >
-            <ImageIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#E63946' }} />
-            <span>CrushPicture</span>
-          </Link>
-          <Link
-            href="/ct/accroche"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200 hover:text-white"
-            style={{ color: '#6b7280' }}
-          >
-            <LayoutDashboard className="w-4 h-4 flex-shrink-0" style={{ color: '#F77F00' }} />
-            <span>CrushTalk</span>
-          </Link>
+            <ImageIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#333' }} />
+            <span>Photos IA</span>
+            <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: '#1A1A1A', color: '#555' }}>
+              Bientôt
+            </span>
+          </div>
         </div>
 
         <div className="mt-auto" />

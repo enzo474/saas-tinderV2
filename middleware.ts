@@ -51,6 +51,7 @@ export async function middleware(request: NextRequest) {
   if (
     path === '/' ||
     path === '/crushpicture' ||
+    path === '/coming-soon' ||
     path === '/game/onboarding' ||
     path === '/auth' ||
     path.startsWith('/auth/callback') ||
@@ -65,20 +66,29 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // Rediriger CrushTalk (/ct/) vers les nouvelles routes intégrées dans /game/
+  if (path === '/ct/accroche') {
+    return NextResponse.redirect(new URL('/game/accroche', request.url))
+  }
+  if (path === '/ct/discussion') {
+    return NextResponse.redirect(new URL('/game/discussion', request.url))
+  }
+  if (path.startsWith('/ct/') || path === '/ct') {
+    return NextResponse.redirect(new URL('/game', request.url))
+  }
+
   // Protected routes - require authentication
   if (!user) {
     const redirectResponse = NextResponse.redirect(new URL('/auth', request.url))
     return copyCookiesToResponse(response, redirectResponse)
   }
 
-  // Routes dashboard : le layout gère lui-même auth + paiement — on évite les DB calls inutiles
-  if (path.startsWith('/dashboard')) {
-    return response
-  }
-
-  // Routes CrushTalk app (/ct/) : juste auth, layout gère le reste
-  if (path.startsWith('/ct/') || path === '/ct') {
-    return response
+  // Bloquer CrushPicture (/dashboard/) sauf panel admin — bientôt disponible
+  if (path.startsWith('/dashboard') && !path.startsWith('/dashboard/admin')) {
+    return copyCookiesToResponse(
+      response,
+      NextResponse.redirect(new URL('/coming-soon', request.url))
+    )
   }
 
   // Pour les routes onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
