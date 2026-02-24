@@ -32,9 +32,9 @@ const STYLES = [
 ]
 
 const LENGTHS = [
-  { id: 'short', label: 'Courte (5–7 messages)' },
-  { id: 'medium', label: 'Moyenne (8–12 messages)' },
-  { id: 'long', label: 'Longue (12–20 messages)' },
+  { id: 'short',  label: 'Courte (12–15 slides)' },
+  { id: 'medium', label: 'Moyenne (16–20 slides)' },
+  { id: 'long',   label: 'Longue (30–50 slides)' },
 ]
 
 async function compressImage(file: File): Promise<{ base64: string; mediaType: string }> {

@@ -6,8 +6,8 @@ import Anthropic from '@anthropic-ai/sdk'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const MESSAGE_COUNTS: Record<string, string> = {
-  short: '5 à 7',
-  medium: '8 à 12',
+  short: '12 à 15',
+  medium: '16 à 20',
   long: '30 à 50',
 }
 
