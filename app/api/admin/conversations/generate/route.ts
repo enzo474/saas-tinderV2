@@ -290,7 +290,7 @@ export async function POST(req: NextRequest) {
 
     // Si une accroche personnalisée est fournie, elle devient le 1er message de "lui" — Claude génère la suite
     const accrocheLine = customAccroche?.trim()
-      ? `\n\n⚠️ ACCROCHE PERSONNALISÉE — OBLIGATOIRE : Le PREMIER message de "lui" dans le JSON doit être EXACTEMENT : "${customAccroche.trim()}"\nNe modifie pas ce texte d'un seul caractère. Génère la réaction de "elle" et la suite de la conversation à partir de cette accroche.`
+      ? `\n\n⚠️ ACCROCHE PERSONNALISÉE — OBLIGATOIRE : Le PREMIER message de "lui" dans le JSON doit reprendre EXACTEMENT cette accroche : "${customAccroche.trim()}"\nCorrige discrètement les fautes d'orthographe et de frappe si il y en a (sans changer le sens ni le ton), puis utilise la version corrigée comme premier message. Génère ensuite la réaction de "elle" et la suite de la conversation à partir de cette accroche.`
       : ''
 
     const userMessage = context
