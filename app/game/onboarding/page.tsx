@@ -151,24 +151,27 @@ export default function GameOnboarding() {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: '#FF6B6B' }}
+      style={{ background: '#0A0A0A' }}
     >
       {/* Progress bar */}
-      <div className="w-full h-1.5" style={{ background: 'rgba(255,255,255,0.3)' }}>
+      <div className="w-full h-1.5" style={{ background: '#1A1A1A' }}>
         <div
           className="h-full transition-all duration-300"
-          style={{ width: `${progress}%`, background: '#fff' }}
+          style={{
+            width: `${progress}%`,
+            background: 'linear-gradient(90deg, #E63946, #FF4757)',
+          }}
         />
       </div>
 
       {/* Content */}
       <div className="flex-1 flex items-center justify-center p-4 py-8">
         <div
-          className="w-full max-w-md rounded-3xl p-7 shadow-2xl"
-          style={{ background: '#fff' }}
+          className="w-full max-w-md rounded-3xl p-7"
+          style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
         >
           {/* Counter */}
-          <p className="text-center text-sm font-semibold mb-6" style={{ color: '#9da3af' }}>
+          <p className="text-center text-sm font-semibold mb-6" style={{ color: '#6b7280' }}>
             Question {step + 1} sur {QUESTIONS.length}
           </p>
 
@@ -177,13 +180,16 @@ export default function GameOnboarding() {
             {/* Mascotte placeholder */}
             <div
               className="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl"
-              style={{ background: 'rgba(255,140,66,0.15)', border: '2px solid rgba(255,140,66,0.4)' }}
+              style={{
+                background: 'rgba(230,57,70,0.1)',
+                border: '2px solid rgba(230,57,70,0.3)',
+              }}
             >
               🎮
             </div>
 
             <div className="flex-1">
-              <h2 className="text-lg font-bold mb-1" style={{ color: '#0A0A0A' }}>
+              <h2 className="font-montserrat text-lg font-bold text-white mb-1">
                 {q.question}
               </h2>
               {q.subtitle && (
@@ -195,20 +201,18 @@ export default function GameOnboarding() {
           {/* Options / Slider */}
           {q.type === 'slider' ? (
             <div className="py-2 mb-7">
-              <div className="relative mb-3">
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={sliderVal}
-                  onChange={(e) => setSliderVal(Number(e.target.value))}
-                  className="w-full h-2 rounded-full appearance-none cursor-pointer"
-                  style={{
-                    background: `linear-gradient(to right, #FF8C42 ${sliderVal}%, #e5e7eb ${sliderVal}%)`,
-                    accentColor: '#FF8C42',
-                  }}
-                />
-              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={sliderVal}
+                onChange={(e) => setSliderVal(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer mb-3"
+                style={{
+                  background: `linear-gradient(to right, #E63946 ${sliderVal}%, #2A2A2A ${sliderVal}%)`,
+                  accentColor: '#E63946',
+                }}
+              />
               <div className="flex justify-between text-sm font-medium" style={{ color: '#9da3af' }}>
                 <span>{q.leftLabel}</span>
                 <span>{q.rightLabel}</span>
@@ -224,9 +228,9 @@ export default function GameOnboarding() {
                     onClick={() => toggleOption(opt.value)}
                     className="w-full p-4 rounded-xl border-2 text-left font-medium text-sm transition-all"
                     style={{
-                      borderColor: sel ? '#FF8C42' : '#e5e7eb',
-                      background: sel ? 'rgba(255,140,66,0.08)' : '#fff',
-                      color: sel ? '#FF8C42' : '#0A0A0A',
+                      borderColor: sel ? '#E63946' : '#2A2A2A',
+                      background: sel ? 'rgba(230,57,70,0.08)' : '#252525',
+                      color: sel ? '#E63946' : '#ffffff',
                     }}
                   >
                     {opt.icon && <span className="mr-2">{opt.icon}</span>}
@@ -242,7 +246,7 @@ export default function GameOnboarding() {
             onClick={handleNext}
             disabled={!canProceed}
             className="w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: canProceed ? 'linear-gradient(135deg, #FF8C42, #E67A35)' : '#d1d5db' }}
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
             {isLast ? 'Terminer' : 'Suivant →'}
           </button>
@@ -252,7 +256,7 @@ export default function GameOnboarding() {
             <button
               onClick={() => setStep((s) => s - 1)}
               className="w-full mt-3 py-2 text-sm transition-colors"
-              style={{ color: '#9da3af' }}
+              style={{ color: '#6b7280' }}
             >
               ← Retour
             </button>

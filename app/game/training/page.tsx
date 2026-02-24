@@ -53,7 +53,7 @@ export default function TrainingPage() {
 
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-white mb-2">Training Mode</h1>
+        <h1 className="font-montserrat text-2xl font-bold text-white mb-2">Training Mode</h1>
         <p style={{ color: '#9da3af' }} className="text-sm">
           Entraîne-toi à obtenir des dates avec nos IA
         </p>
@@ -67,7 +67,7 @@ export default function TrainingPage() {
             className="rounded-2xl border-2 overflow-hidden transition-all duration-200"
             style={{
               background: '#1A1A1A',
-              borderColor: girl.locked ? '#2A2A2A' : '#FF8C42',
+              borderColor: girl.locked ? '#2A2A2A' : '#E63946',
               opacity: girl.locked ? 0.65 : 1,
             }}
           >
@@ -98,7 +98,7 @@ export default function TrainingPage() {
             {/* Infos */}
             <div className="p-5">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-xl font-bold text-white">{girl.name}</h3>
+                <h3 className="font-montserrat text-xl font-bold text-white">{girl.name}</h3>
                 <span
                   className="text-xs font-bold px-2.5 py-1 rounded-full text-white"
                   style={{ background: girl.badgeColor }}
@@ -112,7 +112,7 @@ export default function TrainingPage() {
                 <Link
                   href={`/game/training/${girl.id}/chat`}
                   className="block w-full text-center py-3 rounded-xl text-white font-semibold text-sm transition-all active:scale-95"
-                  style={{ background: 'linear-gradient(135deg, #FF8C42, #E67A35)' }}
+                  style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
                 >
                   Démarrer 🎮
                 </Link>

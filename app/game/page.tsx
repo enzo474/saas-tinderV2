@@ -20,20 +20,20 @@ const GIRLS = [
 ]
 
 export default function GameDashboard() {
-  const level      = 0
-  const xp         = 0
-  const xpNext     = 50
-  const convos     = 0
-  const dates      = 0
-  const bestScore  = 0
-  const xpPct      = Math.min((xp / xpNext) * 100, 100)
+  const level     = 0
+  const xp        = 0
+  const xpNext    = 50
+  const convos    = 0
+  const dates     = 0
+  const bestScore = 0
+  const xpPct     = Math.min((xp / xpNext) * 100, 100)
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
 
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
+        <h1 className="font-montserrat text-2xl font-bold text-white mb-1">Dashboard</h1>
         <p style={{ color: '#9da3af' }} className="text-sm">Bienvenue sur Crushmaxxing Training</p>
       </div>
 
@@ -45,13 +45,13 @@ export default function GameDashboard() {
         {/* Mascotte placeholder */}
         <div
           className="w-32 h-32 mx-auto mb-5 rounded-full flex items-center justify-center text-5xl"
-          style={{ background: '#252525', border: '3px solid #FF8C42' }}
+          style={{ background: '#252525', border: '3px solid #E63946' }}
         >
           🧍
         </div>
 
-        <h2 className="text-2xl font-bold text-white mb-1">Niveau {level}</h2>
-        <p className="text-lg font-semibold mb-6" style={{ color: '#FF8C42' }}>
+        <h2 className="font-montserrat text-2xl font-bold text-white mb-1">Niveau {level}</h2>
+        <p className="text-lg font-semibold mb-6" style={{ color: '#E63946' }}>
           {LEVEL_NAMES[level]}
         </p>
 
@@ -66,7 +66,7 @@ export default function GameDashboard() {
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${xpPct}%`,
-                background: 'linear-gradient(90deg, #FF8C42, #FFA366)',
+                background: 'linear-gradient(90deg, #E63946, #FF4757)',
               }}
             />
           </div>
@@ -76,7 +76,7 @@ export default function GameDashboard() {
         <Link
           href="/game/training"
           className="flex items-center justify-center gap-2 w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #FF8C42, #E67A35)' }}
+          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
           <Dumbbell size={18} />
           Commence ton entraînement
@@ -90,10 +90,10 @@ export default function GameDashboard() {
           style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <Trophy size={18} style={{ color: '#FF8C42' }} />
+            <Trophy size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Conversations</span>
           </div>
-          <p className="text-3xl font-bold text-white">{convos}</p>
+          <p className="font-montserrat text-3xl font-bold text-white">{convos}</p>
         </div>
 
         <div
@@ -101,10 +101,10 @@ export default function GameDashboard() {
           style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <Target size={18} style={{ color: '#FF8C42' }} />
+            <Target size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Dates obtenus</span>
           </div>
-          <p className="text-3xl font-bold text-white">
+          <p className="font-montserrat text-3xl font-bold text-white">
             {dates}
             <span className="text-sm ml-1" style={{ color: '#9da3af' }}>
               ({convos > 0 ? Math.round((dates / convos) * 100) : 0}%)
@@ -117,7 +117,7 @@ export default function GameDashboard() {
           style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <Star size={18} style={{ color: '#FF8C42' }} />
+            <Star size={18} style={{ color: '#E63946' }} />
             <span className="text-xs" style={{ color: '#9da3af' }}>Meilleur score</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -126,7 +126,7 @@ export default function GameDashboard() {
                 key={star}
                 size={28}
                 style={star <= bestScore
-                  ? { color: '#FF8C42', fill: '#FF8C42' }
+                  ? { color: '#E63946', fill: '#E63946' }
                   : { color: '#333' }
                 }
               />
@@ -140,7 +140,7 @@ export default function GameDashboard() {
         className="rounded-2xl p-6 border"
         style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
       >
-        <h3 className="text-lg font-bold text-white mb-5">
+        <h3 className="font-montserrat text-lg font-bold text-white mb-5">
           Meufs débloquées (1/{GIRLS.length})
         </h3>
         <div className="grid grid-cols-3 gap-4">
@@ -148,7 +148,10 @@ export default function GameDashboard() {
             <div key={name} style={{ opacity: locked ? 0.45 : 1 }}>
               <div
                 className="aspect-square rounded-xl mb-2 flex items-center justify-center text-4xl"
-                style={{ background: locked ? '#252525' : `${color}22`, border: `2px solid ${locked ? '#2A2A2A' : color}` }}
+                style={{
+                  background: locked ? '#252525' : `${color}22`,
+                  border: `2px solid ${locked ? '#2A2A2A' : color}`,
+                }}
               >
                 {locked ? <Lock size={28} style={{ color: '#555' }} /> : '👤'}
               </div>
