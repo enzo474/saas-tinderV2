@@ -50,6 +50,7 @@ export async function middleware(request: NextRequest) {
   // Public routes (dont les webhooks externes — pas de session utilisateur)
   if (
     path === '/' ||
+    path === '/crushpicture' ||
     path === '/auth' ||
     path.startsWith('/auth/callback') ||
     path === '/privacy' ||
