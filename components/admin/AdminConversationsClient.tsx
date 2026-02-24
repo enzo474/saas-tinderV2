@@ -8,10 +8,23 @@ import ConversationHistory from './ConversationHistory'
 
 type ActiveView = 'generator' | 'history'
 
+function toPlainText(conversation: { sender: string; message: string }[]): string {
+  return conversation
+    .map(msg => `${msg.sender === 'lui' ? 'homme' : 'femme'} : ${msg.message}`)
+    .join('\n')
+}
+
 export default function AdminConversationsClient() {
   const [activeView, setActiveView] = useState<ActiveView>('generator')
   const [result, setResult] = useState<(GeneratedConversation & { imagePreview: string; storyImagePreview?: string }) | null>(null)
+  const [copied, setCopied] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleGenerated = (data: GeneratedConversation & { imagePreview: string }) => {
     setResult(data)
@@ -103,6 +116,55 @@ export default function AdminConversationsClient() {
                   storyImage={result.storyImagePreview || result.profile_image_url || result.imagePreview || ''}
                   previewRef={previewRef}
                 />
+
+                {/* Version texte brut pour react */}
+                {(() => {
+                  const plain = toPlainText(result.conversation)
+                  return (
+                    <div style={{
+                      background: '#111', border: '1px solid #222',
+                      borderRadius: 16, padding: '18px 20px',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                        <div>
+                          <div style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>
+                            📝 Version texte — pour react / sous-titres
+                          </div>
+                          <div style={{ color: '#666', fontSize: 12, marginTop: 2 }}>
+                            Copie-colle directement dans ton éditeur vidéo
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleCopy(plain)}
+                          style={{
+                            background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(255,140,66,0.12)',
+                            border: `1px solid ${copied ? '#22c55e' : '#ff8c42'}`,
+                            borderRadius: 10, padding: '8px 16px',
+                            color: copied ? '#22c55e' : '#ff8c42',
+                            cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                            transition: 'all 0.2s', whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {copied ? '✓ Copié !' : 'Copier'}
+                        </button>
+                      </div>
+                      <textarea
+                        readOnly
+                        value={plain}
+                        rows={Math.min(result.conversation.length + 2, 18)}
+                        style={{
+                          width: '100%', background: '#0a0a0a',
+                          border: '1px solid #2a2a2a', borderRadius: 10,
+                          padding: '12px 14px', color: '#ccc',
+                          fontSize: 13, lineHeight: '1.7', resize: 'vertical',
+                          outline: 'none', fontFamily: 'monospace',
+                          boxSizing: 'border-box',
+                        }}
+                        onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                      />
+                    </div>
+                  )
+                })()}
 
                 {/* Nouvelle génération */}
                 <button
