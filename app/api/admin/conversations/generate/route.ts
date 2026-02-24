@@ -159,19 +159,97 @@ RÈGLES DE GÉNÉRATION :
 7. EMOJIS : "lui" utilise ZÉRO emoji — ses messages sont secs, sûrs, sans fioriture. "elle" peut en utiliser librement
 8. ENCHAÎNEMENTS : parfois (3 à 4 fois dans la conversation), une personne envoie 2 messages consécutifs au lieu d'un seul. Exemple : "lui" envoie 2 messages d'affilée avant qu'elle réponde, ou "elle" répond en 2 messages courts séparés. Cela rend la conversation plus naturelle et vivante. Représente cela par 2 objets consécutifs avec le même "sender" dans le JSON.
 
-COMPORTEMENT DE "elle" — RÉALISME ABSOLU :
+═══════════════════════════════════════
+CONVERSATIONS D'ENTRAÎNEMENT — ANALYSE STYLE
+═══════════════════════════════════════
+
+Voici des vraies conversations virales. Analyse le STYLE, le RYTHME, le LANGAGE — inspire-toi sans copier.
+
+— CONV A : JOUTE VERBALE + PIVOT HUMOUR → DATE —
+LUI : Tu fais exprès d'avoir l'air innocente alors que tout est calculé, avoue
+ELLE : Arrête, j'ai rien calculé. Si tu es troublé c'est pas ma faute 😊
+LUI : Je suis pas troublé, t'emballe pas
+LUI : Mais j'admets que t'es agréable à regarder parfois.
+ELLE : Toi aussi tu fais le mec ptdr
+LUI : Je fais pas "le mec", je suis juste pas impressionné par deux fossettes et un brushing 😔
+ELLE : Tu te crois spécial alors que tu es juste un énième clown qui fanfaronne
+ELLE : Tu as l'air d'un mec qui surjoue pour cacher qu'il a rien derrière
+LUI : Si je voulais surjouer, je t'aurais déjà fait croire que t'es exceptionnelle.
+LUI : Ce qui est drôle, c'est que tu parles beaucoup pour quelqu'un qui espère quand même que je la valide. Continue ton cirque, je suis curieux de voir jusqu'où tu vas descendre.
+ELLE : Descendre ?
+ELLE : Je te laisse déjà 95 % de l'échange et tu as encore la prétention de croire que c'est moi quémande ?
+ELLE : Tu es perdu mon pauvre. Tu cherches à me rabaisser parce que tu sais très bien que face à une fille un peu trop jolie pour toi, t'existes pas
+LUI : Ok fin du spectacle, Merci à tous
+LUI : Woaw t'as une sacré réparti ptdr
+LUI : Si on continue tu vas me tuer
+LUI : Magnifique, vive d'esprit et provocatrice et bien... J'aimerais bien voir si tu as autant de cran dans la réalité 🤣
+LUI : Je passe te chercher demain soir on va au théâtre, histoire de rester dans le thème
+ELLE : Oh monsieur veut me canaliser en vrai maintenant? J'suis pas sûre que tu tiennes plus de 20 minutes face à moi 😊
+
+— CONV B : OUVERTURE PRÉSUPPOSITIONNELLE —
+LUI : tu dors de quel côté ?
+ELLE : euh pourquoi ?
+LUI : pour savoir où je m'installe
+ELLE : ptdrr c'est quelle genre de technique d'approche ça
+ELLE : mais pas mal j'avoue
+LUI : ok mais du coup t'as pas répondu
+ELLE : à gauche mdr
+LUI : parfait j'arrive
+LUI : et j'espère y'a un oreiller pour moi
+ELLE : mdrrr le mec est exigent en plus
+ELLE : viens mais t'auras pas d'oreiller.
+
+═══════════════════════════════════════
+PATTERNS EXTRAITS DE CES CONVERSATIONS
+═══════════════════════════════════════
+
+PATTERN 1 — COMPLIMENT MINIMISANT (pas flatteur, mais percutant) :
+→ "j'admets que t'es agréable à regarder parfois" — jamais "t'es trop belle"
+→ L'adverbe "parfois" ou la restriction "pas mal" valent plus qu'un superlatif
+→ Ça intrique, ça ne lèche pas
+
+PATTERN 2 — QUAND ELLE EST TRÈS AGRESSIVE VERBALEMENT :
+→ Elle peut sortir des piques dures ("tu surjoues", "t'existes pas", "tu es perdu")
+→ Lui : jamais défensif, jamais agressif en retour — il laisse passer avec une réplique courte et froide
+→ Puis il PIVOTE avec humour ("Ok fin du spectacle, Merci à tous") — coupure totale, nouveau registre
+
+PATTERN 3 — PIVOT HUMOUR + DATE CALLBACK :
+→ Après une joute verbale tendue, le mec bascule en mode chaleureux/amusé
+→ Il reconnaît sa vivacité : "Woaw t'as une sacré réparti ptdr", "Si on continue tu vas me tuer"
+→ Puis enchaîne sur une invitation avec un callback au thème de la conv ("on va au théâtre, histoire de rester dans le thème")
+→ Ce pivot crée un effet de surprise qui rend la fin virale
+
+PATTERN 4 — OUVERTURE PRÉSUPPOSITIONNELLE :
+→ "tu dors de quel côté ?" — présuppose une intimité future sans la demander
+→ Quand elle questionne la technique : AUCUNE justification, redirect immédiat : "ok mais du coup t'as pas répondu"
+→ Elle entre dans le jeu → il escalade dans le scénario qu'elle a accepté : "parfait j'arrive" → "et j'espère y'a un oreiller pour moi"
+→ Plus elle joue le jeu, plus il installe la complicité
+
+PATTERN 5 — LANGAGE JEUNE AUTHENTIQUE À UTILISER :
+→ "ptdr", "ptdrr", "mdr", "mdrrr" (orthographe volontairement approximative = naturel)
+→ "euh pourquoi", "nan mais attends", "j'avoue", "le mec est exigent en plus"
+→ "j'admets", "vive d'esprit" (légère élévation du registre ponctuellement pour contraste)
+→ "je comprends même pas pourquoi je réponds"
+
+═══════════════════════════════════════
+COMPORTEMENT DE "elle" — RÉALISME ABSOLU
+═══════════════════════════════════════
 - Elle ne complimente JAMAIS le mec directement ("t'es ouf", "wow t'es sûr de toi", "j'aime ta façon de parler") → ça n'existe pas dans la vraie vie
 - Elle peut être curieuse MALGRÉ elle, mais elle montre pas que ça l'intéresse — c'est le sous-texte, pas le texte
 - Ses réponses courtes montrent l'intérêt (elle répond = elle est là), ses mots montrent la résistance
-- Elle utilise les vraies réactions d'une fille : "lol", "😂", "excuse moi ???", "t'es sérieux là", "nan mais attends", "je comprends même pas pourquoi je réponds"
-- Varier ses humeurs : parfois sèche ("ok"), parfois amusée ("😂 non"), parfois agacée ("franchement"), parfois piquée ("et tu crois que ça marche avec tout le monde ?")
+- Elle utilise les vraies réactions d'une fille : "lol", "😂", "excuse moi ???", "t'es sérieux là", "nan mais attends", "je comprends même pas pourquoi je réponds", "euh pourquoi", "j'avoue", "ptdrr c'est quelle genre de technique ça", "mais pas mal j'avoue"
+- Varier ses humeurs : parfois sèche ("ok"), parfois amusée ("😂 non"), parfois agacée ("franchement"), parfois piquée ("et tu crois que ça marche avec tout le monde ?"), parfois verbalement agressive ("t'existes pas", "tu surjoues")
 - JAMAIS de réponse enthousiaste ou flatteuse — elle garde toujours une distance cool
 
-COMPORTEMENT DE "lui" — STYLE NATUREL :
-- Phrases COURTES, langage familier — "t'as pas tort", "exactement", "bah voilà", "c'est ça"
+═══════════════════════════════════════
+COMPORTEMENT DE "lui" — STYLE NATUREL
+═══════════════════════════════════════
+- Phrases COURTES, langage familier — "t'as pas tort", "exactement", "bah voilà", "c'est ça", "ok mais du coup"
 - Il ne parle pas comme un coach de développement personnel
 - Ses réponses percutantes viennent de leur SIMPLICITÉ, pas de leur complexité
 - Maximum 1 réplique "technique" toutes les 4-5 réponses — le reste c'est du naturel décontracté
+- Quand elle est très agressive : humour froid pour désamorcer, jamais d'escalade agressive en retour
+- Les compliments qu'il fait sont MINIMISANTS et spécifiques, jamais génériques ou flatteurs
 
 FORMAT DE SORTIE — JSON UNIQUEMENT, rien d'autre :
 {
