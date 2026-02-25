@@ -18,6 +18,12 @@ export async function POST(req: NextRequest) {
     if (!imageBase64 || typeof imageBase64 !== 'string') {
       return NextResponse.json({ error: 'Image requise' }, { status: 400 })
     }
+
+    // Nettoyer le base64 : supprimer tout caractère non-base64 (espaces, retours ligne…)
+    const cleanedBase64 = imageBase64.replace(/[^A-Za-z0-9+/=]/g, '')
+    if (cleanedBase64.length < 100) {
+      return NextResponse.json({ error: 'Image invalide ou trop petite' }, { status: 400 })
+    }
     if (!messageType || !['accroche', 'reponse'].includes(messageType)) {
       return NextResponse.json({ error: 'Type de message invalide' }, { status: 400 })
     }
@@ -67,8 +73,14 @@ export async function POST(req: NextRequest) {
         ? mediaType
         : 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
 
-      const profileAnalysis = await analyzeProfileWithVision(imageBase64, validMediaType)
-      const messages = await generateMessages(profileAnalysis, messageType, selectedTones || [], contextMessage)
+      let profileAnalysis, messages
+      try {
+        profileAnalysis = await analyzeProfileWithVision(cleanedBase64, validMediaType)
+        messages = await generateMessages(profileAnalysis, messageType, selectedTones || [], contextMessage)
+      } catch (guestGenError: unknown) {
+        const msg = guestGenError instanceof Error ? guestGenError.message : 'Erreur lors de la génération'
+        return NextResponse.json({ error: 'Erreur génération: ' + msg }, { status: 500 })
+      }
 
       // Marquer l'IP comme ayant utilisé son analyse gratuite
       await supabaseAdmin
@@ -145,7 +157,7 @@ export async function POST(req: NextRequest) {
 
     let profileAnalysis
     try {
-      profileAnalysis = await analyzeProfileWithVision(imageBase64, validMediaType)
+      profileAnalysis = await analyzeProfileWithVision(cleanedBase64, validMediaType)
     } catch (visionError: unknown) {
       // Rembourser les crédits si Claude échoue (sauf pour Charo)
       if (!isUnlimited) {
@@ -161,7 +173,7 @@ export async function POST(req: NextRequest) {
     let messages
     try {
       messages = await generateMessages(
-        profileAnalysis,
+        profileAnalysis!,
         messageType,
         selectedTones || [],
         contextMessage

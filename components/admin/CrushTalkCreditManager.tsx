@@ -37,9 +37,14 @@ export function CrushTalkCreditManager() {
 
   useEffect(() => { fetchUsers() }, [])
 
+  const getPseudo = (email: string) => email.split('@')[0]
+
   useEffect(() => {
     const q = search.toLowerCase()
-    setFiltered(users.filter(u => u.email.toLowerCase().includes(q)))
+    setFiltered(users.filter(u =>
+      u.email.toLowerCase().includes(q) ||
+      getPseudo(u.email).toLowerCase().includes(q)
+    ))
   }, [search, users])
 
   const handleAddCredits = async () => {
@@ -54,7 +59,7 @@ export function CrushTalkCreditManager() {
       })
       const data = await res.json()
       if (!res.ok) { alert(`Erreur: ${data.error}`); return }
-      setSuccess(`✅ ${amount} crédits CrushTalk ajoutés à ${selectedUser.email} — nouveau solde : ${data.newBalance}`)
+      setSuccess(`✅ ${amount} crédits ajoutés à ${getPseudo(selectedUser.email)} — nouveau solde : ${data.newBalance}`)
       setUsers(prev => prev.map(u => u.id === selectedUser.id ? { ...u, balance: data.newBalance } : u))
       setSelectedUser(prev => prev ? { ...prev, balance: data.newBalance } : null)
     } catch {
@@ -83,7 +88,7 @@ export function CrushTalkCreditManager() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9da3af]" />
         <input
           type="text"
-          placeholder="Rechercher un email..."
+          placeholder="Rechercher par pseudo ou email..."
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full bg-[#16171b] border border-[#2a2d36] rounded-lg pl-9 pr-4 py-2.5 text-white text-sm placeholder-[#6b7280] focus:outline-none focus:border-[#F77F00] transition-colors"
@@ -108,9 +113,9 @@ export function CrushTalkCreditManager() {
               }`}
             >
               <div>
-                <p className="text-sm font-medium">{u.email}</p>
+                <p className="text-sm font-medium">{getPseudo(u.email)}</p>
                 <p className="text-xs text-[#6b7280] mt-0.5">
-                  Inscrit le {new Date(u.joined_at).toLocaleDateString('fr-FR')}
+                  {u.email}
                   {' · '}{u.used_total} crédits utilisés
                 </p>
               </div>
@@ -127,8 +132,9 @@ export function CrushTalkCreditManager() {
       {selectedUser && (
         <div className="bg-[#16171b] border border-[#2a2d36] rounded-lg p-4 space-y-4">
           <p className="text-white text-sm font-medium">
-            Ajouter des crédits à <span className="text-[#F77F00]">{selectedUser.email}</span>
-            <span className="text-[#9da3af] ml-2">(solde actuel : {selectedUser.balance})</span>
+            Ajouter des crédits à <span className="text-[#F77F00]">{getPseudo(selectedUser.email)}</span>
+            <span className="text-[#9da3af] ml-2 text-xs">({selectedUser.email})</span>
+            <span className="text-[#9da3af] ml-2">· solde : {selectedUser.balance}</span>
           </p>
 
           {/* Presets */}

@@ -27,29 +27,55 @@ const TONES = [
 
 const CREDITS_PER_GENERATION = 5
 
-function compressImage(file: File): Promise<{ base64: string; mediaType: string }> {
+const VALID_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'] as const
+type ValidImageType = typeof VALID_IMAGE_TYPES[number]
+
+function cleanBase64(str: string): string {
+  // Supprime tout caractère non-base64 (espaces, retours à la ligne, etc.)
+  return str.replace(/[^A-Za-z0-9+/=]/g, '')
+}
+
+function compressImage(file: File): Promise<{ base64: string; mediaType: ValidImageType }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onloadend = () => {
+      const dataUrl = reader.result as string
+      const commaIdx = dataUrl.indexOf(',')
+      if (commaIdx === -1) { reject(new Error('Format image invalide')); return }
+
+      const header = dataUrl.slice(0, commaIdx)
+      const rawBase64 = dataUrl.slice(commaIdx + 1)
+      const detectedType = header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg'
+      const originalMediaType: ValidImageType = VALID_IMAGE_TYPES.includes(detectedType as ValidImageType)
+        ? (detectedType as ValidImageType)
+        : 'image/jpeg'
+
+      // Essayer la compression canvas
       const img = new window.Image()
       img.onload = () => {
-        const MAX = 1280
-        const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
-        const canvas = document.createElement('canvas')
-        canvas.width = Math.round(img.width * ratio)
-        canvas.height = Math.round(img.height * ratio)
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-        // Certains navigateurs (Safari iOS) ignorent le type JPEG demandé et retournent PNG
-        // On détecte le format réel depuis le dataUrl pour éviter les rejets API
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
-        const [header, base64] = dataUrl.split(',')
-        const detectedType = header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg'
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-        const mediaType = validTypes.includes(detectedType) ? detectedType : 'image/jpeg'
-        resolve({ base64, mediaType })
+        try {
+          const MAX = 1280
+          const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+          const canvas = document.createElement('canvas')
+          canvas.width = Math.round(img.width * ratio)
+          canvas.height = Math.round(img.height * ratio)
+          const ctx = canvas.getContext('2d')
+          if (!ctx) { resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType }); return }
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+          const compressed = canvas.toDataURL('image/jpeg', 0.85)
+          const compressedBase64 = cleanBase64(compressed.slice(compressed.indexOf(',') + 1))
+          // Vérifier que la compression a bien fonctionné (pas une image vide)
+          if (compressedBase64.length > 200) {
+            resolve({ base64: compressedBase64, mediaType: 'image/jpeg' })
+          } else {
+            resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
+          }
+        } catch {
+          resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
+        }
       }
-      img.onerror = reject
-      img.src = reader.result as string
+      img.onerror = () => resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
+      img.src = dataUrl
     }
     reader.onerror = reject
     reader.readAsDataURL(file)
