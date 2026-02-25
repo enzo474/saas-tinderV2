@@ -66,6 +66,27 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // Nouvel onboarding pré-auth (accessibles sans compte)
+  const preAuthPaths = [
+    '/onboarding/intro',
+    '/onboarding/start',
+    '/onboarding/nom',
+    '/onboarding/age',
+    '/onboarding/genre',
+    '/onboarding/objectifs',
+    '/onboarding/decouverte',
+    '/onboarding/demo',
+    '/onboarding/training-preview',
+    '/onboarding/personnalite',
+    '/onboarding/analyse',
+    '/onboarding/profil-pret',
+    '/onboarding/fonctionnalites',
+    '/onboarding/comparaison',
+  ]
+  if (preAuthPaths.some(p => path === p || path.startsWith(p + '/'))) {
+    return response
+  }
+
   // Rediriger CrushTalk (/ct/) vers les nouvelles routes intégrées dans /game/
   if (path === '/ct/accroche') {
     return NextResponse.redirect(new URL('/game/accroche', request.url))

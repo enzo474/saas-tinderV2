@@ -233,6 +233,197 @@ h1, h2, h3, h4, h5, h6 {
   animation: slideUp 0.4s ease-out;
 }
 
+/* ============================================================
+   ONBOARDING v2 – Design System (Pecho-inspired)
+   ============================================================ */
+
+/* Gradient background (full-screen) */
+.ob-bg {
+  min-height: 100dvh;
+  background: linear-gradient(170deg, #FF6161 0%, #E63946 45%, #C1121F 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* White card panel */
+.ob-card {
+  background: #FFFFFF;
+  border-radius: 2rem 2rem 0 0;
+  padding: 2rem 1.5rem 2.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Floating variant (not full bottom) */
+.ob-card-float {
+  background: #FFFFFF;
+  border-radius: 2rem;
+  padding: 2rem 1.5rem;
+  margin: 1rem;
+}
+
+/* Headings inside card */
+.ob-title {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  color: #1C1C1E;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.ob-title-lg {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 900;
+  font-size: 2.2rem;
+  line-height: 1.1;
+  color: #1C1C1E;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.ob-subtitle {
+  font-size: 0.875rem;
+  color: #888888;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* Pill option button */
+.ob-pill {
+  width: 100%;
+  background: #F2F2F2;
+  color: #1C1C1E;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.9375rem 1rem;
+  border-radius: 100px;
+  text-align: center;
+  transition: all 0.18s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.ob-pill:active { transform: scale(0.97); }
+.ob-pill-active {
+  background: #E63946;
+  color: #FFFFFF;
+  border-color: #E63946;
+}
+.ob-pill-dark-active {
+  background: #1C1C1E;
+  color: #FFFFFF;
+  border-color: #1C1C1E;
+}
+
+/* CTA button (dark) */
+.ob-btn {
+  width: 100%;
+  background: #1C1C1E;
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 1rem;
+  border-radius: 100px;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: none;
+}
+.ob-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.ob-btn:not(:disabled):active { transform: scale(0.98); }
+
+/* CTA button (red) */
+.ob-btn-red {
+  background: #E63946;
+  color: #FFFFFF;
+}
+
+/* Option row with emoji/icon */
+.ob-option-row {
+  width: 100%;
+  background: #F2F2F2;
+  color: #1C1C1E;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 1rem 1.25rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  transition: all 0.18s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.ob-option-row:active { transform: scale(0.98); }
+.ob-option-row-active {
+  background: #FFF0F1;
+  border-color: #E63946;
+}
+.ob-option-row-icon {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Progress bar (personality screens) */
+.ob-progress-track {
+  height: 5px;
+  background: #E5E5E5;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.ob-progress-fill {
+  height: 100%;
+  background: #E63946;
+  border-radius: 100px;
+  transition: width 0.4s ease;
+}
+
+/* Feature list item */
+.ob-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  background: #FAFAFA;
+  border-radius: 1rem;
+  border: 1px solid #EFEFEF;
+}
+.ob-feature-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: #F2F2F2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+/* Comparison table */
+.ob-compare-row {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #F0F0F0;
+  gap: 0.5rem;
+}
+
 /* ── Intro Animation keyframes ── */
 @keyframes introWordAppear {
   from { opacity: 0; transform: scale(0.9); }
