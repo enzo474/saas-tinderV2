@@ -1,12 +1,19 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { signInWithGoogle } from './actions'
 import { Check } from 'lucide-react'
 
 export function AuthForm() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const urlError = searchParams.get('error')
+    if (urlError) setError(decodeURIComponent(urlError))
+  }, [searchParams])
 
   const handleGoogleAuth = async () => {
     setLoading(true)
