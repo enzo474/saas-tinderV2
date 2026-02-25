@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 type QuestionType = 'single' | 'multiple' | 'slider' | 'text'
 
@@ -316,19 +315,6 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
             </button>
           )}
 
-          {/* Se connecter */}
-          <div className="mt-5 pt-5 border-t text-center" style={{ borderColor: '#2A2A2A' }}>
-            <p className="text-sm" style={{ color: '#6b7280' }}>
-              Déjà un compte ?{' '}
-              <Link
-                href="/auth"
-                className="font-semibold transition-colors hover:text-white"
-                style={{ color: '#E63946' }}
-              >
-                Se connecter →
-              </Link>
-            </p>
-          </div>
         </div>
       </div>
     </div>
