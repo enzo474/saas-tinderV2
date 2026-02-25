@@ -7,62 +7,87 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const MESSAGE_COUNTS: Record<string, string> = {
   short: '10 à 13',
-  medium: '16 à 20',
-  long: '30 à 50',
+  medium: '14 à 18',
+  long: '18 à 20',
 }
 
-// Profils de personnalité féminine — tirés aléatoirement à chaque génération
-const FEMALE_PROFILES = [
-  {
-    name: 'La Sèche',
-    description: `PROFIL ELLE — LA SÈCHE :
-Elle répond peu et rarement. Ses messages sont ultra-courts, quasi monosyllabiques. Pas d'emojis ou très peu (1 max par message).
-Ton pragmatique, presque indifférent. Elle donne l'impression que répondre lui demande un effort.
-Langage : "ok", "nan", "et ?", "bof", "ouais", "pourquoi", "j'vois pas le rapport", "c'est tout ?"
-Elle peut être surprise par une réplique de lui, mais elle le cache en restant encore plus courte.
-Ses messages longs (2-3 phrases) sont rares et arrivent uniquement si lui a dit quelque chose qui l'a vraiment accroché.`,
-  },
-  {
-    name: 'La Piquante',
-    description: `PROFIL ELLE — LA PIQUANTE :
-Elle est vive d'esprit, a une répartie cinglante, et n'hésite pas à attaquer verbalement.
-Elle écrit des messages plus longs (2-4 phrases), avec des piques bien senties et de l'ironie.
-Langage : formulations directes, parfois agressives, quelques emojis mais utilisés de façon sarcastique (😂, 🙄, 😒).
-Elle peut dire des choses dures ("t'existes pas", "tu surjoues", "t'as rien derrière") mais sans jamais être vulgaire.
-Ses attaques sont construites et précises — pas des insultes brutes. Elle ressemble à une adversaire intellectuelle.
-Si lui retourne bien la situation, elle peut admettre à mi-mot qu'il l'a eue ("bon ok j'avoue").`,
-  },
-  {
-    name: 'La Légère',
-    description: `PROFIL ELLE — LA LÉGÈRE / AMUSÉE :
-Elle rit facilement, elle trouve ça drôle même si elle résiste. Ses messages sont rythmés de "ptdr", "mdrrr", "nan mais attends".
-Emojis fréquents (😂😭💀) mais jamais enthousiastes — elle rit DE lui, pas AVEC lui.
-Messages de longueur moyenne, souvent en 2 temps (elle rit + elle résiste).
-Elle engage le dialogue plus facilement que les autres profils, mais reste sur la défensive sur le fond.
-Son intérêt transparaît dans son rythme de réponse et sa participation, jamais dans ses mots.
-Elle peut poser des questions sur lui sans le vouloir ("mais t'es comme ça avec tout le monde ?").`,
-  },
-  {
-    name: 'La Distante',
-    description: `PROFIL ELLE — LA DISTANTE :
-Elle a l'air occupée, peu disponible, comme si répondre était accessoire dans sa vie.
-Ses messages sont courts à moyens, avec des formulations qui donnent l'impression qu'elle a la tête ailleurs.
-Langage : "ah ok", "ouais bah", "on verra", "j'suis occupée là", "hmm", "peut-être", "sais pas".
-Peu d'emojis, mais peut en glisser un quand lui l'a bien touché — et c'est un signal fort.
-Elle ne s'investit pas dans la conversation mais elle continue à répondre — c'est sa contradiction.
-Ses réponses s'allongent légèrement vers la fin si la conversation l'a accrochée, signe qu'elle est plus là qu'elle ne le dit.`,
-  },
-  {
-    name: 'La Curieuse',
-    description: `PROFIL ELLE — LA CURIEUSE MALGRÉ ELLE :
-Elle pose des questions sans s'en rendre compte — des vraies questions sur lui, sur ce qu'il veut dire.
-Ses messages trahissent un intérêt qu'elle essaie de cacher derrière une formulation neutre ou froide.
-Langage : "c'est quoi ça veut dire ?", "t'es sérieux ?", "j'comprends pas", "et après ?", "genre comment ?".
-Messages de longueur variable — parfois très courts (quand elle se ressaisit), parfois plus longs (quand l'intérêt prend le dessus).
-Elle utilise peu d'emojis mais peut en glisser un de surprise (😐, 👀) quand il dit quelque chose d'inattendu.
-Sa curiosité est son talon d'Achille — si lui joue bien dessus, elle engage beaucoup plus que prévu.`,
-  },
-]
+// ─────────────────────────────────────────────────────────
+// PROFILS FÉMININS PAR LONGUEUR
+// Short  → sympa avec du répondant (capte l'audience rapidement)
+// Medium → moins sympa, légère froideur sans être glaciale
+// Long   → froide, résistance forte, progression lente
+// ─────────────────────────────────────────────────────────
+
+const FEMALE_PROFILES_BY_LENGTH: Record<string, Array<{ name: string; description: string }>> = {
+  short: [
+    {
+      name: 'La Légère',
+      description: `PROFIL ELLE — LA LÉGÈRE / AMUSÉE (version courte) :
+Elle est réactive, souriante malgré elle, elle trouve ça drôle. Elle résiste mais pas méchamment — sa résistance est légère, joueuse.
+Messages rythmés : "ptdr", "nan mais attends", "sérieux ?", "mdrr". Emojis présents (😂😭😏) mais utilisés pour montrer qu'elle trouve ça marrant, pas pour valider.
+Elle engage vite et naturellement — c'est ce qui rend la conv captivante pour le viewer.
+Son répondant : elle a des répliques, elle contre-attaque avec de l'humour, elle teste lui — mais jamais avec hostilité.
+Sa progression : un peu méfiante au début → amusée au milieu → une ouverture claire à la fin (numéro, date ou "pourquoi pas").
+⚠️ Elle ne complimente PAS lui. Son intérêt se lit dans son engagement, pas dans ses mots.`,
+    },
+    {
+      name: 'La Curieuse Joueuse',
+      description: `PROFIL ELLE — LA CURIEUSE JOUEUSE (version courte) :
+Elle est intriguée dès le départ et le montre à moitié. Elle pose des vraies questions sans le vouloir, elle est prise dans le jeu.
+Messages de longueur variable : courts quand elle se ressaisit ("et ?", "genre"), plus longs quand ça l'accroche vraiment.
+Quelques emojis (👀, 😐, 😏) qui trahissent son intérêt mieux que ses mots.
+Son répondant : elle creuse, elle teste, elle met lui en situation. Elle veut comprendre qui il est.
+Sa progression : neutre/curieuse → de plus en plus impliquée → fin ouverte et chaleureuse.
+⚠️ Elle ne complimente PAS lui. Elle montre son intérêt par ses questions et sa présence, jamais par des phrases flatteuses.`,
+    },
+  ],
+
+  medium: [
+    {
+      name: 'La Distante',
+      description: `PROFIL ELLE — LA DISTANTE (version moyenne) :
+Elle a l'air de faire autre chose. Ses réponses arrivent avec une légère nonchalance, comme si c'était lui qui avait de la chance qu'elle réponde.
+Ton : neutre, pas hostile, mais pas invitant non plus. Elle met une distance relationnelle subtile.
+Langage : "ah ok", "ouais bah", "on verra", "hmm", "j'sais pas trop", "peut-être".
+Peu d'emojis — 1 ou 2 max sur toute la conv, glissés à des moments clés pour signaler qu'elle est quand même là.
+Sa progression : distante → légèrement moins distante au milieu si lui a bien joué → fin ambiguë (résistance avec une porte entrouverte).
+Elle ne s'enflamme pas. Même si lui dit quelque chose de percutant, sa réponse reste tempérée.
+⚠️ Jamais de chaleur affichée — son intérêt se lit uniquement dans le fait qu'elle continue à répondre.`,
+    },
+    {
+      name: 'La Piquante Froide',
+      description: `PROFIL ELLE — LA PIQUANTE FROIDE (version moyenne) :
+Elle a de la répartie mais elle est sèche. Pas de sourires, pas de "ptdr" — juste des répliques sèches et bien placées.
+Elle contre-attaque avec des piques courtes et précises, mais sans s'énerver. C'est du mépris poli, pas de la colère.
+Langage : "ok et ?", "t'es sérieux là", "bof", "franchement hein", "nan", "j'vois pas l'intérêt".
+Emojis rares et froids (🙄, 😒) — 1 à 2 sur toute la conv.
+Sa progression : froide et piquante → légère curiosité vers le milieu si lui tient bien → fin résistante mais pas hermétique.
+⚠️ Elle ne cède jamais totalement. Au mieux, une porte entrouverte à la fin. Jamais de numéro ni de date explicite.`,
+    },
+  ],
+
+  long: [
+    {
+      name: 'La Sèche',
+      description: `PROFIL ELLE — LA SÈCHE (version longue) :
+Elle répond par obligation sociale plus que par envie. Ses messages sont courts, quasi mono-syllabiques. Pas d'emojis.
+Ton : indifférent, pragmatique, parfois légèrement agacé. Elle donne l'impression que lui l'interrompt dans sa vie.
+Langage : "ok", "nan", "et ?", "bof", "ouais", "j'vois pas le rapport", "c'est tout ?", silence symbolique avec une réponse sèche.
+Sa progression : totalement froide au début → imperceptiblement moins fermée vers les 2/3 de la conv si lui a fait quelque chose de vraiment inattendu → fin sur une résistance avec une seule petite porte entrouverte (genre "...on verra").
+⚠️ Elle ne montre AUCUN enthousiasme à aucun moment. Chaque signe d'intérêt est mini et rapidement recouvert par de la froideur. C'est son armure.`,
+    },
+    {
+      name: 'La Distante Glaciale',
+      description: `PROFIL ELLE — LA DISTANTE GLACIALE (version longue) :
+Elle répond mais maintient une distance permanente, comme si lui était dans son espace sans y avoir été invité.
+Ses messages sont calculés, jamais spontanés. Pas d'emojis. Ton neutre voire légèrement supérieur.
+Langage : "hmm", "si tu veux", "ça dépend", "pas forcément", "je vois pas trop", "j'ai autre chose".
+Elle peut engager intellectuellement (une vraie réponse longue et froide), mais sans jamais mettre de chaleur dedans.
+Sa progression : distance maximale au début → quelques échanges où elle s'implique intellectuellement (sans se réchauffer) → fin sur un refus poli mais avec une ouverture très floue et non commitante.
+⚠️ Elle ne cède jamais. La "victoire" ici est une réponse ouverte type "peut-être un jour" ou "on verra si tu reviens". C'est tout.`,
+    },
+  ],
+}
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
   trash: `TRASH / PROVOCANT :
@@ -114,8 +139,9 @@ La fille réagit par surprise, confusion, amusement ou agacement — tout ça g�
 function buildSystemPrompt(style: string, length: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.trash
   const messageCount = MESSAGE_COUNTS[length] || '10 à 13'
-  // Profil féminin tiré aléatoirement à chaque appel
-  const femaleProfile = FEMALE_PROFILES[Math.floor(Math.random() * FEMALE_PROFILES.length)]
+  // Profil féminin tiré aléatoirement dans le pool correspondant à la longueur
+  const pool = FEMALE_PROFILES_BY_LENGTH[length] ?? FEMALE_PROFILES_BY_LENGTH.short
+  const femaleProfile = pool[Math.floor(Math.random() * pool.length)]
 
   return `Tu es un expert en création de conversations virales pour TikTok et Instagram.
 Tu génères des FAUSSES conversations entre un homme (lui) et une femme (elle), destinées à du contenu viral.
@@ -198,9 +224,14 @@ STYLE DEMANDÉ : ${styleInstruction}
 
 ${femaleProfile.description}
 
-LONGUEUR : ${messageCount} messages au total (version ${length === 'short' ? 'courte — MAXIMUM 13 slides' : length === 'medium' ? 'moyenne' : 'longue'}).
-Une "slide" = 1 message de "lui" + 1 réponse de "elle" (= 1 échange).
-${length === 'short' ? '⚠️ VERSION COURTE : Ne dépasse PAS 13 slides. La conversation doit être dense et percutante, pas longue. Chaque message compte. Arrive à une conclusion (numéro, date, ou porte ouverte) en 10-13 échanges.' : length === 'long' ? 'Pour l\'option longue : vise 15 à 25 slides/échanges, donc 30 à 50 messages. Ne te limite pas à atteindre un chiffre exact — arrête uniquement quand la conversation est naturellement terminée.' : 'Vise 16 à 20 messages au total.'}
+LONGUEUR : ${messageCount} slides au total. Une "slide" = 1 message de "lui" + 1 réponse de "elle" (= 1 échange).
+${
+  length === 'short'
+    ? '⚠️ VERSION COURTE (10-13 slides) : Dense et captivante. Chaque échange compte. La fille est sympa avec du répondant — le viewer doit avoir envie de lire la suite à chaque slide. Conclusion claire à la fin (numéro, date, ou porte ouverte franche).'
+    : length === 'medium'
+    ? '⚠️ VERSION MOYENNE (14-18 slides) : Rythme plus posé. La fille est moins accessible, légèrement froide — elle teste lui plus longtemps avant de s\'ouvrir légèrement. Fin ambiguë avec une porte entrouverte mais pas de victoire totale.'
+    : '⚠️ VERSION LONGUE (18-20 slides MAX — ne pas dépasser) : La fille est froide tout du long. Résistance forte et durable. Lui doit travailler chaque échange pour gratter un centimètre. La "victoire" est une ouverture très partielle à la fin ("on verra", "peut-être"), jamais un numéro ou un date explicite.'
+}
 
 FLUIDITÉ ET PROGRESSION NATURELLE — RÈGLES IMPÉRATIVES :
 1. La conversation DOIT avoir une courbe narrative : accroche → résistance → pic de tension → résolution. Pas de changement brutal de registre sans transition.
