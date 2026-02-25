@@ -65,7 +65,7 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
         return
       }
       if (data.upgraded) {
-        window.location.href = '/ct/accroche?subscription=upgraded'
+        window.location.href = '/game/accroche?subscription=upgraded'
         return
       }
       if (data.url) {

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { signInWithGoogle } from './actions'
+import { Check } from 'lucide-react'
 
 export default function AuthPage() {
   const [error, setError] = useState<string | null>(null)
@@ -10,9 +11,7 @@ export default function AuthPage() {
   const handleGoogleAuth = async () => {
     setLoading(true)
     setError(null)
-
     const result = await signInWithGoogle()
-
     if (result?.error) {
       setError(result.error)
       setLoading(false)
@@ -20,18 +19,21 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center px-4 py-12">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4"
+      style={{ background: '#0A0A0A' }}
+    >
       {/* Background glow */}
       <div
         className="fixed inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse at 50% 20%, rgba(230,57,70,0.06), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse at 50% 20%, rgba(230,57,70,0.07), transparent 60%)' }}
       />
 
-      <div className="relative z-10 w-full max-w-md">
+      <div className="relative z-10 w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
           <span
-            className="font-montserrat font-extrabold text-2xl md:text-3xl"
+            className="font-montserrat font-extrabold text-2xl"
             style={{
               background: 'linear-gradient(135deg, #E63946, #FF4757)',
               WebkitBackgroundClip: 'text',
@@ -43,24 +45,36 @@ export default function AuthPage() {
           </span>
         </div>
 
-        <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-8">
-          <h1 className="font-montserrat font-bold text-white text-2xl mb-1 text-center">
-            Connexion
-          </h1>
-          <p className="text-text-secondary text-center text-sm mb-8">
-            Continue avec Google pour accéder à ton espace
-          </p>
+        <div
+          className="rounded-2xl p-8 border"
+          style={{ background: '#111111', borderColor: '#1F1F1F' }}
+        >
+          {/* Header */}
+          <div className="text-center mb-7">
+            <div className="text-4xl mb-3">🎁</div>
+            <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
+              Crée ton compte
+            </h1>
+            <p className="text-sm" style={{ color: '#9da3af' }}>
+              Inscription gratuite · <strong className="text-white">5 crédits offerts</strong>
+            </p>
+          </div>
 
           {error && (
-            <div className="bg-red-primary/10 border border-red-primary/50 rounded-xl p-3 mb-5">
-              <p className="text-red-light text-sm">{error}</p>
+            <div
+              className="mb-4 p-3 rounded-xl"
+              style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.3)' }}
+            >
+              <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
             </div>
           )}
 
+          {/* Bouton Google */}
           <button
             onClick={handleGoogleAuth}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-xl border-2 border-border-primary bg-bg-primary hover:border-red-primary/50 hover:bg-bg-secondary text-white font-semibold text-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-5 py-4 rounded-xl border-2 font-semibold text-sm text-white transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+            style={{ borderColor: '#2A2A2A', background: '#0D0D0D' }}
           >
             {loading ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -75,16 +89,33 @@ export default function AuthPage() {
             {loading ? 'Connexion...' : 'Continuer avec Google'}
           </button>
 
-          <p className="text-text-tertiary text-xs text-center mt-6 leading-relaxed">
-            En continuant, tu acceptes nos{' '}
-            <a href="/terms" className="text-text-secondary hover:text-white transition-colors underline">CGU</a>
-            {' '}et notre{' '}
-            <a href="/privacy" className="text-text-secondary hover:text-white transition-colors underline">politique de confidentialité</a>.
-          </p>
+          {/* Bénéfices */}
+          <div className="space-y-3">
+            {[
+              'Pas de carte bancaire requise',
+              '5 crédits offerts = 1 génération gratuite',
+              'Inscription en 2 secondes',
+            ].map((benefit) => (
+              <div key={benefit} className="flex items-center gap-3">
+                <div
+                  className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                  style={{ background: 'rgba(230,57,70,0.15)' }}
+                >
+                  <Check className="w-3 h-3" style={{ color: '#E63946' }} />
+                </div>
+                <span className="text-sm" style={{ color: '#9da3af' }}>{benefit}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Email/password auth désactivé côté front — code disponible dans git pour réactivation */}
+        <p className="text-center text-xs mt-5" style={{ color: '#6b7280' }}>
+          En continuant, tu acceptes nos{' '}
+          <a href="/terms" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>CGU</a>
+          {' '}et notre{' '}
+          <a href="/privacy" className="hover:text-white transition-colors" style={{ color: '#9da3af' }}>Politique de confidentialité</a>.
+        </p>
+      </div>
     </div>
   )
 }

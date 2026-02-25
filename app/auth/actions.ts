@@ -52,8 +52,8 @@ export async function signInWithEmail(formData: FormData) {
     }
   }
 
-  console.log('➡️ [AUTH] Redirecting to /onboarding/intro')
-  redirect('/onboarding/intro')
+  console.log('➡️ [AUTH] Redirecting to /game')
+  redirect('/game')
 }
 
 export async function signUpWithEmail(formData: FormData) {
@@ -77,8 +77,8 @@ export async function signUpWithEmail(formData: FormData) {
   }
 
   console.log('✅ [AUTH] User signed up:', data.user?.id)
-  console.log('➡️ [AUTH] Redirecting to /onboarding/intro')
-  redirect('/onboarding/intro')
+  console.log('➡️ [AUTH] Redirecting to /game')
+  redirect('/game')
 }
 
 export async function signInWithGoogle() {

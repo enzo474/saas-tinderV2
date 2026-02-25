@@ -119,8 +119,8 @@ export async function POST(req: NextRequest) {
       line_items: [{ price: planConfig.priceId, quantity: 1 }],
       mode: 'subscription',
       allow_promotion_codes: true,
-      success_url: `${appUrl}/ct/accroche?subscription=success&plan=${plan}`,
-      cancel_url: `${appUrl}/ct/pricing`,
+      success_url: `${appUrl}/game/accroche?subscription=success&plan=${plan}`,
+      cancel_url: `${appUrl}/game/pricing`,
       customer_email: user.email ?? undefined,
       metadata: {
         product_type: planConfig.productType,

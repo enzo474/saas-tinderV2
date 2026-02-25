@@ -37,8 +37,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Revalider la session et rafraîchir les tokens. getSession() n'est pas fiable en Proxy.
-  // getClaims() valide le JWT et met à jour les cookies (request + response).
   const { data } = await supabase.auth.getClaims()
   const claims = data?.claims
   const user = claims?.sub
@@ -47,18 +45,54 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
-  // Public routes (dont les webhooks externes — pas de session utilisateur)
+  // ── Redirections CrushPicture (produit désactivé) ──────────────────────────
+  if (
+    path === '/crushpicture' ||
+    path === '/start' ||
+    path.startsWith('/onboarding') ||
+    path.startsWith('/ob2') ||
+    path.startsWith('/analysis') ||
+    path === '/results' ||
+    (path === '/pricing' && !path.startsWith('/game')) ||
+    path.startsWith('/dashboard')
+  ) {
+    return copyCookiesToResponse(
+      response,
+      NextResponse.redirect(new URL('/coming-soon', request.url))
+    )
+  }
+
+  // ── Redirections CrushTalk standalone (produit intégré dans /game) ─────────
+  if (path === '/crushtalk' || path.startsWith('/crushtalk/')) {
+    return copyCookiesToResponse(
+      response,
+      NextResponse.redirect(new URL('/game/accroche', request.url))
+    )
+  }
+
+  // ── Redirections anciennes routes /ct/ ─────────────────────────────────────
+  if (path === '/ct/accroche') {
+    return NextResponse.redirect(new URL('/game/accroche', request.url))
+  }
+  if (path === '/ct/discussion') {
+    return NextResponse.redirect(new URL('/game/discussion', request.url))
+  }
+  if (path === '/ct/pricing') {
+    return NextResponse.redirect(new URL('/game/pricing', request.url))
+  }
+  if (path.startsWith('/ct/') || path === '/ct') {
+    return NextResponse.redirect(new URL('/game', request.url))
+  }
+
+  // ── Routes publiques (pas d'auth requise) ──────────────────────────────────
   if (
     path === '/' ||
-    path === '/crushpicture' ||
     path === '/coming-soon' ||
-    path === '/game/onboarding' ||
     path === '/auth' ||
     path.startsWith('/auth/callback') ||
+    path === '/game/onboarding' ||
     path === '/privacy' ||
     path === '/terms' ||
-    path === '/crushtalk' ||
-    path === '/crushtalk/login' ||
     path.startsWith('/api/nanobanana/') ||
     path.startsWith('/api/stripe/') ||
     path.startsWith('/api/crushtalk/checkout-session')
@@ -66,95 +100,24 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
-  // Rediriger CrushTalk (/ct/) vers les nouvelles routes intégrées dans /game/
-  if (path === '/ct/accroche') {
-    return NextResponse.redirect(new URL('/game/accroche', request.url))
-  }
-  if (path === '/ct/discussion') {
-    return NextResponse.redirect(new URL('/game/discussion', request.url))
-  }
-  if (path.startsWith('/ct/') || path === '/ct') {
-    return NextResponse.redirect(new URL('/game', request.url))
-  }
-
-  // Protected routes - require authentication
+  // ── Routes protégées : auth requise ───────────────────────────────────────
   if (!user) {
     const redirectResponse = NextResponse.redirect(new URL('/auth', request.url))
     return copyCookiesToResponse(response, redirectResponse)
   }
 
-  // Bloquer CrushPicture (/dashboard/) sauf panel admin — bientôt disponible
-  if (path.startsWith('/dashboard') && !path.startsWith('/dashboard/admin')) {
-    return copyCookiesToResponse(
-      response,
-      NextResponse.redirect(new URL('/coming-soon', request.url))
-    )
-  }
-
-  // Pour les routes game, onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
+  // ── Routes /game/* et /admin/* : auth uniquement, pas de check DB ─────────
   if (
     path.startsWith('/game') ||
-    path.startsWith('/onboarding') ||
-    path.startsWith('/ob2') ||
-    path.startsWith('/analysis') ||
-    path.startsWith('/start') ||
-    path.startsWith('/crushtalk/')
+    path.startsWith('/admin') ||
+    path.startsWith('/presale')
   ) {
     return response
   }
 
-  // Routes nécessitant un check DB : /results, /pricing, /success + redirect /start
-  // On lance les deux queries en parallèle (une seule fois)
-  const [{ data: analysis }, { data: userProfile }] = await Promise.all([
-    supabase
-      .from('analyses')
-      .select('status, paid_at, ab_variant')
-      .eq('user_id', user.id)
-      .single(),
-    supabase
-      .from('user_profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single(),
-  ])
-
-  // Admins bypass tout
-  if (userProfile?.role === 'admin') {
+  // ── Admin panel : auth gérée côté page ────────────────────────────────────
+  if (path === '/success' || path === '/success/premium') {
     return response
-  }
-
-  // Redirect authenticated users without analysis to /start
-  if (!analysis) {
-    return copyCookiesToResponse(
-      response,
-      NextResponse.redirect(new URL('/start', request.url))
-    )
-  }
-
-  // Results page - requires complete status
-  if (path === '/results' && analysis?.status !== 'complete' && analysis?.status !== 'paid') {
-    const onboardingRoute = analysis?.ab_variant === 'B' ? '/ob2/intro' : '/onboarding/intro'
-    return copyCookiesToResponse(
-      response,
-      NextResponse.redirect(new URL(onboardingRoute, request.url))
-    )
-  }
-
-  // Pricing page - requires complete status
-  if (path === '/pricing' && analysis?.status !== 'complete' && analysis?.status !== 'paid') {
-    const onboardingRoute = analysis?.ab_variant === 'B' ? '/ob2/intro' : '/onboarding/intro'
-    return copyCookiesToResponse(
-      response,
-      NextResponse.redirect(new URL(onboardingRoute, request.url))
-    )
-  }
-
-  // Success page - requires payment
-  if (path === '/success' && !analysis?.paid_at) {
-    return copyCookiesToResponse(
-      response,
-      NextResponse.redirect(new URL('/pricing', request.url))
-    )
   }
 
   return response
@@ -162,14 +125,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     * - /admin (auth vérifiée dans la page admin côté serveur, évite session nulle en Edge)
-     */
     '/((?!_next/static|_next/image|favicon.ico|admin|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

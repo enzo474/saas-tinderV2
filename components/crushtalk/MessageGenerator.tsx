@@ -104,7 +104,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       return
     }
     if (!hasEnoughCredits) {
-      router.push('/ct/pricing')
+      router.push('/game/pricing')
       return
     }
 
@@ -207,7 +207,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         <div
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
           style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-          onClick={() => !isUnlimited && router.push('/ct/pricing')}
+          onClick={() => !isUnlimited && router.push('/game/pricing')}
           title={isUnlimited ? 'Pack Charo — Illimité' : 'Voir les offres'}
         >
           {isUnlimited ? (
@@ -466,7 +466,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
             Tu as utilisé tes crédits gratuits ! Choisis un plan pour continuer.
           </p>
           <button
-            onClick={() => router.push('/ct/pricing')}
+            onClick={() => router.push('/game/pricing')}
             className="ml-4 px-4 py-2 rounded-lg text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >

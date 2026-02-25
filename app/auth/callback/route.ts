@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -9,21 +9,25 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (!error) {
-      // Check if user has an analysis
       const { data: { user } } = await supabase.auth.getUser()
+
       if (user) {
-        const { data: analysis } = await supabase
-          .from('analyses')
-          .select('status')
+        // Créer 5 crédits pour les nouveaux utilisateurs (si pas encore créés)
+        const supabaseAdmin = createServiceRoleClient()
+        const { data: existing } = await supabaseAdmin
+          .from('crushtalk_credits')
+          .select('user_id')
           .eq('user_id', user.id)
           .single()
 
-        if (analysis?.status === 'paid') {
-          return NextResponse.redirect(`${origin}/success`)
-        } else if (analysis?.status === 'complete') {
-          return NextResponse.redirect(`${origin}/results`)
+        if (!existing) {
+          await supabaseAdmin.from('crushtalk_credits').insert({
+            user_id: user.id,
+            balance: 5,
+            used_total: 0,
+          })
         }
       }
 
