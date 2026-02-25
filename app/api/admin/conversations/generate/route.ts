@@ -357,8 +357,6 @@ export async function POST(req: NextRequest) {
       ? `Contexte fourni par l'admin : ${context}${accrocheLine}\n\nGénère la conversation.`
       : `Analyse cette photo de story et génère une conversation virale basée dessus.${accrocheLine}`
 
-    // Ordre de préférence : modèle principal → fallback si surchargé
-    const MODELS = ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307']
     const systemPrompt = buildSystemPrompt(style, length)
     const messagePayload = [
       {
@@ -377,24 +375,28 @@ export async function POST(req: NextRequest) {
       },
     ]
 
+    // Retry sur le même modèle en cas de surcharge temporaire
+    const MAX_RETRIES = 4
     let claudeResponse: Awaited<ReturnType<typeof anthropic.messages.create>> | null = null
     let lastClaudeError: any = null
 
-    for (const model of MODELS) {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
       try {
         claudeResponse = await anthropic.messages.create({
-          model,
+          model: 'claude-sonnet-4-20250514',
           max_tokens: 8192,
           system: systemPrompt,
           messages: messagePayload,
         })
-        break // succès — on sort de la boucle
+        break
       } catch (e: any) {
         lastClaudeError = e
         const isOverloaded = e?.status === 529 || e?.message?.toLowerCase().includes('overloaded') || e?.error?.type === 'overloaded_error'
-        if (!isOverloaded) throw e // erreur autre que surcharge → on propage immédiatement
-        console.warn(`[Admin Conversations] ${model} surchargé, tentative sur modèle suivant…`)
-        await new Promise(r => setTimeout(r, 2000)) // petite pause avant fallback
+        if (!isOverloaded) throw e
+        if (attempt < MAX_RETRIES) {
+          console.warn(`[Admin Conversations] Claude surchargé, tentative ${attempt}/${MAX_RETRIES}…`)
+          await new Promise(r => setTimeout(r, 5000 * attempt))
+        }
       }
     }
 
