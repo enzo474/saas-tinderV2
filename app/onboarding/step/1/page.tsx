@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { StepHeader } from '@/components/ui/StepHeader'
+import { Button } from '@/components/ui/Button'
+import { PillButton } from '@/components/ui/PillButton'
 import { getOrCreateAnalysis, saveOnboardingStep1 } from '@/lib/actions/onboarding'
 
 const matchOptions = [
@@ -12,7 +15,7 @@ const matchOptions = [
 ]
 
 const seniorityOptions = [
-  { label: "Moins d'1 mois", value: 'less-1' },
+  { label: 'Moins d\'1 mois', value: 'less-1' },
   { label: '1 à 3 mois', value: '1-3' },
   { label: '3 à 6 mois', value: '3-6' },
   { label: '6 mois ou plus', value: '6+' },
@@ -26,6 +29,7 @@ export default function OnboardingStep1() {
   const [loading, setLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
+  // Load analysis on mount
   useEffect(() => {
     setMounted(true)
     getOrCreateAnalysis().then(analysis => {
@@ -37,79 +41,89 @@ export default function OnboardingStep1() {
 
   const handleSubmit = async () => {
     if (!analysisId || !currentMatches || !tinderSeniority) return
+
     setLoading(true)
     try {
-      await saveOnboardingStep1({ analysisId, currentMatches, tinderSeniority })
+      await saveOnboardingStep1({
+        analysisId,
+        currentMatches,
+        tinderSeniority,
+      })
       router.push('/onboarding/step/2')
-    } catch {
+    } catch (error) {
+      console.error(error)
       setLoading(false)
     }
   }
 
+  const isValid = currentMatches && tinderSeniority
+
   if (!mounted) {
     return (
-      <div className="ob-bg items-center justify-center" style={{ minHeight: '100dvh' }}>
-        <div className="w-10 h-10 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+      <div className="min-h-screen bg-bg-primary flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-border-primary border-t-red-primary rounded-full animate-spin" />
       </div>
     )
   }
 
-  const isValid = currentMatches && tinderSeniority
-
   return (
-    <div className="ob-bg" style={{ minHeight: '100dvh', justifyContent: 'flex-end' }}>
-      <div className="ob-card" style={{ borderRadius: '2rem 2rem 0 0', minHeight: '72dvh' }}>
-        <div className="text-center mb-6">
-          <h2 className="ob-title-lg">D&apos;où tu pars ?</h2>
-          <p className="ob-subtitle">
-            Pour créer le meilleur profil possible, on a besoin de comprendre ta situation actuelle.
-          </p>
-        </div>
+    <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-md mx-auto">
+        <StepHeader currentStep={1} totalSteps={3} />
 
-        {/* Matchs */}
-        <div className="mb-6">
-          <p className="font-bold text-sm mb-3" style={{ color: '#1C1C1E' }}>
-            Combien de matchs obtiens-tu en moyenne par semaine ?
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {matchOptions.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setCurrentMatches(opt.value)}
-                className={`ob-pill ${currentMatches === opt.value ? 'ob-pill-active' : ''}`}
-              >
-                {opt.label}
-              </button>
-            ))}
+        <div className="bg-gradient-to-br from-bg-secondary to-bg-tertiary border-2 border-border-primary rounded-2xl p-8 space-y-8">
+          <div className="text-center">
+            <h2 className="font-montserrat font-bold text-white text-2xl mb-2">
+              D&apos;où tu pars ?
+            </h2>
+            <p className="text-text-secondary text-sm leading-relaxed">
+              Pour créer le meilleur profil possible, on a besoin de comprendre ta situation actuelle.
+            </p>
           </div>
-        </div>
 
-        {/* Ancienneté */}
-        <div className="mb-8">
-          <p className="font-bold text-sm mb-3" style={{ color: '#1C1C1E' }}>
-            Depuis combien de temps es-tu actif sur Tinder ?
-          </p>
-          <div className="flex flex-col gap-2">
-            {seniorityOptions.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setTinderSeniority(opt.value)}
-                className={`ob-pill ${tinderSeniority === opt.value ? 'ob-pill-dark-active' : ''}`}
-              >
-                {opt.label}
-              </button>
-            ))}
+          {/* Question 1 */}
+          <div>
+            <p className="text-white text-sm font-medium mb-4">
+              Combien de matchs obtiens-tu en moyenne par&nbsp;semaine&nbsp;?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {matchOptions.map((option) => (
+                <PillButton
+                  key={option.value}
+                  selected={currentMatches === option.value}
+                  onClick={() => setCurrentMatches(option.value)}
+                >
+                  {option.label}
+                </PillButton>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="mt-auto">
-          <button
+          {/* Question 2 */}
+          <div>
+            <p className="text-white text-sm font-medium mb-4">
+              Depuis combien de temps es-tu actif sur Tinder ?
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {seniorityOptions.map((option) => (
+                <PillButton
+                  key={option.value}
+                  selected={tinderSeniority === option.value}
+                  onClick={() => setTinderSeniority(option.value)}
+                >
+                  {option.label}
+                </PillButton>
+              ))}
+            </div>
+          </div>
+
+          <Button
             onClick={handleSubmit}
             disabled={!isValid || loading}
-            className="ob-btn"
+            className="w-full justify-center"
           >
-            {loading ? 'Chargement...' : 'Continuer'}
-          </button>
+            {loading ? 'Chargement...' : 'Continuer →'}
+          </Button>
         </div>
       </div>
     </div>

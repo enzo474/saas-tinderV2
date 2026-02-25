@@ -165,24 +165,28 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   }
 
   return (
-    <div className="px-4 py-4 space-y-4">
+    <div className="max-w-4xl mx-auto space-y-6">
 
       {/* Banner bienvenue — 5 crédits offerts */}
       {showWelcomeBanner && (
         <div
-          className="flex items-center justify-between rounded-2xl p-4"
-          style={{ background: 'rgba(230,57,70,0.12)', border: '1px solid rgba(230,57,70,0.3)' }}
+          className="flex items-center justify-between rounded-xl p-4 border"
+          style={{ background: 'rgba(230,57,70,0.08)', borderColor: 'rgba(230,57,70,0.3)' }}
         >
           <div className="flex items-center gap-3">
             <span className="text-xl">🎁</span>
             <div>
-              <p className="text-white text-sm font-bold">5 crédits offerts !</p>
-              <p className="text-xs" style={{ color: '#aaa' }}>
-                Génère ton premier message. Coût : 5 crédits.
+              <p className="text-white text-sm font-semibold">Bienvenue ! Tu as 5 crédits gratuits</p>
+              <p className="text-xs" style={{ color: '#9da3af' }}>
+                Upload un screenshot pour générer ton premier message. Coût : 5 crédits.
               </p>
             </div>
           </div>
-          <button onClick={() => setShowWelcomeBanner(false)} style={{ color: '#666' }}>
+          <button
+            onClick={() => setShowWelcomeBanner(false)}
+            className="flex-shrink-0 ml-3 transition-colors"
+            style={{ color: '#6b7280' }}
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -191,44 +195,42 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       {/* Header avec crédits */}
       <div className="flex items-center justify-between">
         <div>
-          <h2
-            className="text-white font-black text-2xl"
-            style={{ fontFamily: 'var(--font-montserrat)', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}
-          >
-            {activeType === 'accroche' ? 'Disquettes ✨' : 'Conversation 💬'}
-          </h2>
-          <p className="text-sm mt-0.5" style={{ color: 'rgba(255,255,255,0.7)' }}>
+          <h1 className="font-montserrat font-bold text-white text-xl md:text-3xl whitespace-nowrap">
+            {activeType === 'accroche' ? 'Disquettes' : 'Conversation'}
+          </h1>
+          <p className="text-text-secondary text-sm mt-1 line-clamp-2">
             {activeType === 'accroche'
-              ? "Upload un profil, l'IA génère des messages"
-              : "Upload la conv, l'IA génère des réponses"}
+              ? 'Upload un profil, l\'IA génère 4 messages personnalisés pour toi.'
+              : 'Upload la conversation, l\'IA génère des réponses percutantes.'}
           </p>
         </div>
         <div
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full cursor-pointer"
-          style={{ background: 'rgba(255,255,255,0.15)' }}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           onClick={() => !isUnlimited && router.push('/ct/pricing')}
+          title={isUnlimited ? 'Pack Charo — Illimité' : 'Voir les offres'}
         >
           {isUnlimited ? (
             <>
               <Infinity className="w-3.5 h-3.5 text-white" />
-              <span className="font-bold text-white text-xs">Illimité</span>
+              <span className="font-montserrat font-bold text-white text-xs">Illimité</span>
             </>
           ) : (
             <>
               <Zap className="w-3.5 h-3.5 text-white" />
-              <span className="font-bold text-white text-sm">{credits}</span>
-              <span className="text-white/70 text-xs">crd</span>
+              <span className="font-montserrat font-bold text-white text-xs">{credits}</span>
+              <span className="text-white/80 text-[10px]">crédits</span>
             </>
           )}
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-6">
         {/* Colonne gauche — Inputs */}
-        <div className="space-y-3">
+        <div className="space-y-4">
 
           {/* Upload screenshot */}
-          <div className="rounded-3xl p-4" style={{ background: '#1C1C1E' }}>
+          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>
               {activeType === 'accroche' ? 'Screenshot du profil' : 'Screenshot de la conversation'}
             </p>
@@ -283,8 +285,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
 
 
           {/* Sélecteur de ton */}
-          <div className="rounded-3xl p-4" style={{ background: '#1C1C1E' }}>
-            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#E63946' }}>Style</p>
+          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
               {TONES.filter(t => t.label !== 'CrushTalk').map(tone => {
                 const isActive = selectedTone === tone.label
@@ -292,35 +294,39 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                   <button
                     key={tone.label}
                     onClick={() => selectTone(tone.label)}
-                    className="py-3 rounded-2xl text-sm font-semibold transition-all duration-200"
+                    className="flex items-center justify-center px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
                     style={isActive ? {
-                      background: '#E63946',
+                      borderColor: '#E63946',
+                      background: 'rgba(230,57,70,0.1)',
                       color: '#fff',
                     } : {
-                      background: '#2A2A2A',
-                      color: '#888',
+                      borderColor: '#1F1F1F',
+                      color: '#9da3af',
                     }}
                   >
-                    {tone.label}
+                    <span>{tone.label}</span>
                   </button>
                 )
               })}
+
+              {/* CrushTalk — pleine largeur en bas */}
               {(() => {
                 const isActive = selectedTone === 'CrushTalk'
                 return (
                   <button
                     onClick={() => selectTone('CrushTalk')}
-                    className="col-span-2 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-bold transition-all duration-200"
+                    className="col-span-2 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
                     style={isActive ? {
-                      background: 'linear-gradient(135deg, #E63946, #FF4757)',
+                      borderColor: '#E63946',
+                      background: 'rgba(230,57,70,0.1)',
                       color: '#fff',
                     } : {
-                      background: '#2A2A2A',
-                      color: '#888',
+                      borderColor: '#1F1F1F',
+                      color: '#9da3af',
                     }}
                   >
-                    <span>CrushTalk ✨</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.15)', color: isActive ? '#fff' : '#888' }}>
+                    <span>CrushTalk</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
                       Adapté par l&apos;IA
                     </span>
                   </button>
@@ -356,7 +362,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
 
         {/* Colonne droite — Résultats */}
-        <div className="rounded-3xl p-4" style={{ background: '#1C1C1E' }}>
+        <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
           {!results && !loading && (
             <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style={{ background: 'rgba(230,57,70,0.1)' }}>
@@ -407,8 +413,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               {results.map((msg, idx) => (
                 <div
                   key={idx}
-                  className="rounded-2xl p-4"
-                  style={{ background: '#252525' }}
+                  className="rounded-xl p-4 border"
+                  style={{ background: 'rgba(255,255,255,0.03)', borderColor: '#2A2A2A' }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -453,20 +459,18 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
       </div>
 
-      {/* Paywall — crédits insuffisants */}
+      {/* Paywall — crédits insuffisants → redirection vers la page pricing */}
       {!isUnlimited && credits < CREDITS_PER_GENERATION && (
-        <div className="rounded-3xl p-5 text-center" style={{ background: '#1C1C1E' }}>
-          <div className="text-3xl mb-3">💎</div>
-          <p className="font-bold text-white mb-1">Crédits épuisés !</p>
-          <p className="text-sm mb-4" style={{ color: '#888' }}>
-            Choisis un plan pour continuer à générer des messages.
+        <div className="flex items-center justify-between rounded-xl p-4 border" style={{ background: 'rgba(230,57,70,0.08)', borderColor: 'rgba(230,57,70,0.3)' }}>
+          <p className="text-sm font-medium" style={{ color: '#FF4757' }}>
+            Tu as utilisé tes crédits gratuits ! Choisis un plan pour continuer.
           </p>
           <button
             onClick={() => router.push('/ct/pricing')}
-            className="w-full py-4 rounded-2xl text-white font-bold active:scale-95 transition-all"
+            className="ml-4 px-4 py-2 rounded-lg text-sm font-bold text-white flex-shrink-0 transition-all hover:opacity-90"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
-            Voir les offres 🚀
+            Voir les offres
           </button>
         </div>
       )}

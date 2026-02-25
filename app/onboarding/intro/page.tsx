@@ -4,64 +4,39 @@ export const dynamic = 'force-dynamic'
 
 export default function OnboardingIntro() {
   return (
-    <div className="ob-bg items-center justify-between" style={{ minHeight: '100dvh' }}>
-      {/* Contenu haut */}
-      <div className="flex flex-col items-center justify-center flex-1 px-6 pt-20 pb-8 text-center">
-        <p
-          className="text-white/90 font-semibold text-base mb-3"
-          style={{ fontFamily: 'var(--font-montserrat)' }}
-        >
-          Bienvenue sur
-        </p>
-        <h1
-          className="text-white font-black mb-4"
-          style={{
-            fontFamily: 'var(--font-montserrat)',
-            fontSize: 'clamp(3rem, 14vw, 4.5rem)',
-            lineHeight: 1.05,
-            letterSpacing: '-1px',
-            textShadow: '0 2px 12px rgba(0,0,0,0.2)',
-          }}
-        >
-          Crushmaxxing
-        </h1>
-        <p
-          className="text-white font-bold text-lg leading-tight"
-          style={{ fontFamily: 'var(--font-montserrat)' }}
-        >
-          L&apos;app qui te transforme en vrai<br />
-          tombeur de disquettes.
-        </p>
-      </div>
+    <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center px-4 py-12">
+      {/* Background glow */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{ background: 'radial-gradient(ellipse at 50% 30%, rgba(230,57,70,0.08), transparent 60%)' }}
+      />
 
-      {/* Zone mascotte (placeholder) */}
-      <div className="flex items-end justify-center px-8 pb-0" style={{ flex: '0 0 auto' }}>
-        <div
-          className="w-48 h-48 rounded-full flex items-center justify-center"
-          style={{
-            background: 'rgba(255,255,255,0.15)',
-            border: '3px dashed rgba(255,255,255,0.4)',
-          }}
-        >
-          <span className="text-white/60 text-sm font-semibold text-center px-4">
-            Mascotte
+      <div className="relative z-10 max-w-2xl mx-auto text-center">
+        <h1 className="font-montserrat font-black text-white text-4xl md:text-6xl mb-6 leading-tight">
+          Bienvenue sur<br />
+          <span style={{
+            background: 'linear-gradient(135deg, #E63946, #FF4757)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>
+            Crushmaxxing
           </span>
-        </div>
-      </div>
+        </h1>
+        <p className="text-text-secondary text-lg md:text-xl mb-10 leading-relaxed">
+          Marre d&apos;être ignoré sur les apps de&nbsp;dating&nbsp;?<br />On va régler ça. Ensemble.
+        </p>
 
-      {/* CTA bas */}
-      <div className="px-6 pb-10 pt-6">
         <Link
-          href="/onboarding/start"
-          className="ob-btn ob-btn-red"
-          style={{ fontSize: '1.05rem', letterSpacing: '0.01em' }}
+          href="/onboarding/step/1"
+          className="btn-primary text-lg"
         >
-          Commencer
+          C&apos;est parti ! →
         </Link>
-        <div
-          className="w-24 h-1 mx-auto mt-6 rounded-full"
-          style={{ background: 'rgba(0,0,0,0.3)' }}
-        />
+
+        <p className="text-text-tertiary text-sm mt-6">
+          5 minutes • Des résultats qui changent tout
+        </p>
       </div>
     </div>
   )
