@@ -9,28 +9,39 @@ import {
   MessageCircle,
   User,
   ImageIcon,
+  ShieldCheck,
 } from 'lucide-react'
+
+interface NavItem {
+  href: string
+  label: string
+  icon: React.ComponentType<{ className?: string; size?: number; style?: React.CSSProperties }>
+  adminOnly?: boolean
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { href: '/game',            label: 'Dashboard',    icon: Home,          adminOnly: true  },
+  { href: '/game/accroche',   label: 'Disquettes',   icon: MessageSquare, adminOnly: false },
+  { href: '/game/discussion', label: 'Conversation', icon: MessageCircle, adminOnly: false },
+  { href: '/game/training',   label: 'Training',     icon: Dumbbell,      adminOnly: true  },
+  { href: '/game/profile',    label: 'Profil',       icon: User,          adminOnly: false },
+]
 
 interface GameShellProps {
   children: React.ReactNode
   userEmail: string
+  isAdmin?: boolean
 }
 
-const NAV_ITEMS = [
-  { href: '/game',              label: 'Dashboard',    icon: Home          },
-  { href: '/game/accroche',     label: 'Disquettes',   icon: MessageSquare },
-  { href: '/game/discussion',   label: 'Conversation', icon: MessageCircle },
-  { href: '/game/training',     label: 'Training',     icon: Dumbbell      },
-  { href: '/game/profile',      label: 'Profil',       icon: User          },
-]
-
-export function GameShell({ children, userEmail }: GameShellProps) {
+export function GameShell({ children, userEmail, isAdmin = false }: GameShellProps) {
   const pathname = usePathname()
 
   const isActive = (href: string) => {
     if (href === '/game') return pathname === '/game'
     return pathname.startsWith(href)
   }
+
+  const visibleNavItems = NAV_ITEMS.filter(item => isAdmin || !item.adminOnly)
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -49,16 +60,25 @@ export function GameShell({ children, userEmail }: GameShellProps) {
         </h1>
         <div
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
-          style={{ background: 'rgba(230,57,70,0.1)', borderColor: 'rgba(230,57,70,0.3)' }}
+          style={{
+            background: isAdmin ? 'rgba(230,57,70,0.15)' : 'rgba(230,57,70,0.1)',
+            borderColor: 'rgba(230,57,70,0.3)',
+          }}
         >
-          <Dumbbell className="w-3 h-3" style={{ color: '#E63946' }} />
-          <span className="text-xs font-bold" style={{ color: '#E63946' }}>Training Mode</span>
+          {isAdmin ? (
+            <ShieldCheck className="w-3 h-3" style={{ color: '#E63946' }} />
+          ) : (
+            <Dumbbell className="w-3 h-3" style={{ color: '#E63946' }} />
+          )}
+          <span className="text-xs font-bold" style={{ color: '#E63946' }}>
+            {isAdmin ? 'Admin' : 'Training Mode'}
+          </span>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-3 flex flex-col gap-1 mt-3">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {visibleNavItems.map(({ href, label, icon: Icon }) => {
           const active = isActive(href)
           return (
             <Link
@@ -79,19 +99,41 @@ export function GameShell({ children, userEmail }: GameShellProps) {
           )
         })}
 
-        {/* Lien CrushPicture — bientôt disponible */}
-        <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
-          <div
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-not-allowed"
-            style={{ color: '#555' }}
-          >
-            <ImageIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#333' }} />
-            <span>Photos IA</span>
-            <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: '#1A1A1A', color: '#555' }}>
-              Bientôt
-            </span>
+        {/* Lien Admin Panel — admin uniquement */}
+        {isAdmin && (
+          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-200"
+              style={pathname.startsWith('/admin') ? {
+                background: 'rgba(230,57,70,0.12)',
+                color: '#ffffff',
+                fontWeight: 600,
+                borderLeft: '2px solid #E63946',
+                paddingLeft: '10px',
+              } : { color: '#9da3af' }}
+            >
+              <ShieldCheck className="w-4 h-4 flex-shrink-0" />
+              <span>Admin Panel</span>
+            </Link>
           </div>
-        </div>
+        )}
+
+        {/* Photos IA — bientôt disponible */}
+        {!isAdmin && (
+          <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
+            <div
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-not-allowed"
+              style={{ color: '#555' }}
+            >
+              <ImageIcon className="w-4 h-4 flex-shrink-0" style={{ color: '#333' }} />
+              <span>Photos IA</span>
+              <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: '#1A1A1A', color: '#555' }}>
+                Bientôt
+              </span>
+            </div>
+          </div>
+        )}
 
         <div className="mt-auto" />
       </nav>
@@ -111,7 +153,9 @@ export function GameShell({ children, userEmail }: GameShellProps) {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">{userEmail.split('@')[0]}</p>
-            <p className="text-xs" style={{ color: '#6b7280' }}>Training Mode</p>
+            <p className="text-xs" style={{ color: '#6b7280' }}>
+              {isAdmin ? 'Administrateur' : 'Training Mode'}
+            </p>
           </div>
         </Link>
       </div>
@@ -166,10 +210,16 @@ export function GameShell({ children, userEmail }: GameShellProps) {
 
       {/* ── MOBILE BOTTOM NAV ── */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 grid grid-cols-5 h-16 border-t"
-        style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
+        style={{
+          background: '#1A1A1A',
+          borderColor: '#2A2A2A',
+          display: 'grid',
+          gridTemplateColumns: `repeat(${visibleNavItems.length}, 1fr)`,
+          height: '64px',
+        }}
       >
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {visibleNavItems.map(({ href, label, icon: Icon }) => {
           const active = isActive(href)
           return (
             <Link

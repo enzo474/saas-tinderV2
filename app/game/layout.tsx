@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { GameShell } from '@/components/game/GameShell'
 
 export default async function GameLayout({ children }: { children: React.ReactNode }) {
@@ -8,8 +8,18 @@ export default async function GameLayout({ children }: { children: React.ReactNo
 
   if (!user) redirect('/auth')
 
+  // Vérifier le rôle admin
+  const supabaseAdmin = createServiceRoleClient()
+  const { data: profile } = await supabaseAdmin
+    .from('user_profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  const isAdmin = profile?.role === 'admin'
+
   return (
-    <GameShell userEmail={user.email ?? ''}>
+    <GameShell userEmail={user.email ?? ''} isAdmin={isAdmin}>
       {children}
     </GameShell>
   )

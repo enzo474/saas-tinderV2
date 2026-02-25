@@ -42,7 +42,7 @@ interface ProgressionData {
   }
 }
 
-export default function GameDashboard() {
+export default function GameDashboardClient() {
   const [data, setData] = useState<ProgressionData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -53,24 +53,22 @@ export default function GameDashboard() {
       .catch(() => setLoading(false))
   }, [])
 
-  const level      = data?.currentLevel ?? 0
-  const levelName  = data?.levelName ?? LEVEL_NAMES[0]
-  const xp         = data?.totalXP ?? 0
-  const xpNext     = data?.xpToNextLevel ?? 50
-  const xpPct      = data?.progressPercent ?? 0
-  const stats      = data?.stats
-  const girls      = data?.girls ?? []
+  const level     = data?.currentLevel ?? 0
+  const levelName = data?.levelName ?? LEVEL_NAMES[0]
+  const xp        = data?.totalXP ?? 0
+  const xpNext    = data?.xpToNextLevel ?? 50
+  const xpPct     = data?.progressPercent ?? 0
+  const stats     = data?.stats
+  const girls     = data?.girls ?? []
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
 
-      {/* Header */}
       <div>
         <h1 className="font-montserrat text-2xl font-bold text-white mb-1">Dashboard</h1>
         <p style={{ color: '#9da3af' }} className="text-sm">Bienvenue sur Crushmaxxing Training</p>
       </div>
 
-      {/* Mascotte + XP */}
       <div className="rounded-2xl p-8 text-center border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
         <div
           className="w-32 h-32 mx-auto mb-5 rounded-full flex items-center justify-center text-5xl"
@@ -82,7 +80,6 @@ export default function GameDashboard() {
         <h2 className="font-montserrat text-2xl font-bold text-white mb-1">Niveau {level}</h2>
         <p className="text-lg font-semibold mb-6" style={{ color: '#E63946' }}>{levelName}</p>
 
-        {/* Barre XP */}
         <div className="mb-7">
           <div className="flex justify-between text-xs mb-2" style={{ color: '#9da3af' }}>
             <span>XP : {xp} / {level < 6 ? xp + xpNext : '∞'}</span>
@@ -111,7 +108,6 @@ export default function GameDashboard() {
         </Link>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-xl p-5 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
           <div className="flex items-center gap-2 mb-3">
@@ -156,7 +152,6 @@ export default function GameDashboard() {
         </div>
       </div>
 
-      {/* Meufs débloquées */}
       <div className="rounded-2xl p-6 border" style={{ background: '#1A1A1A', borderColor: '#2A2A2A' }}>
         <h3 className="font-montserrat text-lg font-bold text-white mb-5">
           Meufs débloquées ({girls.filter(g => !g.locked).length}/{girls.length || 3})

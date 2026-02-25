@@ -106,12 +106,8 @@ export async function middleware(request: NextRequest) {
     return copyCookiesToResponse(response, redirectResponse)
   }
 
-  // ── Routes /game/* et /admin/* : auth uniquement, pas de check DB ─────────
-  if (
-    path.startsWith('/game') ||
-    path.startsWith('/admin') ||
-    path.startsWith('/presale')
-  ) {
+  // ── Routes /game/* : auth uniquement (le layout gère les droits admin) ─────
+  if (path.startsWith('/game') || path.startsWith('/admin') || path.startsWith('/presale')) {
     return response
   }
 
