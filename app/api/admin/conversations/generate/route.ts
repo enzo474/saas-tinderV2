@@ -6,10 +6,63 @@ import Anthropic from '@anthropic-ai/sdk'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const MESSAGE_COUNTS: Record<string, string> = {
-  short: '12 à 15',
+  short: '10 à 13',
   medium: '16 à 20',
   long: '30 à 50',
 }
+
+// Profils de personnalité féminine — tirés aléatoirement à chaque génération
+const FEMALE_PROFILES = [
+  {
+    name: 'La Sèche',
+    description: `PROFIL ELLE — LA SÈCHE :
+Elle répond peu et rarement. Ses messages sont ultra-courts, quasi monosyllabiques. Pas d'emojis ou très peu (1 max par message).
+Ton pragmatique, presque indifférent. Elle donne l'impression que répondre lui demande un effort.
+Langage : "ok", "nan", "et ?", "bof", "ouais", "pourquoi", "j'vois pas le rapport", "c'est tout ?"
+Elle peut être surprise par une réplique de lui, mais elle le cache en restant encore plus courte.
+Ses messages longs (2-3 phrases) sont rares et arrivent uniquement si lui a dit quelque chose qui l'a vraiment accroché.`,
+  },
+  {
+    name: 'La Piquante',
+    description: `PROFIL ELLE — LA PIQUANTE :
+Elle est vive d'esprit, a une répartie cinglante, et n'hésite pas à attaquer verbalement.
+Elle écrit des messages plus longs (2-4 phrases), avec des piques bien senties et de l'ironie.
+Langage : formulations directes, parfois agressives, quelques emojis mais utilisés de façon sarcastique (😂, 🙄, 😒).
+Elle peut dire des choses dures ("t'existes pas", "tu surjoues", "t'as rien derrière") mais sans jamais être vulgaire.
+Ses attaques sont construites et précises — pas des insultes brutes. Elle ressemble à une adversaire intellectuelle.
+Si lui retourne bien la situation, elle peut admettre à mi-mot qu'il l'a eue ("bon ok j'avoue").`,
+  },
+  {
+    name: 'La Légère',
+    description: `PROFIL ELLE — LA LÉGÈRE / AMUSÉE :
+Elle rit facilement, elle trouve ça drôle même si elle résiste. Ses messages sont rythmés de "ptdr", "mdrrr", "nan mais attends".
+Emojis fréquents (😂😭💀) mais jamais enthousiastes — elle rit DE lui, pas AVEC lui.
+Messages de longueur moyenne, souvent en 2 temps (elle rit + elle résiste).
+Elle engage le dialogue plus facilement que les autres profils, mais reste sur la défensive sur le fond.
+Son intérêt transparaît dans son rythme de réponse et sa participation, jamais dans ses mots.
+Elle peut poser des questions sur lui sans le vouloir ("mais t'es comme ça avec tout le monde ?").`,
+  },
+  {
+    name: 'La Distante',
+    description: `PROFIL ELLE — LA DISTANTE :
+Elle a l'air occupée, peu disponible, comme si répondre était accessoire dans sa vie.
+Ses messages sont courts à moyens, avec des formulations qui donnent l'impression qu'elle a la tête ailleurs.
+Langage : "ah ok", "ouais bah", "on verra", "j'suis occupée là", "hmm", "peut-être", "sais pas".
+Peu d'emojis, mais peut en glisser un quand lui l'a bien touché — et c'est un signal fort.
+Elle ne s'investit pas dans la conversation mais elle continue à répondre — c'est sa contradiction.
+Ses réponses s'allongent légèrement vers la fin si la conversation l'a accrochée, signe qu'elle est plus là qu'elle ne le dit.`,
+  },
+  {
+    name: 'La Curieuse',
+    description: `PROFIL ELLE — LA CURIEUSE MALGRÉ ELLE :
+Elle pose des questions sans s'en rendre compte — des vraies questions sur lui, sur ce qu'il veut dire.
+Ses messages trahissent un intérêt qu'elle essaie de cacher derrière une formulation neutre ou froide.
+Langage : "c'est quoi ça veut dire ?", "t'es sérieux ?", "j'comprends pas", "et après ?", "genre comment ?".
+Messages de longueur variable — parfois très courts (quand elle se ressaisit), parfois plus longs (quand l'intérêt prend le dessus).
+Elle utilise peu d'emojis mais peut en glisser un de surprise (😐, 👀) quand il dit quelque chose d'inattendu.
+Sa curiosité est son talon d'Achille — si lui joue bien dessus, elle engage beaucoup plus que prévu.`,
+  },
+]
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
   trash: `TRASH / PROVOCANT :
@@ -60,7 +113,9 @@ La fille réagit par surprise, confusion, amusement ou agacement — tout ça g�
 
 function buildSystemPrompt(style: string, length: string): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.trash
-  const messageCount = MESSAGE_COUNTS[length] || '8 à 12'
+  const messageCount = MESSAGE_COUNTS[length] || '10 à 13'
+  // Profil féminin tiré aléatoirement à chaque appel
+  const femaleProfile = FEMALE_PROFILES[Math.floor(Math.random() * FEMALE_PROFILES.length)]
 
   return `Tu es un expert en création de conversations virales pour TikTok et Instagram.
 Tu génères des FAUSSES conversations entre un homme (lui) et une femme (elle), destinées à du contenu viral.
@@ -141,10 +196,19 @@ PARAMÈTRES DE CETTE GÉNÉRATION
 
 STYLE DEMANDÉ : ${styleInstruction}
 
-LONGUEUR : ${messageCount} messages au total.
+${femaleProfile.description}
+
+LONGUEUR : ${messageCount} messages au total (version ${length === 'short' ? 'courte — MAXIMUM 13 slides' : length === 'medium' ? 'moyenne' : 'longue'}).
 Une "slide" = 1 message de "lui" + 1 réponse de "elle" (= 1 échange).
-Pour l'option longue : vise 15 à 25 slides/échanges, donc 30 à 50 messages.
-Ne te limite pas à atteindre un chiffre exact — arrête uniquement quand la conversation est naturellement terminée (numéro, rdv, alternative, ou porte ouverte).
+${length === 'short' ? '⚠️ VERSION COURTE : Ne dépasse PAS 13 slides. La conversation doit être dense et percutante, pas longue. Chaque message compte. Arrive à une conclusion (numéro, date, ou porte ouverte) en 10-13 échanges.' : length === 'long' ? 'Pour l\'option longue : vise 15 à 25 slides/échanges, donc 30 à 50 messages. Ne te limite pas à atteindre un chiffre exact — arrête uniquement quand la conversation est naturellement terminée.' : 'Vise 16 à 20 messages au total.'}
+
+FLUIDITÉ ET PROGRESSION NATURELLE — RÈGLES IMPÉRATIVES :
+1. La conversation DOIT avoir une courbe narrative : accroche → résistance → pic de tension → résolution. Pas de changement brutal de registre sans transition.
+2. Le ton de "elle" évolue GRADUELLEMENT — si elle est froide au début, elle peut s'adoucir légèrement vers le milieu, mais pas d'un coup. Un vrai changement de posture chez elle prend 3-4 échanges minimum.
+3. "lui" n'abandonne pas un sujet qui fonctionne pour en sauter à un autre sans lien. Les pivots thématiques doivent être amenés naturellement par un mot ou une réplique de "elle".
+4. Pas de transition "magique" — si elle passe de agressive à sympa, on voit pourquoi dans la conversation (il a dit quelque chose qui l'a désarmée, elle a ri malgré elle, etc.).
+5. Le tempo est réaliste : des échanges courts, rythmés, pas de pavés de texte de part et d'autre.
+6. La fin de la conv doit s'inscrire dans la logique de ce qui s'est passé — pas de victoire surprise si elle a été froide tout du long. Une porte entrouverte est plus réaliste et souvent plus virale.
 
 RÈGLES DE GÉNÉRATION :
 1. Le PREMIER message de "lui" est une RÉPONSE À SA STORY — il commente directement ce qu'il voit sur la photo (vêtement, lieu, activité, expression, contexte)
@@ -232,20 +296,16 @@ PATTERN 5 — LANGAGE JEUNE AUTHENTIQUE À UTILISER :
 → "je comprends même pas pourquoi je réponds"
 
 ═══════════════════════════════════════
-COMPORTEMENT DE "elle" — RÉALISME ABSOLU
+COMPORTEMENT DE "elle" — PROFIL ACTIF : ${femaleProfile.name.toUpperCase()}
 ═══════════════════════════════════════
+Le profil de "elle" pour cette conversation est défini ci-dessus. Applique-le de manière cohérente du début à la fin.
+
+RÈGLES UNIVERSELLES pour "elle" (valables pour tous les profils) :
 - Elle ne complimente JAMAIS le mec directement ("t'es ouf", "wow t'es sûr de toi", "j'aime ta façon de parler") → ça n'existe pas dans la vraie vie
 - Elle peut être curieuse MALGRÉ elle, mais elle montre pas que ça l'intéresse — c'est le sous-texte, pas le texte
 - Ses réponses courtes montrent l'intérêt (elle répond = elle est là), ses mots montrent la résistance
-- Elle utilise les vraies réactions d'une fille, VARIER À CHAQUE FOIS parmi ces registres :
-  → Courte et sèche : "ok", "lol", "ah bon", "et ?", "bref"
-  → Amusée malgré elle : "😂", "ptdr", "mdr non", "attends t'es sérieux"
-  → Agacée/piquée : "excuse moi ???", "nan mais attends", "t'es bizarre toi", "franchement hein"
-  → Curieuse sans le montrer : "et tu crois que ça marche comment ça", "c'est quelle genre d'approche", "j'avoue pas mal"
-  → Contre-attaque verbale : "tu surjoues", "t'existes pas", "t'as rien derrière", "t'es perdu mon pauvre"
-  → Joue le jeu à contrecœur : "bon ok", "je réponds pas à ça", "on verra", "peut-être"
 - ⚠️ INTERDIT de répéter exactement la même formule dans la même conv — si elle a dit "ok" une fois, elle dira pas "ok" 3 fois
-- ⚠️ LA PHRASE "je comprends même pas pourquoi je réponds" EST BANNIE — ne jamais l'utiliser, ni aucune variante proche ("je sais pas pourquoi je te réponds", "je devrais même pas répondre", etc.). C'est une formule overused qui sonne fake.
+- ⚠️ LA PHRASE "je comprends même pas pourquoi je réponds" EST BANNIE — ni aucune variante proche ("je sais pas pourquoi je te réponds", "je devrais même pas répondre"). C'est overused et fake.
 - JAMAIS de réponse enthousiaste ou flatteuse — elle garde toujours une distance cool
 
 ═══════════════════════════════════════
