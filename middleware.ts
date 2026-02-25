@@ -46,6 +46,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // ── Redirections CrushPicture (produit désactivé) ──────────────────────────
+  // /dashboard/admin reste accessible pour les admins
   if (
     path === '/crushpicture' ||
     path === '/start' ||
@@ -54,7 +55,7 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/analysis') ||
     path === '/results' ||
     (path === '/pricing' && !path.startsWith('/game')) ||
-    path.startsWith('/dashboard')
+    (path.startsWith('/dashboard') && !path.startsWith('/dashboard/admin'))
   ) {
     return copyCookiesToResponse(
       response,

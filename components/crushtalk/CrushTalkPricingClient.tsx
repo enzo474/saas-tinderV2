@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Zap, Infinity, Star } from 'lucide-react'
+import { Check, Zap, Infinity } from 'lucide-react'
 
 type CrushTalkPlan = 'chill' | 'charo'
 
@@ -11,18 +11,14 @@ const plans = [
     label: 'Pack Chill',
     price: '8,90',
     period: '/mois',
-    description: '500 crédits · 100 générations/mois',
+    description: '100 générations/mois',
     icon: Zap,
-    accent: '#F77F00',
-    accentBg: 'rgba(247,127,0,0.08)',
-    accentBorder: 'rgba(247,127,0,0.25)',
-    badge: null,
-    subPrice: null,
     features: [
       '100 messages générés par mois',
       'Accroches + Relances',
       '500 crédits mensuels',
     ],
+    badge: null,
   },
   {
     id: 'charo' as CrushTalkPlan,
@@ -31,17 +27,13 @@ const plans = [
     period: '/mois',
     description: 'Générations illimitées',
     icon: Infinity,
-    accent: '#FFAA33',
-    accentBg: 'rgba(255,170,51,0.08)',
-    accentBorder: 'rgba(255,170,51,0.35)',
-    badge: 'MEILLEUR CHOIX',
-    subPrice: 'Soit 0,49€ par jour',
     features: [
       'Messages illimités',
       'Tous les tons disponibles',
       'Jamais de limite',
       'Support prioritaire',
     ],
+    badge: 'MEILLEUR CHOIX',
   },
 ]
 
@@ -68,59 +60,55 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
         window.location.href = '/game/accroche?subscription=upgraded'
         return
       }
-      if (data.url) {
-        window.location.href = data.url
-      }
-    } catch (err: any) {
+      if (data.url) window.location.href = data.url
+    } catch {
       setError('Erreur réseau. Réessaie.')
       setLoading(null)
     }
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch">
+    <div className="space-y-4">
       {plans.map((plan) => {
         const Icon = plan.icon
         const isLoading = loading === plan.id
         const isCurrentPlan = currentPlan === plan.id
+        const isBest = plan.badge && !currentPlan
+
         return (
           <div
             key={plan.id}
-            className="relative rounded-2xl p-6 border flex flex-col transition-all duration-300"
+            className="relative rounded-2xl p-6 border"
             style={{
-              background: plan.accentBg,
-              borderColor: isCurrentPlan ? plan.accent : plan.accentBorder,
-              borderWidth: isCurrentPlan ? '2px' : '1px',
+              background: isCurrentPlan ? 'rgba(230,57,70,0.06)' : '#1A1A1A',
+              borderColor: isCurrentPlan ? '#E63946' : plan.id === 'charo' && !currentPlan ? 'rgba(230,57,70,0.4)' : '#2A2A2A',
+              borderWidth: isCurrentPlan || (plan.id === 'charo' && !currentPlan) ? '2px' : '1px',
             }}
           >
-            {/* Badge plan actuel OU meilleur choix */}
-            {isCurrentPlan ? (
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-white" style={{ background: plan.accent }}>
-                <div className="flex items-center gap-1">
-                  <Check className="w-3 h-3" />
-                  TON PLAN ACTUEL
-                </div>
+            {/* Badge */}
+            {isCurrentPlan && (
+              <div
+                className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-black tracking-wider text-white flex items-center gap-1"
+                style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+              >
+                <Check className="w-3 h-3" /> TON PLAN ACTUEL
               </div>
-            ) : plan.badge && !currentPlan ? (
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-black" />
-                  {plan.badge}
-                </div>
+            )}
+            {isBest && (
+              <div
+                className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[11px] font-black tracking-wider text-white flex items-center gap-1"
+                style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+              >
+                ★ {plan.badge}
               </div>
-            ) : plan.badge && currentPlan && !isCurrentPlan ? (
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-black tracking-wider text-black" style={{ background: 'linear-gradient(135deg, #F77F00, #FFAA33)' }}>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 fill-black" />
-                  {plan.badge}
-                </div>
-              </div>
-            ) : null}
+            )}
 
-            {/* Icon + titre */}
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${plan.accent}20`, border: `1px solid ${plan.accent}40` }}>
-                <Icon className="w-5 h-5" style={{ color: plan.accent }} />
+              <div
+                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                style={{ background: 'rgba(230,57,70,0.12)', border: '1px solid rgba(230,57,70,0.3)' }}
+              >
+                <Icon className="w-5 h-5" style={{ color: '#E63946' }} />
               </div>
               <div>
                 <h2 className="font-montserrat font-bold text-white text-lg">{plan.label}</h2>
@@ -128,34 +116,32 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
               </div>
             </div>
 
-            {/* Prix */}
-            <div className="mb-6">
-              <div className="flex items-baseline gap-1">
-                <span className="font-montserrat font-black text-4xl text-white">{plan.price}€</span>
-                <span className="text-sm" style={{ color: '#6b7280' }}>{plan.period}</span>
-              </div>
-              {plan.subPrice && (
-                <p className="text-xs mt-1" style={{ color: 'rgba(255,170,51,0.7)' }}>{plan.subPrice}</p>
+            <div className="mb-5">
+              <span className="font-montserrat font-black text-4xl text-white">{plan.price}€</span>
+              <span className="text-sm ml-1" style={{ color: '#6b7280' }}>{plan.period}</span>
+              {plan.id === 'charo' && (
+                <p className="text-xs mt-0.5" style={{ color: 'rgba(230,57,70,0.7)' }}>Soit 0,49€ par jour</p>
               )}
             </div>
 
-            {/* Features — flex-1 pour pousser le bouton en bas */}
-            <ul className="space-y-2.5 mb-7 flex-1">
-              {plan.features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2.5 text-sm" style={{ color: '#d1d5db' }}>
-                  <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: `${plan.accent}20` }}>
-                    <Check className="w-2.5 h-2.5" style={{ color: plan.accent }} />
+            <ul className="space-y-2.5 mb-6">
+              {plan.features.map((f) => (
+                <li key={f} className="flex items-center gap-2.5 text-sm" style={{ color: '#d1d5db' }}>
+                  <div
+                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'rgba(230,57,70,0.15)' }}
+                  >
+                    <Check className="w-2.5 h-2.5" style={{ color: '#E63946' }} />
                   </div>
-                  {feature}
+                  {f}
                 </li>
               ))}
             </ul>
 
-            {/* Bouton — toujours en bas grâce à mt-auto */}
             {isCurrentPlan ? (
               <div
-                className="w-full py-3.5 rounded-xl font-bold text-sm text-center mt-auto"
-                style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${plan.accent}40`, color: plan.accent }}
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-center"
+                style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.3)', color: '#E63946' }}
               >
                 ✓ Plan actuel
               </div>
@@ -163,8 +149,8 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
               <button
                 onClick={() => handleSubscribe(plan.id)}
                 disabled={!!loading}
-                className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60 mt-auto"
-                style={{ background: `linear-gradient(135deg, ${plan.accent}, ${plan.id === 'chill' ? '#FFAA33' : '#FFD700'})`, boxShadow: `0 4px 20px ${plan.accent}30` }}
+                className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 disabled:opacity-60 active:scale-95"
+                style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -172,7 +158,9 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
                     Redirection...
                   </span>
                 ) : (
-                  plan.id === 'charo' && currentPlan === 'chill' ? 'Passer au Pack Charo (+6€)' : `Choisir ${plan.label}`
+                  plan.id === 'charo' && currentPlan === 'chill'
+                    ? 'Passer au Pack Charo (+6€)'
+                    : `Choisir ${plan.label}`
                 )}
               </button>
             )}
@@ -181,9 +169,7 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
       })}
 
       {error && (
-        <div className="col-span-2 p-3 rounded-xl text-sm text-red-300 text-center" style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.2)' }}>
-          {error}
-        </div>
+        <p className="text-sm text-center" style={{ color: '#f87171' }}>{error}</p>
       )}
     </div>
   )

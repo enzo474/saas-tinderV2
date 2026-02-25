@@ -122,15 +122,13 @@ export function ProfilePageClient({ email, balance, planLabel, hasActiveSub, isA
                 </p>
               </div>
             </div>
-            {!planLabel && (
-              <Link
-                href="/game/pricing"
-                className="text-xs font-bold px-3 py-1.5 rounded-full transition-all"
-                style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', color: '#fff' }}
-              >
-                Passer Pro
-              </Link>
-            )}
+            <Link
+              href="/game/pricing"
+              className="text-xs font-bold px-3 py-1.5 rounded-full transition-all flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', color: '#fff' }}
+            >
+              {planLabel ? 'Upgrader' : 'Passer Pro'}
+            </Link>
           </div>
         </div>
       </div>

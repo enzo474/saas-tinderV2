@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 type QuestionType = 'single' | 'multiple' | 'slider'
 
@@ -267,6 +268,18 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
             </button>
           )}
         </div>
+
+        {/* Lien Se connecter */}
+        <p className="text-center text-sm mt-5" style={{ color: '#6b7280' }}>
+          Déjà un compte ?{' '}
+          <Link
+            href="/auth"
+            className="font-semibold transition-colors hover:text-white"
+            style={{ color: '#E63946' }}
+          >
+            Se connecter →
+          </Link>
+        </p>
       </div>
     </div>
   )
