@@ -27,11 +27,11 @@ const QUESTIONS: Question[] = [
     question: "Comment as-tu connu l'app ?",
     type: 'single',
     options: [
-      { icon: '📱', label: 'TikTok',              value: 'tiktok'    },
-      { icon: '📷', label: 'Instagram',           value: 'instagram' },
-      { icon: '📺', label: 'YouTube',             value: 'youtube'   },
-      { icon: '👥', label: 'Amis',                value: 'amis'      },
-      { icon: '🔍', label: 'Recherche App Store', value: 'app_store' },
+      { label: 'TikTok',              value: 'tiktok'    },
+      { label: 'Instagram',           value: 'instagram' },
+      { label: 'YouTube',             value: 'youtube'   },
+      { label: 'Amis',                value: 'amis'      },
+      { label: 'Recherche App Store', value: 'app_store' },
     ],
   },
   {
@@ -194,25 +194,14 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
             Question {step + 1} sur {QUESTIONS.length}
           </p>
 
-          {/* Mascotte + Question */}
-          <div className="flex items-start gap-4 mb-7">
-            <div
-              className="w-16 h-16 rounded-2xl flex-shrink-0 flex items-center justify-center text-3xl"
-              style={{
-                background: 'rgba(230,57,70,0.1)',
-                border: '2px solid rgba(230,57,70,0.3)',
-              }}
-            >
-              🎮
-            </div>
-            <div className="flex-1">
-              <h2 className="font-montserrat text-lg font-bold text-white mb-1">
-                {q.question}
-              </h2>
-              {q.subtitle && (
-                <p className="text-xs" style={{ color: '#9da3af' }}>{q.subtitle}</p>
-              )}
-            </div>
+          {/* Question */}
+          <div className="mb-7">
+            <h2 className="font-montserrat text-lg font-bold text-white mb-1">
+              {q.question}
+            </h2>
+            {q.subtitle && (
+              <p className="text-sm" style={{ color: '#9da3af' }}>{q.subtitle}</p>
+            )}
           </div>
 
           {/* Options / Slider */}
@@ -250,8 +239,7 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
                       color: sel ? '#E63946' : '#ffffff',
                     }}
                   >
-                    {opt.icon && <span className="mr-2">{opt.icon}</span>}
-                    {opt.label}
+                      {opt.label}
                   </button>
                 )
               })}

@@ -58,22 +58,15 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
         >
           Crushmaxxing
         </h1>
-        <div
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
-          style={{
-            background: isAdmin ? 'rgba(230,57,70,0.15)' : 'rgba(230,57,70,0.1)',
-            borderColor: 'rgba(230,57,70,0.3)',
-          }}
-        >
-          {isAdmin ? (
+        {isAdmin && (
+          <div
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border"
+            style={{ background: 'rgba(230,57,70,0.15)', borderColor: 'rgba(230,57,70,0.3)' }}
+          >
             <ShieldCheck className="w-3 h-3" style={{ color: '#E63946' }} />
-          ) : (
-            <Dumbbell className="w-3 h-3" style={{ color: '#E63946' }} />
-          )}
-          <span className="text-xs font-bold" style={{ color: '#E63946' }}>
-            {isAdmin ? 'Admin' : 'Training Mode'}
-          </span>
-        </div>
+            <span className="text-xs font-bold" style={{ color: '#E63946' }}>Admin</span>
+          </div>
+        )}
       </div>
 
       {/* Navigation */}
@@ -154,7 +147,7 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-medium truncate">{userEmail.split('@')[0]}</p>
             <p className="text-xs" style={{ color: '#6b7280' }}>
-              {isAdmin ? 'Administrateur' : 'Training Mode'}
+              {isAdmin ? 'Administrateur' : 'Crushmaxxing'}
             </p>
           </div>
         </Link>
