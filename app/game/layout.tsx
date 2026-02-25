@@ -6,7 +6,7 @@ export default async function GameLayout({ children }: { children: React.ReactNo
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) redirect('/crushtalk/login')
+  if (!user) redirect('/auth')
 
   return (
     <GameShell userEmail={user.email ?? ''}>

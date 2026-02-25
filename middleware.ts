@@ -91,8 +91,9 @@ export async function middleware(request: NextRequest) {
     )
   }
 
-  // Pour les routes onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
+  // Pour les routes game, onboarding/ob2/analysis + CrushTalk : juste auth, pas de check DB
   if (
+    path.startsWith('/game') ||
     path.startsWith('/onboarding') ||
     path.startsWith('/ob2') ||
     path.startsWith('/analysis') ||
