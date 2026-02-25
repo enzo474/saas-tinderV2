@@ -443,6 +443,14 @@ export async function POST(req: NextRequest) {
     })
   } catch (error: any) {
     console.error('[Admin Conversations] Error:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    // Anthropic overloaded → renvoyer 529 pour que le client puisse retenter
+    const isOverloaded =
+      error?.status === 529 ||
+      error?.message?.toLowerCase().includes('overloaded') ||
+      error?.error?.type === 'overloaded_error'
+    return NextResponse.json(
+      { error: isOverloaded ? 'Claude est temporairement surchargé. Réessaie dans quelques secondes.' : error.message },
+      { status: isOverloaded ? 529 : 500 },
+    )
   }
 }

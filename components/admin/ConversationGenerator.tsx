@@ -32,7 +32,7 @@ const STYLES = [
 ]
 
 const LENGTHS = [
-  { id: 'short',  label: 'Courte (12–15 slides)' },
+  { id: 'short',  label: 'Courte (10–13 slides)' },
   { id: 'medium', label: 'Moyenne (16–20 slides)' },
   { id: 'long',   label: 'Longue (30–50 slides)' },
 ]
@@ -159,31 +159,57 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
     if (!storyFile) { setError('Uploade la photo de la story d\'abord'); return }
     setLoading(true)
     setError(null)
+
+    const MAX_RETRIES = 3
+    const RETRY_DELAY_MS = 4000
+
     try {
       const story   = await compressImage(storyFile)
       const profile = profileFile ? await compressImage(profileFile) : null
 
-      const res = await fetch('/api/admin/conversations/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          storyImageBase64:   story.base64,
-          storyMediaType:     story.mediaType,
-          profileImageBase64: profile?.base64 || null,
-          profileMediaType:   profile?.mediaType || null,
-          context, customAccroche: customAccroche.trim() || undefined, style, length,
-        }),
+      const body = JSON.stringify({
+        storyImageBase64:   story.base64,
+        storyMediaType:     story.mediaType,
+        profileImageBase64: profile?.base64 || null,
+        profileMediaType:   profile?.mediaType || null,
+        context, customAccroche: customAccroche.trim() || undefined, style, length,
       })
-      if (!res.ok) {
-        const { error: apiError } = await res.json()
-        throw new Error(apiError || 'Erreur lors de la génération')
+
+      let res: Response | null = null
+      let lastError = ''
+
+      for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        res = await fetch('/api/admin/conversations/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+        })
+
+        if (res.ok) break
+
+        // Lire le corps une seule fois
+        const errBody = await res.json().catch(() => ({}))
+        lastError = errBody?.error || `Erreur ${res.status}`
+
+        // 529 = Anthropic overloaded — on retente après délai
+        if (res.status === 529 && attempt < MAX_RETRIES) {
+          setError(`Claude est surchargé, nouvelle tentative ${attempt}/${MAX_RETRIES - 1}…`)
+          await new Promise(r => setTimeout(r, RETRY_DELAY_MS * attempt))
+          setError(null)
+          continue
+        }
+
+        throw new Error(lastError)
       }
+
+      if (!res || !res.ok) throw new Error(lastError || 'Erreur lors de la génération')
+
       const data = await res.json()
       onGenerated({
         ...data,
         style,
         length,
-        imagePreview:       profilePreview || storyPreview!,  // avatar (profil ou story en fallback)
+        imagePreview:       profilePreview || storyPreview!,
         storyImagePreview:  storyPreview!,
       })
     } catch (err: any) {
