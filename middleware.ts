@@ -100,8 +100,10 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/api/nanobanana/') ||
     path.startsWith('/api/stripe/') ||
     path.startsWith('/api/crushtalk/checkout-session') ||
+    path.startsWith('/api/crushtalk/generate') ||
     path.startsWith('/api/check-free-analysis') ||
-    path.startsWith('/api/use-free-analysis')
+    path.startsWith('/api/use-free-analysis') ||
+    path === '/admin1'
   ) {
     return response
   }

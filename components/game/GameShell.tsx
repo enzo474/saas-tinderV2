@@ -138,18 +138,9 @@ export function GameShell({ children, userEmail, isAdmin = false, isGuest = fals
         <div className="mt-auto" />
       </nav>
 
-      {/* User / Se connecter */}
-      <div className="p-3 border-t" style={{ borderColor: '#1F1F1F' }}>
-        {isGuest ? (
-          <Link
-            href="/auth"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-full"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-          >
-            <LogIn className="w-4 h-4 text-white flex-shrink-0" />
-            <span className="text-white text-sm font-semibold">Se connecter</span>
-          </Link>
-        ) : (
+      {/* User (connecté uniquement) */}
+      {!isGuest && (
+        <div className="p-3 border-t" style={{ borderColor: '#1F1F1F' }}>
           <Link
             href="/game/profile"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200"
@@ -168,8 +159,9 @@ export function GameShell({ children, userEmail, isAdmin = false, isGuest = fals
               </p>
             </div>
           </Link>
-        )}
-      </div>
+        </div>
+      )}
+    
     </div>
   )
 
