@@ -357,27 +357,48 @@ export async function POST(req: NextRequest) {
       ? `Contexte fourni par l'admin : ${context}${accrocheLine}\n\nGénère la conversation.`
       : `Analyse cette photo de story et génère une conversation virale basée dessus.${accrocheLine}`
 
-    const claudeResponse = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 8192,
-      system: buildSystemPrompt(style, length),
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: {
-                type: 'base64',
-                media_type: (storyMediaType || 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
-                data: storyImageBase64,
-              },
+    // Ordre de préférence : modèle principal → fallback si surchargé
+    const MODELS = ['claude-sonnet-4-20250514', 'claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307']
+    const systemPrompt = buildSystemPrompt(style, length)
+    const messagePayload = [
+      {
+        role: 'user' as const,
+        content: [
+          {
+            type: 'image' as const,
+            source: {
+              type: 'base64' as const,
+              media_type: (storyMediaType || 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+              data: storyImageBase64,
             },
-            { type: 'text', text: userMessage },
-          ],
-        },
-      ],
-    })
+          },
+          { type: 'text' as const, text: userMessage },
+        ],
+      },
+    ]
+
+    let claudeResponse: Awaited<ReturnType<typeof anthropic.messages.create>> | null = null
+    let lastClaudeError: any = null
+
+    for (const model of MODELS) {
+      try {
+        claudeResponse = await anthropic.messages.create({
+          model,
+          max_tokens: 8192,
+          system: systemPrompt,
+          messages: messagePayload,
+        })
+        break // succès — on sort de la boucle
+      } catch (e: any) {
+        lastClaudeError = e
+        const isOverloaded = e?.status === 529 || e?.message?.toLowerCase().includes('overloaded') || e?.error?.type === 'overloaded_error'
+        if (!isOverloaded) throw e // erreur autre que surcharge → on propage immédiatement
+        console.warn(`[Admin Conversations] ${model} surchargé, tentative sur modèle suivant…`)
+        await new Promise(r => setTimeout(r, 2000)) // petite pause avant fallback
+      }
+    }
+
+    if (!claudeResponse) throw lastClaudeError
 
     const rawText = claudeResponse.content[0].type === 'text' ? claudeResponse.content[0].text : ''
 
