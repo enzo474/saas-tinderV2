@@ -39,8 +39,14 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: string 
         canvas.width = Math.round(img.width * ratio)
         canvas.height = Math.round(img.height * ratio)
         canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        // Certains navigateurs (Safari iOS) ignorent le type JPEG demandé et retournent PNG
+        // On détecte le format réel depuis le dataUrl pour éviter les rejets API
         const dataUrl = canvas.toDataURL('image/jpeg', 0.85)
-        resolve({ base64: dataUrl.split(',')[1], mediaType: 'image/jpeg' })
+        const [header, base64] = dataUrl.split(',')
+        const detectedType = header.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg'
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        const mediaType = validTypes.includes(detectedType) ? detectedType : 'image/jpeg'
+        resolve({ base64, mediaType })
       }
       img.onerror = reject
       img.src = reader.result as string
@@ -351,7 +357,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
             ) : (
               <>
                 <MessageSquare className="w-4 h-4" />
-                {isUnlimited ? 'Générer mes messages' : `Générer mes messages (${CREDITS_PER_GENERATION} crédits)`}
+                {activeType === 'accroche' ? 'Générer une accroche' : 'Générer une réponse'}
               </>
             )}
           </button>
