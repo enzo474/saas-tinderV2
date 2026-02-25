@@ -197,7 +197,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         </div>
       )}
 
-      {/* Header avec crédits */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-montserrat font-bold text-white text-xl md:text-3xl whitespace-nowrap">
@@ -209,25 +209,16 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               : 'Upload la conversation, l\'IA génère des réponses percutantes.'}
           </p>
         </div>
-        <div
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
-          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-          onClick={() => !isUnlimited && router.push('/game/pricing')}
-          title={isUnlimited ? 'Pack Charo — Illimité' : 'Voir les offres'}
-        >
-          {isUnlimited ? (
-            <>
-              <Infinity className="w-3.5 h-3.5 text-white" />
-              <span className="font-montserrat font-bold text-white text-xs">Illimité</span>
-            </>
-          ) : (
-            <>
-              <Zap className="w-3.5 h-3.5 text-white" />
-              <span className="font-montserrat font-bold text-white text-xs">{credits}</span>
-              <span className="text-white/80 text-[10px]">crédits</span>
-            </>
-          )}
-        </div>
+        {/* Badge visible uniquement pour les abonnés illimités */}
+        {isUnlimited && (
+          <div
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          >
+            <Infinity className="w-3.5 h-3.5 text-white" />
+            <span className="font-montserrat font-bold text-white text-xs">Illimité</span>
+          </div>
+        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">

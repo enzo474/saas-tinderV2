@@ -192,16 +192,7 @@ export function GameShell({ children, userEmail, isAdmin = false, isGuest = fals
         >
           Crushmaxxing
         </h1>
-        {isGuest ? (
-          <Link
-            href="/auth"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-          >
-            <LogIn className="w-3 h-3" />
-            Connexion
-          </Link>
-        ) : (
+        {!isGuest && (
           <Link
             href="/game/profile"
             className="w-8 h-8 rounded-full flex items-center justify-center"
