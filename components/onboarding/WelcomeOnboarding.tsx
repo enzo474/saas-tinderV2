@@ -267,19 +267,21 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
               ← Retour
             </button>
           )}
-        </div>
 
-        {/* Lien Se connecter */}
-        <p className="text-center text-sm mt-5" style={{ color: '#6b7280' }}>
-          Déjà un compte ?{' '}
-          <Link
-            href="/auth"
-            className="font-semibold transition-colors hover:text-white"
-            style={{ color: '#E63946' }}
-          >
-            Se connecter →
-          </Link>
-        </p>
+          {/* Séparateur + Se connecter — dans la carte */}
+          <div className="mt-5 pt-5 border-t text-center" style={{ borderColor: '#2A2A2A' }}>
+            <p className="text-sm" style={{ color: '#6b7280' }}>
+              Déjà un compte ?{' '}
+              <Link
+                href="/auth"
+                className="font-semibold transition-colors hover:text-white"
+                style={{ color: '#E63946' }}
+              >
+                Se connecter →
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )

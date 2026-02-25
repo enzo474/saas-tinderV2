@@ -201,16 +201,10 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
         </main>
       </div>
 
-      {/* ── MOBILE BOTTOM NAV ── */}
+      {/* ── MOBILE BOTTOM NAV (mobile uniquement) ── */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t"
-        style={{
-          background: '#1A1A1A',
-          borderColor: '#2A2A2A',
-          display: 'grid',
-          gridTemplateColumns: `repeat(${visibleNavItems.length}, 1fr)`,
-          height: '64px',
-        }}
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex border-t"
+        style={{ background: '#1A1A1A', borderColor: '#2A2A2A', height: '64px' }}
       >
         {visibleNavItems.map(({ href, label, icon: Icon }) => {
           const active = isActive(href)
@@ -218,7 +212,7 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
             <Link
               key={href}
               href={href}
-              className="flex flex-col items-center justify-center gap-1 transition-colors"
+              className="flex flex-col items-center justify-center gap-1 transition-colors flex-1"
               style={{ color: active ? '#E63946' : '#9da3af' }}
             >
               <Icon size={20} />

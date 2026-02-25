@@ -18,9 +18,8 @@ export default async function ProfilePage() {
   ])
 
   const isAdmin = profile?.role === 'admin'
-  const hasActiveSub =
-    credits?.subscription_status === 'active' &&
-    !!credits?.subscription_type
+  // hasActiveSub : vrai si subscription_type est défini (actif ou récemment souscrit)
+  const hasActiveSub = !!credits?.subscription_type && credits?.subscription_type !== null
 
   const planLabel = credits?.subscription_type === 'charo'
     ? 'Pack Charo — Illimité'
