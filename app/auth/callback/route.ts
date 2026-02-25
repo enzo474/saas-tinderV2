@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const googleError = searchParams.get('error')
@@ -27,8 +27,7 @@ export async function GET(request: Request) {
           getAll() {
             return request.cookies.getAll()
           },
-          setAll(toSet) {
-            // Stocker pour les copier manuellement dans la réponse redirect
+          setAll(toSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
             toSet.forEach(c => cookiesToSet.push(c))
           },
         },
