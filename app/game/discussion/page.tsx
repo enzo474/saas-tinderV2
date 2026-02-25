@@ -6,7 +6,19 @@ export default async function GameDiscussionPage() {
   const supabaseAdmin = createServiceRoleClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
+
+  // Guest : 1 génération gratuite basée sur l'IP (pas de crédits en DB)
+  if (!user) {
+    return (
+      <CrushTalkPage
+        messageType="reponse"
+        initialCredits={5}
+        initialSubscriptionType={null}
+        userId=""
+        isGuest
+      />
+    )
+  }
 
   // Récupérer les crédits — auto-créer si absent
   let { data: credits } = await supabaseAdmin

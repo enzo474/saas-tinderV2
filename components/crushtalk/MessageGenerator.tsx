@@ -14,6 +14,7 @@ interface MessageGeneratorProps {
   initialCredits: number
   initialSubscriptionType?: string | null
   userId: string
+  isGuest?: boolean
 }
 
 const TONES = [
@@ -49,7 +50,7 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: string 
   })
 }
 
-export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId }: MessageGeneratorProps) {
+export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId, isGuest = false }: MessageGeneratorProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeType = initialType
@@ -66,8 +67,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const isUnlimited = subscriptionType === 'charo'
-  const hasEnoughCredits = isUnlimited || credits >= CREDITS_PER_GENERATION
+  const isUnlimited = subscriptionType === 'charo' || subscriptionType === 'chill'
+  const hasEnoughCredits = isGuest || isUnlimited || credits >= CREDITS_PER_GENERATION
 
   // Afficher le banner de bienvenue si ?welcome=true dans l'URL
   useEffect(() => {
@@ -129,11 +130,15 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       const data = await res.json()
 
       if (!res.ok) {
-        if (data.type === 'insufficient_credits') {
-          setError(`Crédits insuffisants. Il te faut ${CREDITS_PER_GENERATION} crédits, tu en as ${data.balance}.`)
-        } else {
-          setError(data.error || 'Erreur lors de la génération')
+        if (data.type === 'ip_limit') {
+          router.push('/game/pricing')
+          return
         }
+        if (data.type === 'insufficient_credits') {
+          router.push('/game/pricing')
+          return
+        }
+        setError(data.error || 'Erreur lors de la génération')
         return
       }
 
