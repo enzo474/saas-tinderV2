@@ -92,11 +92,16 @@ export async function middleware(request: NextRequest) {
     path === '/auth' ||
     path.startsWith('/auth/callback') ||
     path === '/game/onboarding' ||
+    path === '/game/accroche' ||
+    path === '/game/discussion' ||
+    path === '/game/pricing' ||
     path === '/privacy' ||
     path === '/terms' ||
     path.startsWith('/api/nanobanana/') ||
     path.startsWith('/api/stripe/') ||
-    path.startsWith('/api/crushtalk/checkout-session')
+    path.startsWith('/api/crushtalk/checkout-session') ||
+    path.startsWith('/api/check-free-analysis') ||
+    path.startsWith('/api/use-free-analysis')
   ) {
     return response
   }

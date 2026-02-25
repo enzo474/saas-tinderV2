@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { analyzeProfileWithVision, generateMessages } from '@/lib/claude/generate-accroche'
+import { getClientIP, generateFingerprint } from '@/lib/utils/get-client-ip'
 
 const CREDITS_PER_GENERATION = 5
 const INITIAL_CREDITS = 5
@@ -11,9 +12,6 @@ export async function POST(req: NextRequest) {
     const supabaseAdmin = createServiceRoleClient()
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
-    }
 
     const { imageBase64, mediaType, messageType, selectedTones, contextMessage } = await req.json()
 
@@ -23,6 +21,74 @@ export async function POST(req: NextRequest) {
     if (!messageType || !['accroche', 'reponse'].includes(messageType)) {
       return NextResponse.json({ error: 'Type de message invalide' }, { status: 400 })
     }
+
+    // ── Mode guest (pas d'auth) : vérification par IP ─────────────────────────
+    if (!user) {
+      const clientIP = await getClientIP()
+
+      if (!clientIP) {
+        return NextResponse.json(
+          { error: 'Impossible de déterminer votre IP', type: 'ip_error' },
+          { status: 400 }
+        )
+      }
+
+      const fingerprint = await generateFingerprint(clientIP)
+
+      // Récupérer ou créer l'entrée IP
+      let { data: ipData, error: ipError } = await supabaseAdmin
+        .from('ip_tracking')
+        .select('id, has_used_free_analysis')
+        .eq('ip_address', clientIP)
+        .single()
+
+      if (ipError && ipError.code === 'PGRST116') {
+        // Première visite : créer l'entrée
+        const { data: newIP } = await supabaseAdmin
+          .from('ip_tracking')
+          .insert({ ip_address: clientIP, fingerprint, has_used_free_analysis: false })
+          .select('id, has_used_free_analysis')
+          .single()
+        ipData = newIP
+      }
+
+      if (!ipData || ipData.has_used_free_analysis) {
+        return NextResponse.json(
+          {
+            error: 'Analyse gratuite déjà utilisée pour cette adresse IP',
+            type: 'ip_limit',
+          },
+          { status: 402 }
+        )
+      }
+
+      // Générer les messages pour le guest
+      const validMediaType = (['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(mediaType)
+        ? mediaType
+        : 'image/jpeg') as 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
+
+      const profileAnalysis = await analyzeProfileWithVision(imageBase64, validMediaType)
+      const messages = await generateMessages(profileAnalysis, messageType, selectedTones || [], contextMessage)
+
+      // Marquer l'IP comme ayant utilisé son analyse gratuite
+      await supabaseAdmin
+        .from('ip_tracking')
+        .update({
+          has_used_free_analysis: true,
+          free_analysis_used_at: new Date().toISOString(),
+        })
+        .eq('id', ipData.id)
+
+      return NextResponse.json({
+        messages,
+        profileAnalysis,
+        newBalance: 0,
+        isUnlimited: false,
+        isGuest: true,
+      })
+    }
+
+    // ── Mode utilisateur authentifié : vérification par crédits ───────────────
 
     // Vérifier/créer les crédits CrushTalk
     let { data: creditsRow } = await supabaseAdmin
@@ -41,8 +107,10 @@ export async function POST(req: NextRequest) {
       creditsRow = newRow
     }
 
-    // Plan Charo = illimité : on ne déduit pas de crédits
-    const isUnlimited = creditsRow?.subscription_type === 'charo' && creditsRow?.subscription_status === 'active'
+    // Plan actif (chill ou charo) = illimité : on ne déduit pas de crédits
+    const isUnlimited =
+      creditsRow?.subscription_status === 'active' &&
+      (creditsRow?.subscription_type === 'charo' || creditsRow?.subscription_type === 'chill')
 
     if (!isUnlimited) {
       if (!creditsRow || creditsRow.balance < CREDITS_PER_GENERATION) {
@@ -78,14 +146,15 @@ export async function POST(req: NextRequest) {
     let profileAnalysis
     try {
       profileAnalysis = await analyzeProfileWithVision(imageBase64, validMediaType)
-    } catch (visionError: any) {
+    } catch (visionError: unknown) {
       // Rembourser les crédits si Claude échoue (sauf pour Charo)
       if (!isUnlimited) {
         await supabaseAdmin.from('crushtalk_credits')
           .update({ balance: creditsRow!.balance, used_total: creditsRow!.used_total, updated_at: new Date().toISOString() })
           .eq('user_id', user.id)
       }
-      return NextResponse.json({ error: 'Erreur analyse du profil: ' + visionError.message }, { status: 500 })
+      const message = visionError instanceof Error ? visionError.message : 'Erreur inconnue'
+      return NextResponse.json({ error: 'Erreur analyse du profil: ' + message }, { status: 500 })
     }
 
     // Générer les messages
@@ -97,14 +166,15 @@ export async function POST(req: NextRequest) {
         selectedTones || [],
         contextMessage
       )
-    } catch (genError: any) {
+    } catch (genError: unknown) {
       // Rembourser les crédits si génération échoue (sauf pour Charo)
       if (!isUnlimited) {
         await supabaseAdmin.from('crushtalk_credits')
           .update({ balance: creditsRow!.balance, used_total: creditsRow!.used_total, updated_at: new Date().toISOString() })
           .eq('user_id', user.id)
       }
-      return NextResponse.json({ error: 'Erreur génération messages: ' + genError.message }, { status: 500 })
+      const message = genError instanceof Error ? genError.message : 'Erreur inconnue'
+      return NextResponse.json({ error: 'Erreur génération messages: ' + message }, { status: 500 })
     }
 
     // Sauvegarder la génération
@@ -131,8 +201,9 @@ export async function POST(req: NextRequest) {
       isUnlimited,
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Erreur interne'
     console.error('[CrushTalk generate] Error:', error)
-    return NextResponse.json({ error: error.message || 'Erreur interne' }, { status: 500 })
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

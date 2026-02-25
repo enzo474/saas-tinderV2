@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-type QuestionType = 'single' | 'multiple' | 'slider'
+type QuestionType = 'single' | 'multiple' | 'slider' | 'text'
 
 interface Option {
   icon?: string
@@ -20,6 +20,7 @@ interface Question {
   options?: Option[]
   leftLabel?: string
   rightLabel?: string
+  placeholder?: string
 }
 
 const QUESTIONS: Question[] = [
@@ -91,17 +92,25 @@ const QUESTIONS: Question[] = [
     leftLabel: 'Léger',
     rightLabel: 'Sarcastique',
   },
+  {
+    id: 8,
+    question: 'Choisis ton pseudo',
+    subtitle: 'Il sera affiché dans ton espace personnel',
+    type: 'text',
+    placeholder: 'Ex: Alpha_Leo, DarkHumor99...',
+  },
 ]
 
 interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
-export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingProps) {
+export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnboardingProps) {
   const router = useRouter()
   const [step, setStep] = useState(0)
   const [answers, setAnswers] = useState<Record<number, string | string[]>>({})
   const [sliderVal, setSliderVal] = useState(50)
+  const [textVal, setTextVal] = useState('')
 
   const q = QUESTIONS[step]
   const progress = ((step + 1) / QUESTIONS.length) * 100
@@ -111,6 +120,8 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
   const canProceed =
     q.type === 'slider'
       ? true
+      : q.type === 'text'
+      ? textVal.trim().length >= 2
       : q.type === 'single'
       ? !!currentAnswer
       : Array.isArray(currentAnswer) && currentAnswer.length > 0
@@ -136,19 +147,34 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
   }
 
   const handleNext = () => {
+    let updatedAnswers = answers
+
     if (q.type === 'slider') {
-      setAnswers({ ...answers, [step]: String(sliderVal) })
+      updatedAnswers = { ...answers, [step]: String(sliderVal) }
+      setAnswers(updatedAnswers)
       setSliderVal(50)
+    } else if (q.type === 'text') {
+      updatedAnswers = { ...answers, [step]: textVal.trim() }
+      setAnswers(updatedAnswers)
     }
+
     if (isLast) {
       const finalAnswers = q.type === 'slider'
         ? { ...answers, [step]: String(sliderVal) }
+        : q.type === 'text'
+        ? { ...answers, [step]: textVal.trim() }
         : answers
+
       try {
         localStorage.setItem('game_onboarding', JSON.stringify(finalAnswers))
+        // Sauvegarder le pseudo séparément pour accès facile
+        const pseudo = finalAnswers[QUESTIONS.length - 1] as string
+        if (pseudo) localStorage.setItem('crushmaxxing_pseudo', pseudo)
       } catch { /* ignore */ }
+
       router.push(redirectTo)
     } else {
+      setTextVal('')
       setStep((s) => s + 1)
     }
   }
@@ -205,7 +231,7 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
             )}
           </div>
 
-          {/* Options / Slider */}
+          {/* Options / Slider / Text */}
           {q.type === 'slider' ? (
             <div className="py-2 mb-7">
               <input
@@ -225,6 +251,28 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
                 <span>{q.rightLabel}</span>
               </div>
             </div>
+          ) : q.type === 'text' ? (
+            <div className="mb-7">
+              <input
+                type="text"
+                value={textVal}
+                onChange={(e) => setTextVal(e.target.value)}
+                placeholder={q.placeholder}
+                maxLength={30}
+                className="w-full p-4 rounded-xl border-2 text-white font-medium text-sm transition-all outline-none"
+                style={{
+                  borderColor: textVal.trim().length >= 2 ? '#E63946' : '#2A2A2A',
+                  background: '#252525',
+                  color: '#ffffff',
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && canProceed) handleNext()
+                }}
+              />
+              <p className="text-xs mt-2 text-right" style={{ color: '#6b7280' }}>
+                {textVal.length}/30
+              </p>
+            </div>
           ) : (
             <div className="space-y-2.5 mb-7">
               {q.options?.map((opt) => {
@@ -240,7 +288,7 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
                       color: sel ? '#E63946' : '#ffffff',
                     }}
                   >
-                      {opt.label}
+                    {opt.label}
                   </button>
                 )
               })}
@@ -254,7 +302,7 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
             className="w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
-            {isLast ? 'Créer mon compte →' : 'Suivant →'}
+            {isLast ? 'Commencer →' : 'Suivant →'}
           </button>
 
           {/* Back */}
@@ -268,7 +316,7 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
             </button>
           )}
 
-          {/* Séparateur + Se connecter — dans la carte */}
+          {/* Se connecter */}
           <div className="mt-5 pt-5 border-t text-center" style={{ borderColor: '#2A2A2A' }}>
             <p className="text-sm" style={{ color: '#6b7280' }}>
               Déjà un compte ?{' '}

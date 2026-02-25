@@ -10,6 +10,7 @@ import {
   User,
   ImageIcon,
   ShieldCheck,
+  LogIn,
 } from 'lucide-react'
 
 interface NavItem {
@@ -17,23 +18,25 @@ interface NavItem {
   label: string
   icon: React.ComponentType<{ className?: string; size?: number; style?: React.CSSProperties }>
   adminOnly?: boolean
+  guestHidden?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/game',            label: 'Dashboard',    icon: Home,          adminOnly: true  },
-  { href: '/game/accroche',   label: 'Disquettes',   icon: MessageSquare, adminOnly: false },
-  { href: '/game/discussion', label: 'Conversation', icon: MessageCircle, adminOnly: false },
-  { href: '/game/training',   label: 'Training',     icon: Dumbbell,      adminOnly: true  },
-  { href: '/game/profile',    label: 'Profil',       icon: User,          adminOnly: false },
+  { href: '/game',            label: 'Dashboard',    icon: Home,          adminOnly: true,  guestHidden: true  },
+  { href: '/game/accroche',   label: 'Disquettes',   icon: MessageSquare, adminOnly: false, guestHidden: false },
+  { href: '/game/discussion', label: 'Conversation', icon: MessageCircle, adminOnly: false, guestHidden: false },
+  { href: '/game/training',   label: 'Training',     icon: Dumbbell,      adminOnly: true,  guestHidden: true  },
+  { href: '/game/profile',    label: 'Profil',       icon: User,          adminOnly: false, guestHidden: true  },
 ]
 
 interface GameShellProps {
   children: React.ReactNode
   userEmail: string
   isAdmin?: boolean
+  isGuest?: boolean
 }
 
-export function GameShell({ children, userEmail, isAdmin = false }: GameShellProps) {
+export function GameShell({ children, userEmail, isAdmin = false, isGuest = false }: GameShellProps) {
   const pathname = usePathname()
 
   const isActive = (href: string) => {
@@ -41,7 +44,11 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
     return pathname.startsWith(href)
   }
 
-  const visibleNavItems = NAV_ITEMS.filter(item => isAdmin || !item.adminOnly)
+  const visibleNavItems = NAV_ITEMS.filter(item => {
+    if (isGuest && item.guestHidden) return false
+    if (!isGuest && !isAdmin && item.adminOnly) return false
+    return true
+  })
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
@@ -112,8 +119,8 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
           </div>
         )}
 
-        {/* Photos IA — bientôt disponible */}
-        {!isAdmin && (
+        {/* Photos IA — bientôt disponible (non-admin connectés uniquement) */}
+        {!isAdmin && !isGuest && (
           <div className="mt-4 pt-4 border-t" style={{ borderColor: '#1F1F1F' }}>
             <div
               className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm cursor-not-allowed"
@@ -131,26 +138,37 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
         <div className="mt-auto" />
       </nav>
 
-      {/* User */}
+      {/* User / Se connecter */}
       <div className="p-3 border-t" style={{ borderColor: '#1F1F1F' }}>
-        <Link
-          href="/game/profile"
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200"
-          style={{ background: '#1A1A1A' }}
-        >
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+        {isGuest ? (
+          <Link
+            href="/auth"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 w-full"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
-            <User className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">{userEmail.split('@')[0]}</p>
-            <p className="text-xs" style={{ color: '#6b7280' }}>
-              {isAdmin ? 'Administrateur' : 'Crushmaxxing'}
-            </p>
-          </div>
-        </Link>
+            <LogIn className="w-4 h-4 text-white flex-shrink-0" />
+            <span className="text-white text-sm font-semibold">Se connecter</span>
+          </Link>
+        ) : (
+          <Link
+            href="/game/profile"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200"
+            style={{ background: '#1A1A1A' }}
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+            >
+              <User className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-white text-sm font-medium truncate">{userEmail.split('@')[0]}</p>
+              <p className="text-xs" style={{ color: '#6b7280' }}>
+                {isAdmin ? 'Administrateur' : 'Crushmaxxing'}
+              </p>
+            </div>
+          </Link>
+        )}
       </div>
     </div>
   )
@@ -174,13 +192,24 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
         >
           Crushmaxxing
         </h1>
-        <Link
-          href="/game/profile"
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-        >
-          <User className="w-4 h-4 text-white" />
-        </Link>
+        {isGuest ? (
+          <Link
+            href="/auth"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-white"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          >
+            <LogIn className="w-3 h-3" />
+            Connexion
+          </Link>
+        ) : (
+          <Link
+            href="/game/profile"
+            className="w-8 h-8 rounded-full flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          >
+            <User className="w-4 h-4 text-white" />
+          </Link>
+        )}
       </header>
 
       {/* ── DESKTOP SIDEBAR ── */}
@@ -220,6 +249,17 @@ export function GameShell({ children, userEmail, isAdmin = false }: GameShellPro
             </Link>
           )
         })}
+        {/* Bouton connexion dans la nav mobile pour les guests */}
+        {isGuest && (
+          <Link
+            href="/auth"
+            className="flex flex-col items-center justify-center gap-1 transition-colors flex-1"
+            style={{ color: '#E63946' }}
+          >
+            <LogIn size={20} />
+            <span className="text-xs font-medium leading-none">Connexion</span>
+          </Link>
+        )}
       </nav>
     </div>
   )
