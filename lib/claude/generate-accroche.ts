@@ -24,7 +24,7 @@ const TONES_CONFIG: Record<string, { emoji: string; label: string }> = {
   Drôle: { emoji: '😂', label: 'Drôle' },
   Mystérieux: { emoji: '🌙', label: 'Mystérieux' },
   Compliment: { emoji: '⚡', label: 'Compliment' },
-  CrushMaxing: { emoji: '🔥', label: 'CrushMaxing' },
+  CrushMaxxing: { emoji: '🔥', label: 'CrushMaxxing' },
   'Mon Ton': { emoji: '🎭', label: 'Mon Ton' },
 }
 
@@ -61,7 +61,7 @@ function buildMonTonInstruction(profile: OnboardingProfile): string {
   return `\n\n${lines}`
 }
 
-const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushMaxing']
+const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushMaxxing']
 
 /**
  * Étape 1 : analyse le screenshot du profil avec Claude Vision
@@ -303,7 +303,7 @@ Pour chaque ton, applique les principes en tenant compte de TOUTE la conversatio
 - Drôle : humour décalé ou retournement inattendu de son dernier message — elle doit sourire malgré elle
 - Mystérieux : crée de l'intrigue sur la suite, laisse inachevé, elle doit demander quoi — 1 ligne max
 - Compliment : valorise un détail précis de ce qu'ELLE a dit ou de ce qui est visible, avec une pointe
-- CrushMaxing : la réponse optimale — analyse tout le fil, applique le principe le plus pertinent parmi les 10, génère LA réponse qui fait le plus avancer vers un date dans ce contexte exact
+- CrushMaxxing : la réponse optimale — analyse tout le fil, applique le principe le plus pertinent parmi les 10, génère LA réponse qui fait le plus avancer vers un date dans ce contexte exact
 
 Rien d'autre que le JSON.`
 
@@ -428,7 +428,7 @@ DESCRIPTION PRÉCISE DE CHAQUE TON
 
 - Compliment : un détail précis valorisé avec une pointe ou un minimisant. Jamais "t'es belle". "J'admets que t'es agréable à regarder, parfois" vaut 10 fois "t'es magnifique". Toujours inattendu.
 
-- CrushMaxing : analyse tout — bio, photo_context, vibe, tenue — et choisis LA meilleure approche parmi les 3. LE message parfait pour CE profil précis, pas un mélange générique.
+- CrushMaxxing : analyse tout — bio, photo_context, vibe, tenue — et choisis LA meilleure approche parmi les 3. LE message parfait pour CE profil précis, pas un mélange générique.
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
