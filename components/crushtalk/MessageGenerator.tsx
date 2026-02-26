@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap, Infinity, X } from 'lucide-react'
+import { Upload, Copy, Check, RefreshCw, MessageSquare, Zap, Infinity, X, ChevronDown } from 'lucide-react'
 interface GeneratedMessage {
   tone: string
   emoji: string
@@ -121,6 +121,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [isDragging, setIsDragging] = useState(false)
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false)
   const [onboardingProfile, setOnboardingProfile] = useState<OnboardingProfile | null>(null)
+  const [toneDrawerOpen, setToneDrawerOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isUnlimited = subscriptionType === 'charo' || subscriptionType === 'chill'
@@ -358,67 +359,90 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           </div>
 
 
-          {/* Sélecteur de ton */}
-          <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
-            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton souhaité</p>
-            <div className="grid grid-cols-2 gap-2">
-              {TONES.filter(t => t.label !== 'CrushMaxing' && t.label !== 'Mon Ton').map(tone => {
-                const isActive = selectedTone === tone.label
-                return (
-                  <button
-                    key={tone.label}
-                    onClick={() => selectTone(tone.label)}
-                    className="flex items-center justify-center px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                    style={isActive ? {
-                      borderColor: '#E63946',
-                      background: 'rgba(230,57,70,0.1)',
-                      color: '#fff',
-                    } : {
-                      borderColor: '#1F1F1F',
-                      color: '#9da3af',
-                    }}
-                  >
-                    <span>{tone.label}</span>
-                  </button>
-                )
-              })}
+          {/* Sélecteur de ton — tiroir */}
+          <div className="rounded-2xl border overflow-hidden" style={{ background: '#111111', borderColor: toneDrawerOpen ? '#E63946' : '#1F1F1F', transition: 'border-color 0.2s' }}>
+            {/* Tête du tiroir — ton actif */}
+            <button
+              onClick={() => setToneDrawerOpen(o => !o)}
+              className="w-full flex items-center justify-between px-5 py-4"
+              style={{ background: 'transparent' }}
+            >
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton</p>
+                <span className="text-sm font-semibold" style={{ color: '#fff' }}>{selectedTone}</span>
+                {selectedTone === 'Mon Ton' && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(230,57,70,0.2)', color: '#FF4757' }}>Ton profil</span>
+                )}
+              </div>
+              <ChevronDown
+                className="w-4 h-4 transition-transform duration-200"
+                style={{ color: '#9da3af', transform: toneDrawerOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+              />
+            </button>
 
-              {/* CrushMaxing + Mon Ton — côte à côte en bas */}
-              {(['CrushMaxing', 'Mon Ton'] as const).map((toneName) => {
-                const isActive = selectedTone === toneName
-                const isCrushTalk = toneName === 'CrushMaxing'
-                const isMonTon = toneName === 'Mon Ton'
-                const hasProfile = !!onboardingProfile?.style || !!onboardingProfile?.approach
-                const disabled = isMonTon && !hasProfile
-                return (
-                  <button
-                    key={toneName}
-                    onClick={() => !disabled && selectTone(toneName)}
-                    className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                    style={disabled ? {
-                      borderColor: '#1F1F1F',
-                      color: '#444',
-                      cursor: 'not-allowed',
-                      opacity: 0.5,
-                    } : isActive ? {
-                      borderColor: '#E63946',
-                      background: 'rgba(230,57,70,0.1)',
-                      color: '#fff',
-                    } : {
-                      borderColor: '#1F1F1F',
-                      color: '#9da3af',
-                    }}
-                  >
-                    <span>{toneName}</span>
-                    {!isCrushTalk && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
-                        {disabled ? 'Fais l\'onboarding' : 'Ton profil'}
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+            {/* Contenu du tiroir */}
+            {toneDrawerOpen && (
+              <div className="px-4 pb-4 grid grid-cols-2 gap-2" style={{ borderTop: '1px solid #1F1F1F' }}>
+                <div style={{ height: 12 }} />
+                <div style={{ height: 12 }} />
+                {TONES.filter(t => t.label !== 'CrushMaxing' && t.label !== 'Mon Ton').map(tone => {
+                  const isActive = selectedTone === tone.label
+                  return (
+                    <button
+                      key={tone.label}
+                      onClick={() => { selectTone(tone.label); setToneDrawerOpen(false) }}
+                      className="flex items-center justify-center px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                      style={isActive ? {
+                        borderColor: '#E63946',
+                        background: 'rgba(230,57,70,0.1)',
+                        color: '#fff',
+                      } : {
+                        borderColor: '#1F1F1F',
+                        color: '#9da3af',
+                      }}
+                    >
+                      {tone.label}
+                    </button>
+                  )
+                })}
+
+                {/* CrushMaxing + Mon Ton */}
+                {(['CrushMaxing', 'Mon Ton'] as const).map((toneName) => {
+                  const isActive = selectedTone === toneName
+                  const isCrushTalk = toneName === 'CrushMaxing'
+                  const isMonTon = toneName === 'Mon Ton'
+                  const hasProfile = !!onboardingProfile?.style || !!onboardingProfile?.approach
+                  const disabled = isMonTon && !hasProfile
+                  return (
+                    <button
+                      key={toneName}
+                      onClick={() => { if (!disabled) { selectTone(toneName); setToneDrawerOpen(false) } }}
+                      className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                      style={disabled ? {
+                        borderColor: '#1F1F1F',
+                        color: '#444',
+                        cursor: 'not-allowed',
+                        opacity: 0.5,
+                      } : isActive ? {
+                        borderColor: '#E63946',
+                        background: 'rgba(230,57,70,0.1)',
+                        color: '#fff',
+                      } : {
+                        borderColor: '#1F1F1F',
+                        color: '#9da3af',
+                      }}
+                    >
+                      <span>{toneName}</span>
+                      {!isCrushTalk && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
+                          {disabled ? 'Fais l\'onboarding' : 'Ton profil'}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
           {/* Bouton générer */}
