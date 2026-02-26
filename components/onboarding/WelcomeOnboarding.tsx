@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const SHOW_VIDEO_INTRO = true
-const TELLA_EMBED_URL = 'https://www.tella.tv/video/enzos-video-57k5/embed?autoplay=1&loop=1&muted=0'
+const TELLA_EMBED_URL = 'https://www.tella.tv/video/tuto-crushmaxxing-57k5/embed?autoplay=1&loop=1'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
