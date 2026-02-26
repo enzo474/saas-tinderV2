@@ -1,7 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Check, Zap, Infinity } from 'lucide-react'
+
+async function trackEvent(event: string, data: Record<string, unknown> = {}) {
+  try {
+    await fetch('/api/tracking/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, data }),
+    })
+  } catch { /* ignore */ }
+}
 
 type CrushTalkPlan = 'chill' | 'charo'
 
@@ -41,9 +51,14 @@ export function CrushTalkPricingClient({ currentPlan }: { currentPlan?: 'chill' 
   const [loading, setLoading] = useState<CrushTalkPlan | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    trackEvent('pricing_visited')
+  }, [])
+
   const handleSubscribe = async (plan: CrushTalkPlan) => {
     setLoading(plan)
     setError(null)
+    trackEvent('checkout_started', { plan })
     try {
       const res = await fetch('/api/crushtalk/checkout-session', {
         method: 'POST',

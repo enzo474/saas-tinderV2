@@ -86,6 +86,13 @@ export default async function DashboardAdminPage() {
             >
               💬 Conversations Virales
             </a>
+            <a
+              href="/dashboard/admin/data"
+              className="bg-[#16171b] hover:bg-[#1a1b20] border border-[#E63946]/40 text-white py-3 px-4 rounded-lg font-inter text-sm transition-colors text-center font-semibold"
+              style={{ borderColor: 'rgba(230,57,70,0.4)' }}
+            >
+              📊 Data Analytics
+            </a>
           </div>
         </div>
       </div>

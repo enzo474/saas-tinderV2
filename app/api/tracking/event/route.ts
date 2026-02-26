@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // S'assurer que la ligne existe pour cette IP
     const { data: existing } = await supabase
       .from('ip_tracking')
-      .select('id, dashboard_total_visits, dashboard_first_visit_at')
+      .select('id, dashboard_total_visits, dashboard_first_visit_at, pricing_visit_count')
       .eq('ip_address', clientIP)
       .maybeSingle()
 
@@ -85,6 +85,16 @@ export async function POST(req: NextRequest) {
         patch.has_subscribed = true
         patch.subscribed_at = now
         if (data.plan) patch.subscription_plan = data.plan
+        break
+
+      case 'pricing_visited':
+        patch.pricing_visited_at = now
+        patch.pricing_visit_count = ((existing as Record<string, unknown> & { pricing_visit_count?: number } | null)?.pricing_visit_count ?? 0) + 1
+        break
+
+      case 'checkout_started':
+        patch.checkout_started_at = now
+        if (data.plan) patch.checkout_plan = data.plan
         break
 
       default:
