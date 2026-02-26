@@ -105,6 +105,23 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
       display: 'flex', flexDirection: 'column',
       zIndex: 50,
     }}>
+      {/* Titre au-dessus de la vidéo */}
+      <div style={{ padding: '14px 20px 10px', textAlign: 'center' }}>
+        <span style={{
+          fontFamily: 'Montserrat, sans-serif',
+          fontWeight: 800,
+          fontSize: 15,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          background: 'linear-gradient(135deg, #E63946, #FF4757)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}>
+          Comment ça marche ?
+        </span>
+      </div>
+
       {/* Iframe Tella — overflow hidden pour rogner le chrome du player */}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
@@ -124,6 +141,14 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
             border: 'none',
           }}
         />
+        {/* Masque pour cacher le titre Tella en haut à gauche */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: 38,
+          background: '#000',
+          borderRadius: '16px 16px 0 0',
+          pointerEvents: 'none',
+        }} />
       </div>
 
       {/* Boutons fixes en bas */}
