@@ -49,31 +49,48 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: ValidIm
         ? (detectedType as ValidImageType)
         : 'image/jpeg'
 
+      const compressToTarget = (imgEl: HTMLImageElement, maxPx: number, quality: number): string | null => {
+        try {
+          const ratio = Math.min(maxPx / imgEl.width, maxPx / imgEl.height, 1)
+          const canvas = document.createElement('canvas')
+          canvas.width = Math.round(imgEl.width * ratio)
+          canvas.height = Math.round(imgEl.height * ratio)
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return null
+          ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height)
+          const dataUrlOut = canvas.toDataURL('image/jpeg', quality)
+          const b64 = cleanBase64(dataUrlOut.slice(dataUrlOut.indexOf(',') + 1))
+          return b64.length > 200 ? b64 : null
+        } catch { return null }
+      }
+
       // Essayer la compression canvas
       const img = new window.Image()
       img.onload = () => {
-        try {
-          const MAX = 1280
-          const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
-          const canvas = document.createElement('canvas')
-          canvas.width = Math.round(img.width * ratio)
-          canvas.height = Math.round(img.height * ratio)
-          const ctx = canvas.getContext('2d')
-          if (!ctx) { resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType }); return }
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-          const compressed = canvas.toDataURL('image/jpeg', 0.85)
-          const compressedBase64 = cleanBase64(compressed.slice(compressed.indexOf(',') + 1))
-          // Vérifier que la compression a bien fonctionné (pas une image vide)
-          if (compressedBase64.length > 200) {
-            resolve({ base64: compressedBase64, mediaType: 'image/jpeg' })
+        // Passe 1 : 900px / 0.80
+        let b64 = compressToTarget(img, 900, 0.80)
+        // Passe 2 : si encore trop lourd (> ~1.2MB en base64 ≈ 900k chars), on réduit davantage
+        if (b64 && b64.length > 900_000) {
+          b64 = compressToTarget(img, 600, 0.70) ?? b64
+        }
+        if (b64) {
+          resolve({ base64: b64, mediaType: 'image/jpeg' })
+        } else {
+          // Fallback brut — tronquer si vraiment trop grand pour éviter le "Load failed" iOS
+          const raw = cleanBase64(rawBase64)
+          if (raw.length > 900_000) {
+            // Re-tenter une compression d'urgence à très basse qualité
+            const emergency = compressToTarget(img, 480, 0.60)
+            resolve({ base64: emergency ?? raw.slice(0, 900_000), mediaType: 'image/jpeg' })
           } else {
-            resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
+            resolve({ base64: raw, mediaType: originalMediaType })
           }
-        } catch {
-          resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
         }
       }
-      img.onerror = () => resolve({ base64: cleanBase64(rawBase64), mediaType: originalMediaType })
+      img.onerror = () => {
+        const raw = cleanBase64(rawBase64)
+        resolve({ base64: raw.slice(0, 900_000), mediaType: originalMediaType })
+      }
       img.src = dataUrl
     }
     reader.onerror = reject

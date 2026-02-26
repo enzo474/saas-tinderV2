@@ -320,15 +320,43 @@ Tons demandés : ${tonesRequest.join(', ')}.`
 
   const text = response.content[0].type === 'text' ? response.content[0].text : '[]'
 
-  try {
-    const jsonMatch = text.match(/\[[\s\S]*\]/)
-    if (!jsonMatch) throw new Error('No JSON array found')
-    return JSON.parse(jsonMatch[0]) as GeneratedMessage[]
-  } catch {
-    return tonesRequest.map(tone => ({
-      tone,
-      emoji: TONES_CONFIG[tone]?.emoji || '💬',
-      content: `Message personnalisé basé sur ton profil — réessaie si le résultat est vide.`,
-    }))
+  // Extraction robuste : cherche tous les tableaux JSON dans la réponse et retourne le premier valide
+  const extractJsonArray = (raw: string): GeneratedMessage[] | null => {
+    // Nettoyer les blocs de code markdown
+    const cleaned = raw.replace(/```(?:json)?\s*/gi, '').replace(/```/g, '').trim()
+
+    // Trouver toutes les occurrences de '[' et tenter de parser depuis chacune
+    let idx = 0
+    while (idx < cleaned.length) {
+      const start = cleaned.indexOf('[', idx)
+      if (start === -1) break
+      // Trouver la fermeture de ce tableau en comptant les crochets
+      let depth = 0
+      let end = -1
+      for (let i = start; i < cleaned.length; i++) {
+        if (cleaned[i] === '[') depth++
+        else if (cleaned[i] === ']') {
+          depth--
+          if (depth === 0) { end = i; break }
+        }
+      }
+      if (end !== -1) {
+        try {
+          const parsed = JSON.parse(cleaned.slice(start, end + 1))
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].tone) return parsed
+        } catch { /* continuer */ }
+      }
+      idx = start + 1
+    }
+    return null
   }
+
+  const parsed = extractJsonArray(text)
+  if (parsed) return parsed
+
+  return tonesRequest.map(tone => ({
+    tone,
+    emoji: TONES_CONFIG[tone]?.emoji || '💬',
+    content: `Message personnalisé basé sur ton profil — réessaie si le résultat est vide.`,
+  }))
 }
