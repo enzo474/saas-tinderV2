@@ -143,6 +143,7 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
   const [context, setContext] = useState('')
   const [customAccroche, setCustomAccroche] = useState('')
   const [customFirstReply, setCustomFirstReply] = useState('')
+  const [customSecondMessage, setCustomSecondMessage] = useState('')
   const [style, setStyle] = useState('trash')
   const [length, setLength] = useState('medium')
   const [loading, setLoading] = useState(false)
@@ -173,7 +174,12 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
         storyMediaType:     story.mediaType,
         profileImageBase64: profile?.base64 || null,
         profileMediaType:   profile?.mediaType || null,
-        context, customAccroche: customAccroche.trim() || undefined, customFirstReply: customFirstReply.trim() || undefined, style, length,
+        context,
+        customAccroche: customAccroche.trim() || undefined,
+        customFirstReply: customFirstReply.trim() || undefined,
+        customSecondMessage: customSecondMessage.trim() || undefined,
+        style,
+        length,
       })
 
       let res: Response | null = null
@@ -327,10 +333,35 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
         />
       </div>
 
+      {/* Réplique de lui (3e message) */}
+      <div>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 4 }}>
+          5. Réplique de lui (3e message){' '}
+          <span style={{ color: '#666', fontSize: 13, fontWeight: 400 }}>(optionnel)</span>
+        </h2>
+        <p style={{ color: '#666', fontSize: 13, marginBottom: 12, lineHeight: '1.5' }}>
+          Sa réponse au 1er message d'elle. Claude génère ensuite la suite à partir de là.
+        </p>
+        <textarea
+          value={customSecondMessage}
+          onChange={(e) => setCustomSecondMessage(e.target.value)}
+          placeholder={"Ex: \"c'est tout ce que t'as à dire ?\" ou \"je savais que tu répondrais ça\""}
+          rows={2}
+          style={{
+            width: '100%', background: '#111', border: '1px solid #333',
+            borderRadius: 12, padding: '12px 14px', color: '#fff',
+            fontSize: 14, resize: 'vertical', outline: 'none',
+            fontFamily: 'inherit', boxSizing: 'border-box',
+          }}
+          onFocus={(e) => { e.target.style.borderColor = '#ff8c42' }}
+          onBlur={(e) => { e.target.style.borderColor = '#333' }}
+        />
+      </div>
+
       {/* Style */}
       <div>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12 }}>
-          5. Style de conversation
+          6. Style de conversation
         </h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
           {STYLES.map((s) => (
@@ -355,7 +386,7 @@ export default function ConversationGenerator({ onGenerated }: ConversationGener
       {/* Longueur */}
       <div>
         <h2 style={{ fontSize: 16, fontWeight: 700, color: '#fff', marginBottom: 12 }}>
-          6. Longueur
+          7. Longueur
         </h2>
         <div style={{ display: 'flex', gap: 10 }}>
           {LENGTHS.map((l) => (
