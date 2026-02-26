@@ -373,20 +373,25 @@ export async function POST(req: NextRequest) {
     const admin = await isUserAdmin(user.id)
     if (!admin) return NextResponse.json({ error: 'Accès refusé — Admin uniquement' }, { status: 403 })
 
-    const { storyImageBase64, storyMediaType, profileImageBase64, profileMediaType, context, style, length, customAccroche } = await req.json()
+    const { storyImageBase64, storyMediaType, profileImageBase64, profileMediaType, context, style, length, customAccroche, customFirstReply } = await req.json()
 
     if (!storyImageBase64 || !style || !length) {
       return NextResponse.json({ error: 'Paramètres manquants (storyImage requis)' }, { status: 400 })
     }
 
-    // Si une accroche personnalisée est fournie, elle devient le 1er message de "lui" — Claude génère la suite
+    // Si une accroche personnalisée est fournie, elle devient le 1er message de "lui"
     const accrocheLine = customAccroche?.trim()
       ? `\n\n⚠️ ACCROCHE PERSONNALISÉE — OBLIGATOIRE : Le PREMIER message de "lui" dans le JSON doit reprendre EXACTEMENT cette accroche : "${customAccroche.trim()}"\nCorrige discrètement les fautes d'orthographe et de frappe si il y en a (sans changer le sens ni le ton), puis utilise la version corrigée comme premier message. Génère ensuite la réaction de "elle" et la suite de la conversation à partir de cette accroche.`
       : ''
 
+    // Si une première réponse d'elle est fournie, elle devient le 2e message (1ère réponse d'elle)
+    const firstReplyLine = customFirstReply?.trim()
+      ? `\n\n⚠️ PREMIÈRE RÉPONSE D'ELLE — OBLIGATOIRE : Le DEUXIÈME message du JSON (1er message de "elle") doit reprendre EXACTEMENT ce texte : "${customFirstReply.trim()}"\nCorrige discrètement les fautes d'orthographe et de frappe si besoin (sans changer le sens ni le ton). Génère ensuite la suite de la conversation de façon cohérente avec ce point de départ.`
+      : ''
+
     const userMessage = context
-      ? `Contexte fourni par l'admin : ${context}${accrocheLine}\n\nGénère la conversation.`
-      : `Analyse cette photo de story et génère une conversation virale basée dessus.${accrocheLine}`
+      ? `Contexte fourni par l'admin : ${context}${accrocheLine}${firstReplyLine}\n\nGénère la conversation.`
+      : `Analyse cette photo de story et génère une conversation virale basée dessus.${accrocheLine}${firstReplyLine}`
 
     const systemPrompt = buildSystemPrompt(style, length)
     const messagePayload = [
