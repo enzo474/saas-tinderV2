@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const SHOW_VIDEO_INTRO = true
-const TELLA_EMBED_URL = 'https://www.tella.tv/video/tuto-crushmaxxing-57k5/embed?autoplay=1&muted=1&loop=1'
+const VIDEO_URL = 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/video/unboard_video.mp4'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
@@ -120,7 +120,7 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         </span>
       </div>
 
-      {/* Iframe Tella avec cadre */}
+      {/* Vidéo Supabase avec cadre */}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         margin: '0 12px',
@@ -128,15 +128,18 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         border: '2px solid #E63946',
         boxShadow: '0 0 18px rgba(230,57,70,0.45)',
       }}>
-        <iframe
-          src={TELLA_EMBED_URL}
-          allow="autoplay; fullscreen; picture-in-picture"
-          allowFullScreen
+        <video
+          src={VIDEO_URL}
+          autoPlay
+          loop
+          muted
+          playsInline
           style={{
             position: 'absolute',
-            top: '-4%', left: '-4%',
-            width: '108%', height: '108%',
-            border: 'none',
+            top: 0, left: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover',
+            borderRadius: 16,
           }}
         />
       </div>

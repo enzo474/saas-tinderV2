@@ -34,7 +34,7 @@ interface OnboardingProfile {
 }
 
 const STYLE_INSTRUCTIONS: Record<string, string> = {
-  direct:     'ton direct, franc, sans détour — il va droit au but',
+  direct:     'zéro filtre, affirmation sèche et trash assumée — il dit ce qu\'il pense sans chercher à plaire',
   drole:      'humour décalé, légèreté, réplique qui fait sourire malgré soi',
   mysterieux: 'intrigue, laisse une question en suspens, elle doit vouloir en savoir plus',
   compliment: 'valorise un détail précis avec une pointe — jamais banal, toujours inattendu',
@@ -274,7 +274,7 @@ ${tonesRequest.map(tone => `  { "tone": "${tone}", "emoji": "${TONES_CONFIG[tone
 ]
 
 Pour chaque ton, applique les principes en tenant compte de TOUTE la conversation :
-- Direct : sûr de lui, phrase courte et tranchante, pas d'hésitation — il sait ce qu'il veut et il le dit. Pas de question si possible. Limite provocateur mais toujours respectueux. 1 phrase max.
+- Direct : zéro filtre, zéro politesse inutile. Affirmation sèche qui dit exactement ce qu'il pense — trash assumé, jamais insultant, mais clairement pas là pour se faire aimer. 1 phrase MAX, pas de question, pas de smiley.
 - Drôle : humour décalé ou retournement inattendu de son dernier message — elle doit sourire malgré elle
 - Mystérieux : crée de l'intrigue sur la suite, laisse inachevé, elle doit demander quoi — 1 ligne max
 - Compliment : valorise un détail précis de ce qu'ELLE a dit ou de ce qui est visible, avec une pointe
@@ -320,7 +320,7 @@ Ces messages n'ont PAS plu. Tu dois impérativement :
 
 DESCRIPTION PRÉCISE DE CHAQUE TON (applique-la à la lettre) :
 
-- Direct : mec qui a confiance, qui n'a pas froid aux yeux. Phrase sèche, affirmation assumée, pas d'interrogatif, pas de timidité. Exemples de registre : "T'as l'air de quelqu'un qui sait exactement ce qu'elle veut." / "Je te veux dans mon équipe." / "Cette photo te rend service mais toi tu t'en fous." Court, tranchant, jamais poli au sens fade du terme. Zéro hésitation. Limite provocateur mais toujours dans le respect.
+- Direct : mec qui s'en fout complètement des conséquences. Zéro filtre, zéro politesse inutile, zéro question. Une affirmation sèche qui dit exactement ce qu'il pense — pas pour plaire, pour marquer. Trash assumé, jamais violent ni insultant, mais clairement pas là pour se faire des amis. Exemples de registre : "Tu me plais. Point." / "Cette photo, c'est trop calculé pour être innocent." / "Je sais pas si t'es chiante dans la vraie vie mais je veux tester." / "T'as exactement la tête de l'ennui que j'aime." / "Je te veux. C'est réglé." — 1 phrase MAX, sèche, sans remords. PAS DE QUESTION. PAS DE SMILEY. PAS DE COMPLIMENT BANAL.
 
 - Drôle : une phrase qui fait sourire malgré soi. Humour décalé, observation inattendue, absurde maîtrisé. Pas une blague forcée — plutôt un angle que personne n'aurait pris. Peut être une à deux lignes si la chute le justifie.
 

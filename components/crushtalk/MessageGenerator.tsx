@@ -410,9 +410,11 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                     }}
                   >
                     <span>{toneName}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
-                      {isCrushTalk ? 'Adapté par l\'IA' : disabled ? 'Fais l\'onboarding' : 'Ton profil'}
-                    </span>
+                    {!isCrushTalk && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
+                        {disabled ? 'Fais l\'onboarding' : 'Ton profil'}
+                      </span>
+                    )}
                   </button>
                 )
               })}
