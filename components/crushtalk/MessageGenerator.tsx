@@ -362,7 +362,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
-              {TONES.filter(t => t.label !== 'CrushTalk').map(tone => {
+              {TONES.filter(t => t.label !== 'CrushTalk' && t.label !== 'Mon Ton').map(tone => {
                 const isActive = selectedTone === tone.label
                 return (
                   <button

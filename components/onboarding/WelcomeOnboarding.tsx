@@ -139,13 +139,6 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
             border: 'none',
           }}
         />
-        {/* Masque pour cacher le titre Tella */}
-        <div style={{
-          position: 'absolute', top: 0, left: 0, right: 0,
-          height: 36, background: '#000',
-          borderRadius: '16px 16px 0 0',
-          pointerEvents: 'none',
-        }} />
       </div>
 
       {/* Boutons en bas */}
