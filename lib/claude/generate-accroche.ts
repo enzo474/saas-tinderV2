@@ -75,6 +75,8 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
   "photo_context": "résumé de l échange visible : ce que l utilisateur a dit (droite) et ce que la femme a répondu (gauche)"
 }
 
+⚠️ RÈGLE POUR photo_context ET interests : décris les objets et éléments visuels de façon GÉNÉRIQUE. Exemple : "miroir" (pas "miroir hexagonal" ou "miroir diamant"), "canapé" (pas "canapé en velours bleu canard"), "voiture" (pas "BMW série 3 grise"). Garde le nom simple et commun, sans préciser la forme, la couleur ou la marque.
+
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
           },
         ],
@@ -251,6 +253,7 @@ EXEMPLES DE BONS DÉBUTS (adapte toujours au profil, n'utilise pas ces phrases t
 
 RÈGLES ABSOLUES :
 - Utilise des détails spécifiques de la bio ou des photos (jamais générique)
+- ⚠️ OBJETS DANS LES PHOTOS : mentionne-les de façon SIMPLE et GÉNÉRIQUE. Dis "miroir" pas "miroir hexagonal", "voiture" pas "BMW grise", "canapé" pas "canapé en velours". Ne sur-décris jamais un objet visible, garde le nom usuel suffit.
 - Longueur : 1 à 2 phrases max
 - Pas de "Salut", pas de "Coucou", pas de "Bonjour"
 - Pas d'emojis en excès (max 1 par message)
