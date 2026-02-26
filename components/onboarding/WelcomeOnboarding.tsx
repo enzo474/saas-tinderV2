@@ -97,7 +97,7 @@ interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
-export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnboardingProps) {
+export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingProps) {
   const router = useRouter()
 
   // showVideo = true uniquement si SHOW_VIDEO_INTRO est activé
@@ -374,6 +374,14 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
               ← Retour
             </button>
           )}
+
+          {/* Lien connexion pour les utilisateurs existants */}
+          <p className="text-center text-xs mt-4" style={{ color: '#6b7280' }}>
+            Déjà un compte ?{' '}
+            <a href="/auth" className="font-medium transition-colors hover:text-white" style={{ color: '#9da3af' }}>
+              Se connecter →
+            </a>
+          </p>
         </div>
       </div>
     </div>

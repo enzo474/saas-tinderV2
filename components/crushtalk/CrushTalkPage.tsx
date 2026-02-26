@@ -7,17 +7,15 @@ interface CrushTalkPageProps {
   initialCredits: number
   initialSubscriptionType?: string | null
   userId: string
-  isGuest?: boolean
 }
 
-export function CrushTalkPage({ messageType, initialCredits, initialSubscriptionType, userId, isGuest }: CrushTalkPageProps) {
+export function CrushTalkPage({ messageType, initialCredits, initialSubscriptionType, userId }: CrushTalkPageProps) {
   return (
     <MessageGenerator
       messageType={messageType}
       initialCredits={initialCredits}
       initialSubscriptionType={initialSubscriptionType}
       userId={userId}
-      isGuest={isGuest}
     />
   )
 }

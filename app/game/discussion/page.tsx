@@ -6,37 +6,24 @@ export default async function GameDiscussionPage() {
   const supabaseAdmin = createServiceRoleClient()
 
   const { data: { user } } = await supabase.auth.getUser()
+  // Le layout garantit que user est défini ici
 
-  // Guest : 1 génération gratuite basée sur l'IP (pas de crédits en DB)
-  if (!user) {
-    return (
-      <CrushTalkPage
-        messageType="reponse"
-        initialCredits={5}
-        initialSubscriptionType={null}
-        userId=""
-        isGuest
-      />
-    )
-  }
-
-  // Récupérer les crédits — auto-créer si absent
   let { data: credits } = await supabaseAdmin
     .from('crushtalk_credits')
     .select('balance, subscription_type, subscription_status')
-    .eq('user_id', user.id)
+    .eq('user_id', user!.id)
     .single()
 
   if (!credits) {
     await supabaseAdmin.from('crushtalk_credits').insert({
-      user_id: user.id,
+      user_id: user!.id,
       balance: 5,
       used_total: 0,
     })
     const { data: fresh } = await supabaseAdmin
       .from('crushtalk_credits')
       .select('balance, subscription_type, subscription_status')
-      .eq('user_id', user.id)
+      .eq('user_id', user!.id)
       .single()
     credits = fresh
   }
@@ -51,7 +38,7 @@ export default async function GameDiscussionPage() {
       messageType="reponse"
       initialCredits={credits?.balance ?? 0}
       initialSubscriptionType={subscriptionType}
-      userId={user.id}
+      userId={user!.id}
     />
   )
 }

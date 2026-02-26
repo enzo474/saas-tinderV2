@@ -14,7 +14,6 @@ interface MessageGeneratorProps {
   initialCredits: number
   initialSubscriptionType?: string | null
   userId: string
-  isGuest?: boolean
 }
 
 const TONES = [
@@ -82,7 +81,7 @@ function compressImage(file: File): Promise<{ base64: string; mediaType: ValidIm
   })
 }
 
-export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId, isGuest = false }: MessageGeneratorProps) {
+export function MessageGenerator({ messageType: initialType, initialCredits, initialSubscriptionType, userId }: MessageGeneratorProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeType = initialType
@@ -100,7 +99,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isUnlimited = subscriptionType === 'charo' || subscriptionType === 'chill'
-  const hasEnoughCredits = isGuest || isUnlimited || credits >= CREDITS_PER_GENERATION
+  const hasEnoughCredits = isUnlimited || credits >= CREDITS_PER_GENERATION
 
   // Afficher le banner de bienvenue si ?welcome=true dans l'URL
   useEffect(() => {
@@ -162,10 +161,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       const data = await res.json()
 
       if (!res.ok) {
-        if (data.type === 'ip_limit') {
-          router.push('/game/pricing')
-          return
-        }
         if (data.type === 'insufficient_credits') {
           router.push('/game/pricing')
           return

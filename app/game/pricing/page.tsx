@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { PricingClient } from './PricingClient'
 
@@ -5,21 +6,19 @@ export default async function GamePricingPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let hasActivePlan = false
+  if (!user) redirect('/auth')
 
-  if (user) {
-    const supabaseAdmin = createServiceRoleClient()
-    const { data: credits } = await supabaseAdmin
-      .from('crushtalk_credits')
-      .select('subscription_type, subscription_status')
-      .eq('user_id', user.id)
-      .single()
+  const supabaseAdmin = createServiceRoleClient()
+  const { data: credits } = await supabaseAdmin
+    .from('crushtalk_credits')
+    .select('subscription_type, subscription_status')
+    .eq('user_id', user.id)
+    .single()
 
-    hasActivePlan =
-      !!credits?.subscription_status &&
-      credits.subscription_status === 'active' &&
-      !!credits.subscription_type
-  }
+  const hasActivePlan =
+    !!credits?.subscription_status &&
+    credits.subscription_status === 'active' &&
+    !!credits.subscription_type
 
   return (
     <div className="max-w-2xl mx-auto space-y-8">
@@ -49,7 +48,7 @@ export default async function GamePricingPage() {
         </p>
       </div>
 
-      <PricingClient isGuest={!user} hasActivePlan={hasActivePlan} />
+      <PricingClient isGuest={false} hasActivePlan={hasActivePlan} />
 
       <div className="text-center space-y-1.5">
         <p className="text-xs" style={{ color: '#6b7280' }}>
