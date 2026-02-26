@@ -33,28 +33,27 @@ async function fetchAdminData() {
     serviceRole.auth.admin.listUsers({ page: 1, perPage: 1000 }),
   ])
 
-  // user_profiles pour les emails
+  // user_profiles = source de vérité (seuls les vrais users actifs)
   const { data: profiles } = await serviceRole.from('user_profiles').select('id, email, created_at')
 
-  const users = usersListResult.data?.users ?? []
+  const allAuthUsers = usersListResult.data?.users ?? []
   const generations = generationsResult.data ?? []
   const credits = creditsResult.data ?? []
   const funnel = funnelResult.data ?? []
   const profilesList = profiles ?? []
 
-  // Enrichir les users avec plan, nb générations, email
-  const enrichedUsers = users.map((u) => {
-    const profile = profilesList.find((p) => p.id === u.id)
-    const credit = credits.find((c) => c.user_id === u.id)
-    const userGens = generations.filter((g) => g.user_id === u.id)
-    const email = profile?.email ?? u.email ?? '—'
-    const provider = (u.app_metadata?.provider as string) ?? 'email'
+  // On ne garde que les users qui ont un user_profile (supprimés = exclus)
+  const enrichedUsers = profilesList.map((profile) => {
+    const authUser = allAuthUsers.find((u) => u.id === profile.id)
+    const credit = credits.find((c) => c.user_id === profile.id)
+    const userGens = generations.filter((g) => g.user_id === profile.id)
+    const provider = (authUser?.app_metadata?.provider as string) ?? 'email'
     return {
-      id: u.id,
-      email,
+      id: profile.id,
+      email: profile.email ?? authUser?.email ?? '—',
       provider,
-      created_at: u.created_at,
-      last_sign_in_at: u.last_sign_in_at ?? null,
+      created_at: profile.created_at ?? authUser?.created_at ?? '',
+      last_sign_in_at: authUser?.last_sign_in_at ?? null,
       plan: credit?.subscription_type ?? null,
       subscription_status: credit?.subscription_status ?? null,
       subscription_period_end: credit?.subscription_current_period_end ?? null,
@@ -66,10 +65,10 @@ async function fetchAdminData() {
     }
   })
 
-  // KPIs globaux
+  // KPIs globaux — basés sur les profils existants uniquement
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-  const activeThisMonth = users.filter((u) =>
+  const activeThisMonth = enrichedUsers.filter((u) =>
     u.last_sign_in_at && new Date(u.last_sign_in_at) > thirtyDaysAgo
   ).length
 
@@ -101,7 +100,7 @@ async function fetchAdminData() {
     const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000)
     signupsByDay[d.toISOString().slice(0, 10)] = 0
   }
-  users.forEach((u) => {
+  enrichedUsers.forEach((u) => {
     const day = u.created_at?.slice(0, 10)
     if (day && day in signupsByDay) signupsByDay[day]++
   })
@@ -132,12 +131,11 @@ async function fetchAdminData() {
     .sort((a, b) => b[1] - a[1])
     .slice(0, 6)
 
-  // Répartition Google vs Email
+  // Répartition Google vs Email (basé sur les profils existants)
   const providerCounts = { google: 0, email: 0, other: 0 }
-  users.forEach((u) => {
-    const p = (u.app_metadata?.provider as string) ?? 'email'
-    if (p === 'google') providerCounts.google++
-    else if (p === 'email') providerCounts.email++
+  enrichedUsers.forEach((u) => {
+    if (u.provider === 'google') providerCounts.google++
+    else if (u.provider === 'email') providerCounts.email++
     else providerCounts.other++
   })
 
@@ -152,10 +150,10 @@ async function fetchAdminData() {
 
   return {
     kpis: {
-      total_users: users.length,
+      total_users: enrichedUsers.length,
       active_this_month: activeThisMonth,
       active_subscribers: activeSubscribers,
-      conversion_rate: users.length > 0 ? Math.round((activeSubscribers / users.length) * 100) : 0,
+      conversion_rate: enrichedUsers.length > 0 ? Math.round((activeSubscribers / enrichedUsers.length) * 100) : 0,
       total_gens: totalGens,
       total_accroches: totalAccroches,
       total_reponses: totalReponses,
