@@ -75,12 +75,13 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
   "bio": "dernier(s) message(s) de LA FEMME (gauche) ou bio ou null",
   "interests": ["info visible 1", "info visible 2"],
   "vibe": "résumé du stade : ex 'elle résiste mais intéressée', 'elle a dit j ai un mec', 'conversation bien engagée', 'elle veut du concret', 'elle teste', 'elle est chaude'",
-  "photo_context": "ce que la photo révèle sur la personne : son attitude, son environnement, sa vibe générale"
+  "photo_context": "description précise de ce qui est visible : objet principal si présent (ex: miroir, voiture, animal, décor), attitude de la personne, vibe générale. Ex: 'selfie devant un miroir, regard direct, tenue décontractée' ou 'photo en plein air, sourire naturel, fond de montagne'"
 }
 
 ⚠️ RÈGLES ABSOLUES pour photo_context et interests :
 - Objets et décor : GÉNÉRIQUE uniquement. "miroir" (jamais "miroir hexagonal"), "voiture" (jamais "BMW grise"), "canapé" (jamais "canapé en velours").
-- Décris TOUJOURS l'ensemble de ce qui est visible : la personne, son attitude, son environnement, les éléments notables autour d'elle. Ne te limite pas à un seul élément (ex : ne parle pas QUE des vêtements si un miroir ou un décor est aussi visible).
+- Si un objet notable est visible (miroir, animal, voiture, paysage, salle de sport…), il DOIT apparaître dans photo_context — ne l'omets pas au profit d'une description vague.
+- Décris l'ensemble : objet principal + attitude + vibe. Pas seulement la vibe.
 
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
           },
@@ -260,7 +261,10 @@ EXEMPLES DE BONS DÉBUTS (adapte toujours au profil, n'utilise pas ces phrases t
 - "Il y a deux choses que j'aime sur cette photo." [puis développer sur des détails réels]
 - "Je sais pas ce que je dois contempler, toi ou la vue ?"
 - "Trois pour le prix d'une. Mais je suis un homme intelligent alors je te veux toi uniquement."
+- Sur un selfie miroir : "Ce miroir a une sacrée chance de te refléter tous les jours." / "Cette façon de tenir ton téléphone... tu sais exactement ce que tu fais."
 - Une observation précise sur quelque chose de visible dans le profil
+
+⚠️ SI UN MIROIR EST VISIBLE : c'est un point d'accroche fort et naturel — utilise-le comme référence principale ou secondaire. Un selfie miroir dit quelque chose sur la personne (confiance, spontanéité) — joue avec ça.
 
 RÈGLES ABSOLUES :
 - Utilise des détails spécifiques de la bio ou des photos (jamais générique)
