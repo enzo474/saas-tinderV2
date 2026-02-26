@@ -408,6 +408,7 @@ RÈGLES UNIVERSELLES pour "elle" (valables pour tous les profils) :
 - Ses réponses courtes montrent l'intérêt (elle répond = elle est là), ses mots montrent la résistance
 - ⚠️ INTERDIT de répéter exactement la même formule dans la même conv — si elle a dit "ok" une fois, elle dira pas "ok" 3 fois
 - ⚠️ LA PHRASE "je comprends même pas pourquoi je réponds" EST BANNIE — ni aucune variante proche ("je sais pas pourquoi je te réponds", "je devrais même pas répondre"). C'est overused et fake.
+- ⚠️ LE MOT "smooth" EST BANNI — ne jamais l'utiliser dans les messages de "elle" ou de "lui". Cherche un équivalent naturel en français.
 - JAMAIS de réponse enthousiaste ou flatteuse — elle garde toujours une distance cool
 
 ═══════════════════════════════════════

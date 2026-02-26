@@ -17,6 +17,7 @@ function toPlainText(conversation: { sender: string; message: string }[]): strin
 export default function AdminConversationsClient() {
   const [activeView, setActiveView] = useState<ActiveView>('generator')
   const [result, setResult] = useState<(GeneratedConversation & { imagePreview: string; storyImagePreview?: string }) | null>(null)
+  const [editableConv, setEditableConv] = useState<{ sender: string; message: string; timestamp: string }[]>([])
   const [copied, setCopied] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
 
@@ -28,6 +29,7 @@ export default function AdminConversationsClient() {
 
   const handleGenerated = (data: GeneratedConversation & { imagePreview: string }) => {
     setResult(data)
+    setEditableConv(data.conversation)
   }
 
   const tabStyle = (active: boolean): React.CSSProperties => ({
@@ -96,14 +98,20 @@ export default function AdminConversationsClient() {
                   </div>
                 )}
 
+                {/* Hint édition */}
+                <div style={{ textAlign: 'center', color: '#555', fontSize: 12 }}>
+                  ✏️ Clique sur une bulle pour modifier — Entrée pour ajouter un message
+                </div>
+
                 {/* Preview */}
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                   <div style={{ overflowY: 'auto', maxHeight: '70vh' }}>
                     <ConversationPreview
                       ref={previewRef}
-                      conversation={result.conversation}
+                      conversation={editableConv}
                       profileImage={result.imagePreview || result.profile_image_url || ''}
                       storyImage={result.storyImagePreview || result.profile_image_url || result.imagePreview || ''}
+                      onConversationChange={setEditableConv}
                     />
                   </div>
                 </div>
@@ -111,7 +119,7 @@ export default function AdminConversationsClient() {
                 {/* Export */}
                 <ExportCarousel
                   conversationId={result.id}
-                  conversation={result.conversation}
+                  conversation={editableConv}
                   profileImage={result.imagePreview || result.profile_image_url || ''}
                   storyImage={result.storyImagePreview || result.profile_image_url || result.imagePreview || ''}
                   previewRef={previewRef}
@@ -119,7 +127,7 @@ export default function AdminConversationsClient() {
 
                 {/* Version texte brut pour react */}
                 {(() => {
-                  const plain = toPlainText(result.conversation)
+                  const plain = toPlainText(editableConv)
                   return (
                     <div style={{
                       background: '#111', border: '1px solid #222',
@@ -151,7 +159,7 @@ export default function AdminConversationsClient() {
                       <textarea
                         readOnly
                         value={plain}
-                        rows={Math.min(result.conversation.length + 2, 18)}
+                        rows={Math.min(editableConv.length + 2, 18)}
                         style={{
                           width: '100%', background: '#0a0a0a',
                           border: '1px solid #2a2a2a', borderRadius: 10,
