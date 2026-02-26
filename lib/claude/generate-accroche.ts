@@ -80,8 +80,7 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
 
 ⚠️ RÈGLES ABSOLUES pour photo_context et interests :
 - Objets et décor : GÉNÉRIQUE uniquement. "miroir" (jamais "miroir hexagonal"), "voiture" (jamais "BMW grise"), "canapé" (jamais "canapé en velours").
-- Vêtements : GÉNÉRIQUE uniquement. "tenue décontractée", "robe", "tenue sport" — JAMAIS la couleur ni le type précis ("lingerie verte", "crop top blanc" sont INTERDITS). 
-- Focus sur la VIBE et l'ATTITUDE, pas sur les détails vestimentaires ou la description physique précise.
+- Décris TOUJOURS l'ensemble de ce qui est visible : la personne, son attitude, son environnement, les éléments notables autour d'elle. Ne te limite pas à un seul élément (ex : ne parle pas QUE des vêtements si un miroir ou un décor est aussi visible).
 
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
           },
