@@ -21,7 +21,7 @@ const TONES = [
   { label: 'Drôle', description: null },
   { label: 'Mystérieux', description: null },
   { label: 'Compliment', description: null },
-  { label: 'CrushTalk', description: 'Adapté par l\'IA' },
+  { label: 'CrushMaxing', description: 'Adapté par l\'IA' },
   { label: 'Mon Ton', description: 'Selon ton profil' },
 ]
 
@@ -110,7 +110,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const activeType = initialType
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [selectedTone, setSelectedTone] = useState<string>('CrushTalk')
+  const [selectedTone, setSelectedTone] = useState<string>('CrushMaxing')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
@@ -362,7 +362,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           <div className="rounded-2xl p-5 border" style={{ background: '#111111', borderColor: '#1F1F1F' }}>
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton souhaité</p>
             <div className="grid grid-cols-2 gap-2">
-              {TONES.filter(t => t.label !== 'CrushTalk' && t.label !== 'Mon Ton').map(tone => {
+              {TONES.filter(t => t.label !== 'CrushMaxing' && t.label !== 'Mon Ton').map(tone => {
                 const isActive = selectedTone === tone.label
                 return (
                   <button
@@ -383,10 +383,10 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                 )
               })}
 
-              {/* CrushTalk + Mon Ton — côte à côte en bas */}
-              {(['CrushTalk', 'Mon Ton'] as const).map((toneName) => {
+              {/* CrushMaxing + Mon Ton — côte à côte en bas */}
+              {(['CrushMaxing', 'Mon Ton'] as const).map((toneName) => {
                 const isActive = selectedTone === toneName
-                const isCrushTalk = toneName === 'CrushTalk'
+                const isCrushTalk = toneName === 'CrushMaxing'
                 const isMonTon = toneName === 'Mon Ton'
                 const hasProfile = !!onboardingProfile?.style || !!onboardingProfile?.approach
                 const disabled = isMonTon && !hasProfile

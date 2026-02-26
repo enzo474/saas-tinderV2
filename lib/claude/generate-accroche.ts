@@ -24,7 +24,7 @@ const TONES_CONFIG: Record<string, { emoji: string; label: string }> = {
   Drôle: { emoji: '😂', label: 'Drôle' },
   Mystérieux: { emoji: '🌙', label: 'Mystérieux' },
   Compliment: { emoji: '⚡', label: 'Compliment' },
-  CrushTalk: { emoji: '🔥', label: 'CrushTalk' },
+  CrushMaxing: { emoji: '🔥', label: 'CrushMaxing' },
   'Mon Ton': { emoji: '🎭', label: 'Mon Ton' },
 }
 
@@ -61,7 +61,7 @@ function buildMonTonInstruction(profile: OnboardingProfile): string {
   return `\n\n${lines}`
 }
 
-const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushTalk']
+const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushMaxing']
 
 /**
  * Étape 1 : analyse le screenshot du profil avec Claude Vision
@@ -274,11 +274,11 @@ ${tonesRequest.map(tone => `  { "tone": "${tone}", "emoji": "${TONES_CONFIG[tone
 ]
 
 Pour chaque ton, applique les principes en tenant compte de TOUTE la conversation :
-- Direct : affirmation nette, peu de mots, très sûr de lui — avance vers le concret
-- Drôle : humour décalé ou retournement inattendu de son dernier message
-- Mystérieux : crée de l'intrigue sur la suite, laisse inachevé, elle doit demander
+- Direct : sûr de lui, phrase courte et tranchante, pas d'hésitation — il sait ce qu'il veut et il le dit. Pas de question si possible. Limite provocateur mais toujours respectueux. 1 phrase max.
+- Drôle : humour décalé ou retournement inattendu de son dernier message — elle doit sourire malgré elle
+- Mystérieux : crée de l'intrigue sur la suite, laisse inachevé, elle doit demander quoi — 1 ligne max
 - Compliment : valorise un détail précis de ce qu'ELLE a dit ou de ce qui est visible, avec une pointe
-- CrushTalk : la réponse optimale — analyse tout le fil, applique le principe le plus pertinent parmi les 10, génère LA réponse qui fait le plus avancer vers un date dans ce contexte exact
+- CrushMaxing : la réponse optimale — analyse tout le fil, applique le principe le plus pertinent parmi les 10, génère LA réponse qui fait le plus avancer vers un date dans ce contexte exact
 
 Rien d'autre que le JSON.`
 
@@ -304,9 +304,9 @@ EXEMPLES DE BONS DÉBUTS (adapte toujours au profil, n'utilise pas ces phrases t
 RÈGLES ABSOLUES :
 - Utilise des détails spécifiques de la bio ou des photos (jamais générique)
 - ⚠️ OBJETS DANS LES PHOTOS : mentionne-les de façon SIMPLE et GÉNÉRIQUE. Dis "miroir" pas "miroir hexagonal", "voiture" pas "BMW grise", "canapé" pas "canapé en velours". Ne sur-décris jamais un objet visible, garde le nom usuel suffit.
-- Longueur : 1 à 2 phrases max
+- ⚠️ LONGUEUR ABSOLUE : 1 phrase, 2 max. JAMAIS plus. Si tu dépasses 2 lignes, le message est raté. Court = percutant. Long = ignoré.
 - Pas de "Salut", pas de "Coucou", pas de "Bonjour"
-- Pas d'emojis en excès (max 1 par message)
+- Pas d'emojis en excès (max 1 par message, ou zéro)
 - Reste naturel, comme si un homme très confiant écrivait spontanément${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS À L'UTILISATEUR (à NE PAS répéter) :
@@ -317,6 +317,18 @@ Ces messages n'ont PAS plu. Tu dois impérativement :
 - Changer de registre (si c'était une observation, essaie une question décalée ou une affirmation directe)
 - Ne PAS reprendre les mêmes mots-clés ni la même structure de phrase
 - Surprendre — l'objectif est que cette nouvelle version soit clairement différente des précédentes` : ''}
+
+DESCRIPTION PRÉCISE DE CHAQUE TON (applique-la à la lettre) :
+
+- Direct : mec qui a confiance, qui n'a pas froid aux yeux. Phrase sèche, affirmation assumée, pas d'interrogatif, pas de timidité. Exemples de registre : "T'as l'air de quelqu'un qui sait exactement ce qu'elle veut." / "Je te veux dans mon équipe." / "Cette photo te rend service mais toi tu t'en fous." Court, tranchant, jamais poli au sens fade du terme. Zéro hésitation. Limite provocateur mais toujours dans le respect.
+
+- Drôle : une phrase qui fait sourire malgré soi. Humour décalé, observation inattendue, absurde maîtrisé. Pas une blague forcée — plutôt un angle que personne n'aurait pris. Peut être une à deux lignes si la chute le justifie.
+
+- Mystérieux : crée un manque. Dit quelque chose sans tout dire. Elle doit se demander quoi. Une affirmation qui laisse une question en suspens. Jamais d'explication. Une ligne suffit toujours.
+
+- Compliment : un détail précis valorisé avec une pointe. Jamais "t'es belle". Toujours inattendu, toujours sur quelque chose de visible ou lu dans la bio. Avec une légère pique ou une tournure qui sort du lot.
+
+- CrushMaxing : la version optimale pour CE profil précis. Tu analyses tout — bio, photo_context, vibe — et tu choisis le registre qui aura le plus d'impact. Ce n'est pas un mélange des autres tons, c'est LE message parfait pour cette personne. Peut être direct, drôle, mystérieux ou compliment selon ce qui matche le mieux avec ce profil.
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
