@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const SHOW_VIDEO_INTRO = true
+const TELLA_EMBED_URL = 'https://www.tella.tv/video/tuto-crushmaxxing-57k5/embed?autoplay=1&muted=1&loop=1'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
@@ -95,17 +96,8 @@ interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
-// ─── Composant lecteur vidéo intro (fichier local) ───────────────────────────
+// ─── Composant lecteur vidéo intro (Tella embed) ─────────────────────────────
 function VideoIntro({ onFinish }: { onFinish: () => void }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-
-  useEffect(() => {
-    const v = videoRef.current
-    if (!v) return
-    v.muted = true
-    v.play().catch(() => {})
-  }, [])
-
   return (
     <div style={{
       position: 'fixed', inset: 0,
@@ -128,7 +120,7 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         </span>
       </div>
 
-      {/* Vidéo avec cadre */}
+      {/* Iframe Tella avec cadre */}
       <div style={{
         flex: 1, position: 'relative', overflow: 'hidden',
         margin: '0 12px',
@@ -136,19 +128,24 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         border: '2px solid #E63946',
         boxShadow: '0 0 18px rgba(230,57,70,0.45)',
       }}>
-        <video
-          ref={videoRef}
-          src="/unboard_video.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
+        <iframe
+          src={TELLA_EMBED_URL}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
           style={{
-            position: 'absolute', top: 0, left: 0,
-            width: '100%', height: '100%',
-            objectFit: 'cover',
+            position: 'absolute',
+            top: '-4%', left: '-4%',
+            width: '108%', height: '108%',
+            border: 'none',
           }}
         />
+        {/* Masque pour cacher le titre Tella */}
+        <div style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          height: 36, background: '#000',
+          borderRadius: '16px 16px 0 0',
+          pointerEvents: 'none',
+        }} />
       </div>
 
       {/* Boutons en bas */}
