@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const SHOW_VIDEO_INTRO = true
-const TELLA_EMBED_URL = 'https://www.tella.tv/video/tuto-crushmaxxing-57k5/embed?autoplay=1&loop=1'
+const TELLA_EMBED_URL = 'https://www.tella.tv/video/tuto-crushmaxxing-57k5/embed?autoplay=1&muted=1&loop=1'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
@@ -99,37 +99,51 @@ interface WelcomeOnboardingProps {
 // ─── Composant lecteur vidéo intro (Tella embed) ─────────────────────────────
 function VideoIntro({ onFinish }: { onFinish: () => void }) {
   return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center"
-      style={{ background: '#000', position: 'relative' }}
-    >
-      {/* Iframe Tella plein écran */}
-      <div className="w-full flex-1" style={{ position: 'relative', paddingTop: '177.78%' /* 9/16 portrait */ }}>
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: '#000',
+      display: 'flex', flexDirection: 'column',
+      zIndex: 50,
+    }}>
+      {/* Iframe Tella — occupe tout l'espace disponible */}
+      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
         <iframe
           src={TELLA_EMBED_URL}
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           style={{
             position: 'absolute', top: 0, left: 0,
-            width: '100%', height: '100%', border: 'none',
+            width: '100%', height: '100%',
+            border: 'none',
           }}
         />
       </div>
 
-      {/* Boutons en bas */}
-      <div className="w-full flex flex-col items-center gap-3 px-6 py-6" style={{ background: '#000' }}>
+      {/* Boutons fixes en bas */}
+      <div style={{
+        flexShrink: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        gap: 12, padding: '20px 24px 32px',
+        background: '#000',
+      }}>
         <button
           onClick={onFinish}
-          className="w-full max-w-sm py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
-          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          style={{
+            width: '100%', maxWidth: 400,
+            padding: '16px 0', borderRadius: 16,
+            background: 'linear-gradient(135deg, #E63946, #FF4757)',
+            color: '#fff', fontWeight: 700, fontSize: 16,
+            border: 'none', cursor: 'pointer',
+          }}
         >
           Commencer →
         </button>
-
         <button
           onClick={onFinish}
-          className="text-sm transition-colors"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'rgba(255,255,255,0.35)', fontSize: 13,
+          }}
         >
           Passer la vidéo
         </button>
