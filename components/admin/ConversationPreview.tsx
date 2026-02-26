@@ -96,6 +96,13 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
       setTimeout(() => setEditingIdx(idx + 1), 30)
     }
 
+    const deleteMessage = (idx: number) => {
+      if (conversation.length <= 1) return // ne jamais tout supprimer
+      const newConv = conversation.filter((_, i) => i !== idx)
+      onConversationChange?.(newConv)
+      setEditingIdx(null)
+    }
+
     const handleKeyDown = (
       e: React.KeyboardEvent<HTMLTextAreaElement>,
       idx: number,
@@ -107,6 +114,11 @@ const ConversationPreview = forwardRef<HTMLDivElement, ConversationPreviewProps>
       }
       if (e.key === 'Escape') {
         setEditingIdx(null)
+      }
+      // Backspace sur message vide → supprime la bulle
+      if (e.key === 'Backspace' && conversation[idx]?.message === '') {
+        e.preventDefault()
+        deleteMessage(idx)
       }
     }
 
