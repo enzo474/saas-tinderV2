@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       // Récupérer ou créer l'entrée IP
       let { data: ipData, error: ipError } = await supabaseAdmin
         .from('ip_tracking')
-        .select('id, has_used_free_analysis')
+        .select('id, has_used_free_analysis, is_unlimited')
         .eq('ip_address', clientIP)
         .single()
 
@@ -53,12 +53,15 @@ export async function POST(req: NextRequest) {
         const { data: newIP } = await supabaseAdmin
           .from('ip_tracking')
           .insert({ ip_address: clientIP, fingerprint, has_used_free_analysis: false })
-          .select('id, has_used_free_analysis')
+          .select('id, has_used_free_analysis, is_unlimited')
           .single()
         ipData = newIP
       }
 
-      if (!ipData || ipData.has_used_free_analysis) {
+      // IP avec accès illimité (admin/test) → bypass total
+      const ipIsUnlimited = !!(ipData as ({ is_unlimited?: boolean } & typeof ipData) | null)?.is_unlimited
+
+      if (!ipIsUnlimited && (!ipData || ipData.has_used_free_analysis)) {
         return NextResponse.json(
           {
             error: 'Analyse gratuite déjà utilisée pour cette adresse IP',
@@ -82,14 +85,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Erreur génération: ' + msg }, { status: 500 })
       }
 
-      // Marquer l'IP comme ayant utilisé son analyse gratuite
-      await supabaseAdmin
-        .from('ip_tracking')
-        .update({
-          has_used_free_analysis: true,
-          free_analysis_used_at: new Date().toISOString(),
-        })
-        .eq('id', ipData.id)
+      // Marquer l'IP comme ayant utilisé son analyse gratuite (sauf si unlimited)
+      if (!ipIsUnlimited && ipData) {
+        await supabaseAdmin
+          .from('ip_tracking')
+          .update({
+            has_used_free_analysis: true,
+            free_analysis_used_at: new Date().toISOString(),
+          })
+          .eq('id', ipData.id)
+      }
 
       return NextResponse.json({
         messages,
