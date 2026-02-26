@@ -195,6 +195,7 @@ export default function AdminConversationsClient() {
           <ConversationHistory
             onReload={(conv) => {
               setResult(conv)
+              setEditableConv(conv.conversation)
               setActiveView('generator')
             }}
           />
