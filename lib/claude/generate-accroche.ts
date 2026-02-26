@@ -53,7 +53,10 @@ export async function analyzeProfileWithVision(
           },
           {
             type: 'text',
-            text: `Analyse ce screenshot. Il peut s'agir soit d'un profil de dating app, soit d'une conversation (DM Instagram, Tinder, Bumble...).
+            text: `Analyse ce screenshot. Il peut s'agir soit d'un profil de dating app, soit d'une conversation (DM Instagram, Tinder, Bumble...), soit d'une story Instagram/Snapchat.
+
+⚠️ SI C'EST UNE STORY (barre de progression en haut, bouton "Envoyer un message" en bas, interface plein écran) :
+IGNORE TOTALEMENT l'interface de la story : barre de progression, pseudo dans le header, bouton réponse, heure, icônes. Concentre-toi UNIQUEMENT sur la personne, sa pose, son environnement et sa vibe. Traite-la exactement comme si tu analysais une photo seule.
 
 Si c'est un PROFIL : extrais les infos du profil.
 
@@ -72,10 +75,13 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
   "bio": "dernier(s) message(s) de LA FEMME (gauche) ou bio ou null",
   "interests": ["info visible 1", "info visible 2"],
   "vibe": "résumé du stade : ex 'elle résiste mais intéressée', 'elle a dit j ai un mec', 'conversation bien engagée', 'elle veut du concret', 'elle teste', 'elle est chaude'",
-  "photo_context": "résumé de l échange visible : ce que l utilisateur a dit (droite) et ce que la femme a répondu (gauche)"
+  "photo_context": "ce que la photo révèle sur la personne : son attitude, son environnement, sa vibe générale"
 }
 
-⚠️ RÈGLE POUR photo_context ET interests : décris les objets et éléments visuels de façon GÉNÉRIQUE. Exemple : "miroir" (pas "miroir hexagonal" ou "miroir diamant"), "canapé" (pas "canapé en velours bleu canard"), "voiture" (pas "BMW série 3 grise"). Garde le nom simple et commun, sans préciser la forme, la couleur ou la marque.
+⚠️ RÈGLES ABSOLUES pour photo_context et interests :
+- Objets et décor : GÉNÉRIQUE uniquement. "miroir" (jamais "miroir hexagonal"), "voiture" (jamais "BMW grise"), "canapé" (jamais "canapé en velours").
+- Vêtements : GÉNÉRIQUE uniquement. "tenue décontractée", "robe", "tenue sport" — JAMAIS la couleur ni le type précis ("lingerie verte", "crop top blanc" sont INTERDITS). 
+- Focus sur la VIBE et l'ATTITUDE, pas sur les détails vestimentaires ou la description physique précise.
 
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
           },
