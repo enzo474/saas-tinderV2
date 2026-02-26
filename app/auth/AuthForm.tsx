@@ -10,7 +10,6 @@ type AuthMode = 'signup' | 'login'
 export function AuthForm() {
   const [mode, setMode]           = useState<AuthMode>('signup')
   const [error, setError]         = useState<string | null>(null)
-  const [success, setSuccess]     = useState<string | null>(null)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [showPassword, setShowPassword]   = useState(false)
   const [isPending, startTransition]      = useTransition()
@@ -36,7 +35,6 @@ export function AuthForm() {
   const handleEmailSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setError(null)
-    setSuccess(null)
     const formData = new FormData(e.currentTarget)
 
     startTransition(async () => {
@@ -44,8 +42,6 @@ export function AuthForm() {
       const result = await action(formData)
       if (result?.error) {
         setError(result.error)
-      } else if (mode === 'signup') {
-        setSuccess('Compte créé ! Vérifie ton email pour confirmer ton inscription.')
       }
     })
   }
@@ -91,7 +87,7 @@ export function AuthForm() {
             </h1>
             <p className="text-sm" style={{ color: '#9da3af' }}>
               {mode === 'signup'
-                ? <>Inscription gratuite · <strong className="text-white">5 crédits offerts</strong></>
+                ? <>Inscription gratuite · <strong className="text-white">1 accroche offerte</strong></>
                 : 'Connecte-toi pour accéder à tes outils'}
             </p>
           </div>
@@ -100,11 +96,6 @@ export function AuthForm() {
           {error && (
             <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(230,57,70,0.1)', border: '1px solid rgba(230,57,70,0.3)' }}>
               <p className="text-sm" style={{ color: '#f87171' }}>{error}</p>
-            </div>
-          )}
-          {success && (
-            <div className="mb-4 p-3 rounded-xl" style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)' }}>
-              <p className="text-sm" style={{ color: '#4ade80' }}>{success}</p>
             </div>
           )}
 
@@ -180,7 +171,7 @@ export function AuthForm() {
           <p className="text-center text-sm" style={{ color: '#6b7280' }}>
             {mode === 'signup' ? 'Déjà un compte ?' : 'Pas encore de compte ?'}{' '}
             <button
-              onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(null); setSuccess(null) }}
+              onClick={() => { setMode(mode === 'signup' ? 'login' : 'signup'); setError(null) }}
               className="font-semibold transition-colors hover:text-white"
               style={{ color: '#9da3af' }}
             >
@@ -193,7 +184,7 @@ export function AuthForm() {
             <div className="mt-5 pt-5 border-t space-y-2.5" style={{ borderColor: '#1F1F1F' }}>
               {[
                 'Pas de carte bancaire requise',
-                '5 crédits offerts = 1 génération gratuite',
+                '1 accroche ou réponse gratuite offerte',
                 'Inscription en 30 secondes',
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center gap-3">

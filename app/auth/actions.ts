@@ -43,14 +43,7 @@ export async function signUpWithEmail(formData: FormData) {
     } catch { /* non-bloquant */ }
   }
 
-  // Si Supabase nécessite une confirmation email, on ne redirige pas automatiquement
-  // (le AuthForm affiche un message de succès)
-  // Si la session est immédiatement créée (email confirmation désactivée), on redirige
-  if (data.session) {
-    redirect('/game/accroche')
-  }
-
-  return {}
+  redirect('/game/accroche')
 }
 
 export async function signInWithGoogle() {
