@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
-// Mettre à true quand la vidéo Tella est prête
-const SHOW_VIDEO_INTRO = false
-const TELLA_VIDEO_URL = '' // Ex: "https://www.tella.tv/video/xxx/embed"
+const SHOW_VIDEO_INTRO = true
+const VIDEO_SRC = '/unboard_video.mp4'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
@@ -97,6 +96,102 @@ interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
+// ─── Composant lecteur vidéo intro ───────────────────────────────────────────
+function VideoIntro({ onFinish }: { onFinish: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [muted, setMuted] = useState(false)
+  const [tapToPlay, setTapToPlay] = useState(false)
+
+  useEffect(() => {
+    const v = videoRef.current
+    if (!v) return
+    // Tentative 1 : autoplay avec son
+    v.muted = false
+    v.play().catch(() => {
+      // iOS bloque le son sans interaction — on repart en muted
+      v.muted = true
+      setMuted(true)
+      v.play().catch(() => setTapToPlay(true))
+    })
+  }, [])
+
+  const handleTap = () => {
+    const v = videoRef.current
+    if (!v) return
+    setTapToPlay(false)
+    v.muted = false
+    setMuted(false)
+    v.play().catch(() => {})
+  }
+
+  const toggleMute = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.muted = !v.muted
+    setMuted(v.muted)
+  }
+
+  return (
+    <div
+      className="min-h-screen flex flex-col items-center justify-center"
+      style={{ background: '#000', position: 'relative' }}
+      onClick={tapToPlay ? handleTap : undefined}
+    >
+      <video
+        ref={videoRef}
+        src={VIDEO_SRC}
+        loop
+        playsInline
+        className="w-full h-full"
+        style={{ maxHeight: '100dvh', objectFit: 'contain', display: 'block' }}
+      />
+
+      {/* Overlay tap-to-play (iOS uniquement si tout autoplay bloqué) */}
+      {tapToPlay && (
+        <div
+          className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer"
+          style={{ background: 'rgba(0,0,0,0.7)' }}
+        >
+          <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.4)' }}>
+            <span style={{ fontSize: 32 }}>▶</span>
+          </div>
+          <p className="text-white text-sm font-medium">Appuie pour lancer la vidéo</p>
+        </div>
+      )}
+
+      {/* Boutons en bas */}
+      <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-3 px-6">
+        {/* Toggle son */}
+        {!tapToPlay && (
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleMute() }}
+            className="px-4 py-2 rounded-full text-sm font-medium"
+            style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
+          >
+            {muted ? '🔇 Activer le son' : '🔊 Son activé'}
+          </button>
+        )}
+
+        <button
+          onClick={(e) => { e.stopPropagation(); onFinish() }}
+          className="w-full max-w-sm py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
+          style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+        >
+          Commencer →
+        </button>
+
+        <button
+          onClick={(e) => { e.stopPropagation(); onFinish() }}
+          className="text-sm transition-colors"
+          style={{ color: 'rgba(255,255,255,0.4)' }}
+        >
+          Passer la vidéo
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingProps) {
   const router = useRouter()
 
@@ -179,47 +274,12 @@ export function WelcomeOnboarding({ redirectTo = '/auth' }: WelcomeOnboardingPro
     router.push(redirectTo)
   }
 
-  // ─── Page vidéo intro (masquée tant que SHOW_VIDEO_INTRO = false) ────────────
+  // ─── Page vidéo intro ────────────────────────────────────────────────────────
   if (showVideo) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0A0A0A' }}>
-        <div className="w-full max-w-md rounded-3xl p-7 flex flex-col items-center gap-6" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
-          <span className="font-montserrat font-extrabold text-lg" style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            Crushmaxxing
-          </span>
-
-          <div className="w-full rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9', background: '#000' }}>
-            {TELLA_VIDEO_URL ? (
-              <iframe
-                src={TELLA_VIDEO_URL}
-                className="w-full h-full"
-                allow="autoplay; fullscreen"
-                style={{ border: 'none' }}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center" style={{ color: '#6b7280', fontSize: 14 }}>
-                Vidéo bientôt disponible
-              </div>
-            )}
-          </div>
-
-          <button
-            onClick={() => { trackEvent('onboarding_video_viewed', { duration: 0 }); setShowVideo(false) }}
-            className="w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #FF8C42, #E67A35)' }}
-          >
-            Commencer →
-          </button>
-
-          <button
-            onClick={() => setShowVideo(false)}
-            className="text-sm transition-colors"
-            style={{ color: '#6b7280' }}
-          >
-            Passer la vidéo
-          </button>
-        </div>
-      </div>
+      <VideoIntro
+        onFinish={() => { trackEvent('onboarding_video_viewed', { duration: 0 }); setShowVideo(false) }}
+      />
     )
   }
 
