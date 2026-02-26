@@ -294,6 +294,58 @@ LUI : et j'espère y'a un oreiller pour moi
 ELLE : mdrrr le mec est exigent en plus
 ELLE : viens mais t'auras pas d'oreiller.
 
+— CONV C : QUESTION QUOTIDIENNE → DATE FULGURANT —
+LUI : tu ronfles ?
+ELLE : hein ? pourquoi tu me demandes ça ?
+LUI : faut que je sache si je ramène des boules Quies
+ELLE : mdr t'abuses. et si c'est toi qui ronfles ?
+LUI : impossible, je dors comme un ange
+ELLE : je te crois moyen sur ça
+LUI : ok on verra ce soir alors
+ELLE : ah ouais ? tu t'invites carrément
+LUI : j'aime pas perdre de temps
+ELLE : au moins t'es honnête
+LUI : et j'espère que ton lit est confortable
+ELLE : viens tester par toi-même
+
+— CONV D : TRASH DIRECT SUR LA TENUE → DATE IMMÉDIAT —
+LUI : t'as mis un boxer ou un string sous ta robe ?
+ELLE : c'est comme ça que tu dragues ? 😂 j'ai jamais vu ça
+LUI : faut bien tester de nouvelles approches, non ?
+ELLE : mdr continue sur ta lancée, je suis curieuse
+LUI : fais gaffe si j'innove trop tu vas plus pouvoir te passer de moi
+ELLE : mdr t'es qui pour dire ça toi ?
+LUI : juste un mec qui t'invite à dîner ce soir 19h. ça te va ?
+ELLE : j'avoue j'aime bien les mecs qui ont du culot
+LUI : parfait. je réserve. mais viens pas avec un boxer hein
+ELLE : t'inquiète, je gère
+
+— CONV E : PUSH-PULL INTENSE + "LAISSE-MOI ÊTRE TA PROCHAINE ERREUR" —
+LUI : tu m'hypnotises
+ELLE : merci
+LUI : comment t'es parfaite
+ELLE : j'imagine que je dois remercier mes parents pour ça
+LUI : oh je le ferai bien avant de leur demander leur bénédiction
+ELLE : leur bénédiction ?
+LUI : pour devenir ton mari légalement pour toujours
+ELLE : 😭😭 j'ai un copain
+LUI : ouais il doit dégager. je suis pas branché trio. l'univers a déjà décidé notre destin. mdr
+ELLE : OMG désolée j'ai pas fait exprès [appel accidentel]
+LUI : c'est pas grave. ce coup de fil en dit plus que mille mots
+ELLE : non c'était vraiment un accident
+LUI : hmm. tes doigts ont glissé, mais pas ton cœur
+ELLE : tu penses vraiment que ça veut dire quelque chose ?
+LUI : non. mais je pense qu'une partie de toi voulait que ce soit le cas
+ELLE : tu sais pas ce que je veux
+LUI : pas encore. mais je compte bien le découvrir
+ELLE : bonne chance alors
+LUI : si t'étais vraiment pas intéressée, on serait pas encore en train de parler
+ELLE : tu pètes plus haut que ton cul
+LUI : peut-être. mais au moins je mens pas
+ELLE : laisse-moi être ta prochaine erreur
+LUI : me tente pas, sérieux
+ELLE : et si j'étais pas en train de te tenter ? et si je te donnais juste ce que tu voulais au fond ?
+
 ═══════════════════════════════════════
 PATTERNS EXTRAITS DE CES CONVERSATIONS
 ═══════════════════════════════════════
@@ -325,6 +377,25 @@ PATTERN 5 — LANGAGE JEUNE AUTHENTIQUE À UTILISER :
 → "euh pourquoi", "nan mais attends", "j'avoue", "le mec est exigent en plus"
 → "j'admets", "vive d'esprit" (légère élévation du registre ponctuellement pour contraste)
 → "je comprends même pas pourquoi je réponds"
+
+PATTERN 6 — ACCROCHE QUOTIDIENNE PRÉSUPPOSITIONNELLE :
+→ "tu ronfles ?" / "tu dors de quel côté ?" → présuppose une intimité future sans jamais la demander
+→ Quand elle questionne → JAMAIS de justification, redirect immédiat : "ok mais du coup t'as pas répondu"
+→ Elle entre dans le jeu → escalade assumée : "parfait j'arrive" / "j'espère que ton lit est confortable"
+→ Le registre est décontracté, jamais lourd — ça fait sourire tout en installant l'idée
+
+PATTERN 7 — TRASH DIRECT SUR LA TENUE/STORY + DATE IMMÉDIAT :
+→ "t'as mis un boxer ou un string sous ta robe ?" — osé, basé sur ce qui est visible, jamais agressif
+→ Quand elle questionne la technique : "faut bien tester de nouvelles approches, non ?"
+→ Enchaîner rapidement sur un date avec heure et lieu précis (pas "t'es libre quand ?", mais "ce soir 19h")
+→ Callback à la fin sur le même sujet pour la cohérence (boxer/string) — rend la fin virale
+
+PATTERN 8 — PUSH-PULL + "LAISSE-MOI ÊTRE TA PROCHAINE ERREUR" :
+→ "me tente pas" → "et si j'étais pas en train de te tenter ? et si je te donnais juste ce que tu voulais au fond ?"
+→ "laisse-moi être ta prochaine erreur" — pour quand elle résiste mais continue de parler
+→ Reframer un accident (appel raté, message non voulu) en signe du destin : "tes doigts ont glissé, mais pas ton cœur"
+→ "si t'étais vraiment pas intéressée, on serait pas encore en train de parler" — quand elle dit vouloir arrêter mais répond
+→ La tension push-pull est ce qui crée l'addiction à la conv pour le viewer
 
 ═══════════════════════════════════════
 COMPORTEMENT DE "elle" — PROFIL ACTIF : ${femaleProfile.name.toUpperCase()}
