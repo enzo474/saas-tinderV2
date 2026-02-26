@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 const SHOW_VIDEO_INTRO = true
-const VIDEO_SRC = '/unboard_video.mp4'
+const TELLA_EMBED_URL = 'https://www.tella.tv/video/enzos-video-57k5/embed?autoplay=1&loop=1&muted=0'
 
 type QuestionType = 'single' | 'multiple' | 'text'
 
@@ -96,84 +96,30 @@ interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
-// ─── Composant lecteur vidéo intro ───────────────────────────────────────────
+// ─── Composant lecteur vidéo intro (Tella embed) ─────────────────────────────
 function VideoIntro({ onFinish }: { onFinish: () => void }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [muted, setMuted] = useState(false)
-  const [tapToPlay, setTapToPlay] = useState(false)
-
-  useEffect(() => {
-    const v = videoRef.current
-    if (!v) return
-    // Tentative 1 : autoplay avec son
-    v.muted = false
-    v.play().catch(() => {
-      // iOS bloque le son sans interaction — on repart en muted
-      v.muted = true
-      setMuted(true)
-      v.play().catch(() => setTapToPlay(true))
-    })
-  }, [])
-
-  const handleTap = () => {
-    const v = videoRef.current
-    if (!v) return
-    setTapToPlay(false)
-    v.muted = false
-    setMuted(false)
-    v.play().catch(() => {})
-  }
-
-  const toggleMute = () => {
-    const v = videoRef.current
-    if (!v) return
-    v.muted = !v.muted
-    setMuted(v.muted)
-  }
-
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center"
       style={{ background: '#000', position: 'relative' }}
-      onClick={tapToPlay ? handleTap : undefined}
     >
-      <video
-        ref={videoRef}
-        src={VIDEO_SRC}
-        loop
-        playsInline
-        className="w-full h-full"
-        style={{ maxHeight: '100dvh', objectFit: 'contain', display: 'block' }}
-      />
-
-      {/* Overlay tap-to-play (iOS uniquement si tout autoplay bloqué) */}
-      {tapToPlay && (
-        <div
-          className="absolute inset-0 flex flex-col items-center justify-center gap-4 cursor-pointer"
-          style={{ background: 'rgba(0,0,0,0.7)' }}
-        >
-          <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.15)', border: '2px solid rgba(255,255,255,0.4)' }}>
-            <span style={{ fontSize: 32 }}>▶</span>
-          </div>
-          <p className="text-white text-sm font-medium">Appuie pour lancer la vidéo</p>
-        </div>
-      )}
+      {/* Iframe Tella plein écran */}
+      <div className="w-full flex-1" style={{ position: 'relative', paddingTop: '177.78%' /* 9/16 portrait */ }}>
+        <iframe
+          src={TELLA_EMBED_URL}
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          style={{
+            position: 'absolute', top: 0, left: 0,
+            width: '100%', height: '100%', border: 'none',
+          }}
+        />
+      </div>
 
       {/* Boutons en bas */}
-      <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-3 px-6">
-        {/* Toggle son */}
-        {!tapToPlay && (
-          <button
-            onClick={(e) => { e.stopPropagation(); toggleMute() }}
-            className="px-4 py-2 rounded-full text-sm font-medium"
-            style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', border: '1px solid rgba(255,255,255,0.2)' }}
-          >
-            {muted ? '🔇 Activer le son' : '🔊 Son activé'}
-          </button>
-        )}
-
+      <div className="w-full flex flex-col items-center gap-3 px-6 py-6" style={{ background: '#000' }}>
         <button
-          onClick={(e) => { e.stopPropagation(); onFinish() }}
+          onClick={onFinish}
           className="w-full max-w-sm py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
           style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
@@ -181,7 +127,7 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         </button>
 
         <button
-          onClick={(e) => { e.stopPropagation(); onFinish() }}
+          onClick={onFinish}
           className="text-sm transition-colors"
           style={{ color: 'rgba(255,255,255,0.4)' }}
         >
