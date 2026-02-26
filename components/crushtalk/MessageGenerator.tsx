@@ -22,7 +22,13 @@ const TONES = [
   { label: 'Mystérieux', description: null },
   { label: 'Compliment', description: null },
   { label: 'CrushTalk', description: 'Adapté par l\'IA' },
+  { label: 'Mon Ton', description: 'Selon ton profil' },
 ]
+
+interface OnboardingProfile {
+  style?: string   // Q3 : direct | drole | mysterieux | compliment
+  approach?: string // Q4 : subtiles | directes
+}
 
 const CREDITS_PER_GENERATION = 5
 
@@ -114,6 +120,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(false)
+  const [onboardingProfile, setOnboardingProfile] = useState<OnboardingProfile | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const isUnlimited = subscriptionType === 'charo' || subscriptionType === 'chill'
@@ -125,6 +132,20 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       setShowWelcomeBanner(true)
     }
   }, [searchParams])
+
+  // Lire les réponses de l'onboarding depuis localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('game_onboarding')
+      if (raw) {
+        const answers = JSON.parse(raw)
+        setOnboardingProfile({
+          style: answers['2'] ?? undefined,    // Q3 : style préféré
+          approach: answers['3'] ?? undefined, // Q4 : type d'accroche
+        })
+      }
+    } catch { /* ignore */ }
+  }, [])
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -176,6 +197,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           messageType: activeType,
           selectedTones: [selectedTone],
           previousMessages: previousMessages.length > 0 ? previousMessages : undefined,
+          onboardingProfile: selectedTone === 'Mon Ton' ? onboardingProfile : undefined,
         }),
       })
 
@@ -361,14 +383,24 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                 )
               })}
 
-              {/* CrushTalk — pleine largeur en bas */}
-              {(() => {
-                const isActive = selectedTone === 'CrushTalk'
+              {/* CrushTalk + Mon Ton — côte à côte en bas */}
+              {(['CrushTalk', 'Mon Ton'] as const).map((toneName) => {
+                const isActive = selectedTone === toneName
+                const isCrushTalk = toneName === 'CrushTalk'
+                const isMonTon = toneName === 'Mon Ton'
+                const hasProfile = !!onboardingProfile?.style || !!onboardingProfile?.approach
+                const disabled = isMonTon && !hasProfile
                 return (
                   <button
-                    onClick={() => selectTone('CrushTalk')}
-                    className="col-span-2 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                    style={isActive ? {
+                    key={toneName}
+                    onClick={() => !disabled && selectTone(toneName)}
+                    className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
+                    style={disabled ? {
+                      borderColor: '#1F1F1F',
+                      color: '#444',
+                      cursor: 'not-allowed',
+                      opacity: 0.5,
+                    } : isActive ? {
                       borderColor: '#E63946',
                       background: 'rgba(230,57,70,0.1)',
                       color: '#fff',
@@ -377,13 +409,13 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                       color: '#9da3af',
                     }}
                   >
-                    <span>CrushTalk</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
-                      Adapté par l&apos;IA
+                    <span>{toneName}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
+                      {isCrushTalk ? 'Adapté par l\'IA' : disabled ? 'Fais l\'onboarding' : 'Ton profil'}
                     </span>
                   </button>
                 )
-              })()}
+              })}
             </div>
           </div>
 

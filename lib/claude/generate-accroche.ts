@@ -25,6 +25,40 @@ const TONES_CONFIG: Record<string, { emoji: string; label: string }> = {
   Mystérieux: { emoji: '🌙', label: 'Mystérieux' },
   Compliment: { emoji: '⚡', label: 'Compliment' },
   CrushTalk: { emoji: '🔥', label: 'CrushTalk' },
+  'Mon Ton': { emoji: '🎭', label: 'Mon Ton' },
+}
+
+interface OnboardingProfile {
+  style?: string    // Q3 : direct | drole | mysterieux | compliment
+  approach?: string // Q4 : subtiles | directes
+}
+
+const STYLE_INSTRUCTIONS: Record<string, string> = {
+  direct:     'ton direct, franc, sans détour — il va droit au but',
+  drole:      'humour décalé, légèreté, réplique qui fait sourire malgré soi',
+  mysterieux: 'intrigue, laisse une question en suspens, elle doit vouloir en savoir plus',
+  compliment: 'valorise un détail précis avec une pointe — jamais banal, toujours inattendu',
+}
+
+const APPROACH_INSTRUCTIONS: Record<string, string> = {
+  subtiles:  'finesse et indirection — le sous-entendu fait le travail, pas l\'explicite',
+  directes:  'cash et assumé — il dit ce qu\'il pense sans s\'excuser',
+}
+
+function buildMonTonInstruction(profile: OnboardingProfile): string {
+  const styleInstr = profile.style ? STYLE_INSTRUCTIONS[profile.style] : null
+  const approachInstr = profile.approach ? APPROACH_INSTRUCTIONS[profile.approach] : null
+
+  if (!styleInstr && !approachInstr) return ''
+
+  const lines = [
+    'PROFIL DE L\'UTILISATEUR — "Mon Ton" activé :',
+    styleInstr    ? `- Style naturel : ${styleInstr}` : null,
+    approachInstr ? `- Type d\'accroche : ${approachInstr}` : null,
+    '→ Adapte le message pour coller à ce style. Ne mentionne pas ces préférences explicitement — elles doivent transparaître naturellement dans le ton et la formulation.',
+  ].filter(Boolean).join('\n')
+
+  return `\n\n${lines}`
 }
 
 const ALL_TONES = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushTalk']
@@ -116,7 +150,8 @@ export async function generateMessages(
   messageType: 'accroche' | 'reponse',
   selectedTones: string[],
   contextMessage?: string,
-  previousMessages: string[] = []
+  previousMessages: string[] = [],
+  onboardingProfile: OnboardingProfile | null = null
 ): Promise<GeneratedMessage[]> {
   const tonesRequest = selectedTones.length > 0 ? selectedTones : ALL_TONES
 
@@ -225,7 +260,7 @@ Ce n'est pas une réponse générique — c'est LA réponse parfaite pour CETTE 
 
 INSPIRATION MAXIMALE : Colle au maximum au style des exemples fournis dans les 10 principes.
 Ces exemples ne sont pas des modèles à copier mot pour mot, mais le registre exact à reproduire :
-court, sûr, sans justification, qui avance toujours vers le réel.${previousMessages.length > 0 ? `
+court, sûr, sans justification, qui avance toujours vers le réel.${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — RÉPONSES DÉJÀ PROPOSÉES À L'UTILISATEUR (à NE PAS répéter) :
 ${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
@@ -272,7 +307,7 @@ RÈGLES ABSOLUES :
 - Longueur : 1 à 2 phrases max
 - Pas de "Salut", pas de "Coucou", pas de "Bonjour"
 - Pas d'emojis en excès (max 1 par message)
-- Reste naturel, comme si un homme très confiant écrivait spontanément${previousMessages.length > 0 ? `
+- Reste naturel, comme si un homme très confiant écrivait spontanément${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS À L'UTILISATEUR (à NE PAS répéter) :
 ${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
