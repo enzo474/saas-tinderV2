@@ -1,12 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
-type QuestionType = 'single' | 'multiple' | 'slider' | 'text'
+// Mettre à true quand la vidéo Tella est prête
+const SHOW_VIDEO_INTRO = false
+const TELLA_VIDEO_URL = '' // Ex: "https://www.tella.tv/video/xxx/embed"
+
+type QuestionType = 'single' | 'multiple' | 'text'
 
 interface Option {
-  icon?: string
   label: string
   value: string
 }
@@ -17,88 +20,78 @@ interface Question {
   subtitle?: string
   type: QuestionType
   options?: Option[]
-  leftLabel?: string
-  rightLabel?: string
   placeholder?: string
+  maxLength?: number
 }
 
 const QUESTIONS: Question[] = [
   {
     id: 1,
-    question: "Comment as-tu connu l'app ?",
-    type: 'single',
-    options: [
-      { label: 'TikTok',              value: 'tiktok'    },
-      { label: 'Instagram',           value: 'instagram' },
-      { label: 'YouTube',             value: 'youtube'   },
-      { label: 'Amis',                value: 'amis'      },
-      { label: 'Recherche App Store', value: 'app_store' },
-    ],
-  },
-  {
-    id: 2,
     question: 'Quels sont tes objectifs ?',
     subtitle: 'Crushmaxxing sera personnalisé en fonction de tes objectifs',
     type: 'multiple',
     options: [
-      { label: 'Découvrir de nouvelles disquettes',   value: 'disquettes' },
+      { label: 'Découvrir de nouvelles disquettes',  value: 'disquettes' },
       { label: 'Engager la conversation facilement',  value: 'engager'    },
-      { label: 'Tchatcher mon pain',                  value: 'tchatcher'  },
-      { label: 'Avoir plus de dates',                 value: 'dates'      },
+      { label: 'Chatter mon pain',                   value: 'tchatcher'  },
+      { label: 'Avoir plus de dates',                value: 'dates'      },
+    ],
+  },
+  {
+    id: 2,
+    question: 'Quel est ton plus gros problème ?',
+    type: 'single',
+    options: [
+      { label: 'Je sais pas quoi dire en premier message', value: 'no_opener'  },
+      { label: 'Mes messages restent sans réponse',        value: 'no_reply'   },
+      { label: 'Je stresse et j\'envoie rien',             value: 'stress'     },
+      { label: 'Je copie-colle partout le même truc',      value: 'copypaste'  },
     ],
   },
   {
     id: 3,
-    question: 'Quel est ton genre ?',
-    subtitle: 'Tes réponses seront adaptées en fonction de ton genre',
+    question: 'Ton style de messages préféré ?',
     type: 'single',
     options: [
-      { label: 'Homme',  value: 'homme'  },
-      { label: 'Femme',  value: 'femme'  },
-      { label: 'Neutre', value: 'neutre' },
+      { label: '🎯 Direct (va droit au but)',        value: 'direct'     },
+      { label: '😂 Drôle (humour et blagues)',       value: 'drole'      },
+      { label: '🌙 Mystérieux (intrigue)',           value: 'mysterieux' },
+      { label: '⚡ Compliment (flatteur mais classe)', value: 'compliment' },
     ],
   },
   {
     id: 4,
-    question: 'Quel est ton âge ?',
+    question: 'Tes accroches sont plutôt...',
     type: 'single',
     options: [
-      { label: 'Moins de 20', value: '<20'   },
-      { label: '20–24',       value: '20-24' },
-      { label: '25–34',       value: '25-34' },
-      { label: '35–44',       value: '35-44' },
-      { label: '45+',         value: '45+'   },
+      { label: 'Subtiles (finesse et indirection)', value: 'subtiles'  },
+      { label: 'Directes (cash et assumées)',        value: 'directes'  },
     ],
   },
   {
     id: 5,
-    question: 'Tu préfères être plutôt...',
-    type: 'slider',
-    leftLabel: 'Sérieux',
-    rightLabel: 'Tchatcheur',
-  },
-  {
-    id: 6,
-    question: 'Tes approches sont plutôt...',
-    type: 'slider',
-    leftLabel: 'Subtiles',
-    rightLabel: 'Directes',
-  },
-  {
-    id: 7,
-    question: 'Ton humour est...',
-    type: 'slider',
-    leftLabel: 'Léger',
-    rightLabel: 'Sarcastique',
-  },
-  {
-    id: 8,
     question: 'Choisis ton pseudo',
     subtitle: 'Il sera affiché dans ton espace personnel',
     type: 'text',
-    placeholder: 'Ex: Alpha_Leo, DarkHumor99...',
+    placeholder: 'Ton pseudo...',
+    maxLength: 20,
   },
 ]
+
+const SUCCESS_MESSAGES: Record<string, string> = {
+  no_opener: "On va t'écrire des accroches qui font réagir à tous les coups ! 🔥",
+  no_reply:  "Fini les messages ignorés ! On génère des accroches qui font répondre ! 💬",
+  stress:    "T'inquiète, on fait le taf à ta place. Plus de stress, juste des résultats ! 💪",
+  copypaste: "Fini le copier-coller ! Chaque message sera personnalisé selon son profil ! 🎯",
+}
+
+function trackEvent(event: string, data: Record<string, unknown> = {}) {
+  fetch('/api/tracking/event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ event, data }),
+  }).catch(() => {})
+}
 
 interface WelcomeOnboardingProps {
   redirectTo?: string
@@ -106,10 +99,27 @@ interface WelcomeOnboardingProps {
 
 export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnboardingProps) {
   const router = useRouter()
-  const [step, setStep] = useState(0)
-  const [answers, setAnswers] = useState<Record<number, string | string[]>>({})
-  const [sliderVal, setSliderVal] = useState(50)
-  const [textVal, setTextVal] = useState('')
+
+  // showVideo = true uniquement si SHOW_VIDEO_INTRO est activé
+  const [showVideo, setShowVideo]     = useState(SHOW_VIDEO_INTRO)
+  const [step, setStep]               = useState(0)
+  const [answers, setAnswers]         = useState<Record<number, string | string[]>>({})
+  const [textVal, setTextVal]         = useState('')
+  const [showSuccess, setShowSuccess] = useState(false)
+  const trackedSteps                  = useRef<Set<number>>(new Set())
+
+  // Track onboarding_started au premier render
+  useEffect(() => {
+    trackEvent('onboarding_started')
+  }, [])
+
+  // Track chaque nouvelle question affichée
+  useEffect(() => {
+    if (showVideo || showSuccess) return
+    if (trackedSteps.current.has(step)) return
+    trackedSteps.current.add(step)
+    trackEvent(`onboarding_question_${step + 1}_viewed`)
+  }, [step, showVideo, showSuccess])
 
   const q = QUESTIONS[step]
   const progress = ((step + 1) / QUESTIONS.length) * 100
@@ -117,9 +127,7 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
 
   const currentAnswer = answers[step]
   const canProceed =
-    q.type === 'slider'
-      ? true
-      : q.type === 'text'
+    q.type === 'text'
       ? textVal.trim().length >= 2
       : q.type === 'single'
       ? !!currentAnswer
@@ -146,43 +154,118 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
   }
 
   const handleNext = () => {
-    let updatedAnswers = answers
-
-    if (q.type === 'slider') {
-      updatedAnswers = { ...answers, [step]: String(sliderVal) }
-      setAnswers(updatedAnswers)
-      setSliderVal(50)
-    } else if (q.type === 'text') {
-      updatedAnswers = { ...answers, [step]: textVal.trim() }
-      setAnswers(updatedAnswers)
-    }
+    const finalAnswers = q.type === 'text'
+      ? { ...answers, [step]: textVal.trim() }
+      : answers
 
     if (isLast) {
-      const finalAnswers = q.type === 'slider'
-        ? { ...answers, [step]: String(sliderVal) }
-        : q.type === 'text'
-        ? { ...answers, [step]: textVal.trim() }
-        : answers
-
       try {
         localStorage.setItem('game_onboarding', JSON.stringify(finalAnswers))
-        // Sauvegarder le pseudo séparément pour accès facile
         const pseudo = finalAnswers[QUESTIONS.length - 1] as string
         if (pseudo) localStorage.setItem('crushmaxxing_pseudo', pseudo)
       } catch { /* ignore */ }
 
-      router.push(redirectTo)
+      trackEvent('onboarding_completed')
+      setAnswers(finalAnswers)
+      setShowSuccess(true)
     } else {
+      if (q.type === 'text') setAnswers(finalAnswers)
       setTextVal('')
       setStep((s) => s + 1)
     }
   }
 
+  const handleGoToDashboard = () => {
+    router.push(redirectTo)
+  }
+
+  // ─── Page vidéo intro (masquée tant que SHOW_VIDEO_INTRO = false) ────────────
+  if (showVideo) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0A0A0A' }}>
+        <div className="w-full max-w-md rounded-3xl p-7 flex flex-col items-center gap-6" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
+          <span className="font-montserrat font-extrabold text-lg" style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            Crushmaxxing
+          </span>
+
+          <div className="w-full rounded-2xl overflow-hidden" style={{ aspectRatio: '16/9', background: '#000' }}>
+            {TELLA_VIDEO_URL ? (
+              <iframe
+                src={TELLA_VIDEO_URL}
+                className="w-full h-full"
+                allow="autoplay; fullscreen"
+                style={{ border: 'none' }}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center" style={{ color: '#6b7280', fontSize: 14 }}>
+                Vidéo bientôt disponible
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={() => { trackEvent('onboarding_video_viewed', { duration: 0 }); setShowVideo(false) }}
+            className="w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #FF8C42, #E67A35)' }}
+          >
+            Commencer →
+          </button>
+
+          <button
+            onClick={() => setShowVideo(false)}
+            className="text-sm transition-colors"
+            style={{ color: '#6b7280' }}
+          >
+            Passer la vidéo
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Page de succès finale ────────────────────────────────────────────────────
+  if (showSuccess) {
+    const problem = answers[1] as string
+    const successMessage = SUCCESS_MESSAGES[problem] ?? "CrushTalk va t'aider à transformer tes matchs en dates ! 🚀"
+    const pseudo = (answers[QUESTIONS.length - 1] as string) || ''
+
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4" style={{ background: '#0A0A0A' }}>
+        <div className="w-full max-w-md rounded-3xl p-7 flex flex-col items-center gap-6 text-center" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
+          <span className="font-montserrat font-extrabold text-lg" style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+            Crushmaxxing
+          </span>
+
+          <div className="flex flex-col items-center gap-3">
+            <div className="text-4xl">🎯</div>
+            {pseudo && (
+              <p className="text-sm font-medium" style={{ color: '#9da3af' }}>
+                Bienvenue, <span className="text-white font-bold">{pseudo}</span> !
+              </p>
+            )}
+            <h2 className="font-montserrat text-xl font-bold text-white leading-snug">
+              {successMessage}
+            </h2>
+            <p className="text-sm" style={{ color: '#9da3af' }}>
+              Ton profil est prêt. Lance ta première accroche gratuite maintenant.
+            </p>
+          </div>
+
+          <button
+            onClick={handleGoToDashboard}
+            className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
+          >
+            Générer ma 1ère accroche gratuitement →
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ─── Questions ───────────────────────────────────────────────────────────────
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: '#0A0A0A' }}
-    >
+    <div className="min-h-screen flex flex-col" style={{ background: '#0A0A0A' }}>
       {/* Progress bar */}
       <div className="w-full h-1.5" style={{ background: '#1A1A1A' }}>
         <div
@@ -194,12 +277,8 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
         />
       </div>
 
-      {/* Content */}
       <div className="flex-1 flex items-center justify-center p-4 py-8">
-        <div
-          className="w-full max-w-md rounded-3xl p-7"
-          style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}
-        >
+        <div className="w-full max-w-md rounded-3xl p-7" style={{ background: '#1A1A1A', border: '1px solid #2A2A2A' }}>
           {/* Logo */}
           <div className="text-center mb-5">
             <span
@@ -230,34 +309,15 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
             )}
           </div>
 
-          {/* Options / Slider / Text */}
-          {q.type === 'slider' ? (
-            <div className="py-2 mb-7">
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={sliderVal}
-                onChange={(e) => setSliderVal(Number(e.target.value))}
-                className="w-full h-2 rounded-full appearance-none cursor-pointer mb-3"
-                style={{
-                  background: `linear-gradient(to right, #E63946 ${sliderVal}%, #2A2A2A ${sliderVal}%)`,
-                  accentColor: '#E63946',
-                }}
-              />
-              <div className="flex justify-between text-sm font-medium" style={{ color: '#9da3af' }}>
-                <span>{q.leftLabel}</span>
-                <span>{q.rightLabel}</span>
-              </div>
-            </div>
-          ) : q.type === 'text' ? (
+          {/* Options ou champ texte */}
+          {q.type === 'text' ? (
             <div className="mb-7">
               <input
                 type="text"
                 value={textVal}
                 onChange={(e) => setTextVal(e.target.value)}
                 placeholder={q.placeholder}
-                maxLength={30}
+                maxLength={q.maxLength ?? 20}
                 className="w-full p-4 rounded-xl border-2 text-white font-medium text-sm transition-all outline-none"
                 style={{
                   borderColor: textVal.trim().length >= 2 ? '#E63946' : '#2A2A2A',
@@ -269,7 +329,7 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
                 }}
               />
               <p className="text-xs mt-2 text-right" style={{ color: '#6b7280' }}>
-                {textVal.length}/30
+                {textVal.length}/{q.maxLength ?? 20}
               </p>
             </div>
           ) : (
@@ -301,7 +361,7 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
             className="w-full py-4 rounded-2xl text-white font-semibold text-base transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
             style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
           >
-            {isLast ? 'Commencer →' : 'Suivant →'}
+            {isLast ? 'Terminer →' : 'Suivant →'}
           </button>
 
           {/* Back */}
@@ -314,7 +374,6 @@ export function WelcomeOnboarding({ redirectTo = '/game/accroche' }: WelcomeOnbo
               ← Retour
             </button>
           )}
-
         </div>
       </div>
     </div>
