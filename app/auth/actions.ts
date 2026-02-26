@@ -23,10 +23,14 @@ export async function signUpWithEmail(formData: FormData) {
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) return { error: error.message }
 
-  // Créer les 5 crédits de bienvenue pour le nouveau compte
   if (data.user) {
     try {
       const admin = createServiceRoleClient()
+
+      // Forcer la confirmation email pour éviter le blocage de session
+      await admin.auth.admin.updateUserById(data.user.id, { email_confirm: true })
+
+      // Créer les crédits de bienvenue
       const { data: existing } = await admin
         .from('crushtalk_credits')
         .select('user_id')
@@ -41,6 +45,10 @@ export async function signUpWithEmail(formData: FormData) {
         })
       }
     } catch { /* non-bloquant */ }
+
+    // Connecter l'utilisateur immédiatement après inscription
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) return { error: signInError.message }
   }
 
   redirect('/game/accroche')
