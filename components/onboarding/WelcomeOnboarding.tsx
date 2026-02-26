@@ -106,15 +106,21 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
       zIndex: 50,
     }}>
       {/* Iframe Tella — overflow hidden pour rogner le chrome du player */}
-      <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>
+      <div style={{
+        flex: 1, position: 'relative', overflow: 'hidden',
+        margin: '0 12px',
+        borderRadius: 18,
+        border: '2px solid #E63946',
+        boxShadow: '0 0 18px rgba(230,57,70,0.45)',
+      }}>
         <iframe
           src={TELLA_EMBED_URL}
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           style={{
             position: 'absolute',
-            top: '-8%', left: '-8%',
-            width: '116%', height: '116%',
+            top: '-4%', left: '-4%',
+            width: '108%', height: '108%',
             border: 'none',
           }}
         />
