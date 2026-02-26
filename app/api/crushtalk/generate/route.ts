@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Non authentifié', type: 'unauthorized' }, { status: 401 })
     }
 
-    const { imageBase64, mediaType, messageType, selectedTones, contextMessage } = await req.json()
+    const { imageBase64, mediaType, messageType, selectedTones, contextMessage, previousMessages } = await req.json()
 
     if (!imageBase64 || typeof imageBase64 !== 'string') {
       return NextResponse.json({ error: 'Image requise' }, { status: 400 })
@@ -97,7 +97,8 @@ export async function POST(req: NextRequest) {
         profileAnalysis!,
         messageType,
         selectedTones || [],
-        contextMessage
+        contextMessage,
+        previousMessages || []
       )
     } catch (genError: unknown) {
       if (!isUnlimited) {

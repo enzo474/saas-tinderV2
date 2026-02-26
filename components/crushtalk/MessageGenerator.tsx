@@ -91,6 +91,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
+  const [previousMessages, setPreviousMessages] = useState<string[]>([])
   const [credits, setCredits] = useState(initialCredits)
   const [subscriptionType, setSubscriptionType] = useState<string | null>(initialSubscriptionType ?? null)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
@@ -115,6 +116,8 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
     }
     setScreenshot(file)
     setError(null)
+    setPreviousMessages([])
+    setResults(null)
     const url = URL.createObjectURL(file)
     setScreenshotPreview(url)
   }, [])
@@ -155,6 +158,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           mediaType,
           messageType: activeType,
           selectedTones: [selectedTone],
+          previousMessages: previousMessages.length > 0 ? previousMessages : undefined,
         }),
       })
 
@@ -169,6 +173,13 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
         return
       }
 
+      // Accumuler les messages générés pour éviter les répétitions aux prochaines regénérations
+      if (data.messages) {
+        setPreviousMessages(prev => [
+          ...prev,
+          ...data.messages.map((m: GeneratedMessage) => m.content),
+        ])
+      }
       setResults(data.messages)
       if (data.isUnlimited) {
         setSubscriptionType('charo')
@@ -194,6 +205,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
     setScreenshotPreview(null)
     setResults(null)
     setError(null)
+    setPreviousMessages([])
   }
 
   return (

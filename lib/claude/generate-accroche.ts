@@ -114,7 +114,8 @@ export async function generateMessages(
   profileAnalysis: ProfileAnalysis,
   messageType: 'accroche' | 'reponse',
   selectedTones: string[],
-  contextMessage?: string
+  contextMessage?: string,
+  previousMessages: string[] = []
 ): Promise<GeneratedMessage[]> {
   const tonesRequest = selectedTones.length > 0 ? selectedTones : ALL_TONES
 
@@ -223,7 +224,12 @@ Ce n'est pas une réponse générique — c'est LA réponse parfaite pour CETTE 
 
 INSPIRATION MAXIMALE : Colle au maximum au style des exemples fournis dans les 10 principes.
 Ces exemples ne sont pas des modèles à copier mot pour mot, mais le registre exact à reproduire :
-court, sûr, sans justification, qui avance toujours vers le réel.
+court, sûr, sans justification, qui avance toujours vers le réel.${previousMessages.length > 0 ? `
+
+⚠️ RÉGÉNÉRATION — RÉPONSES DÉJÀ PROPOSÉES À L'UTILISATEUR (à NE PAS répéter) :
+${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
+
+Ces réponses n'ont pas convenu. Change complètement de principe parmi les 10 — si la précédente utilisait le reframe, essaie la curiosité ou le contrôle du cadre. Ne reprends pas les mêmes mots ni la même structure.` : ''}
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
@@ -262,7 +268,16 @@ RÈGLES ABSOLUES :
 - Longueur : 1 à 2 phrases max
 - Pas de "Salut", pas de "Coucou", pas de "Bonjour"
 - Pas d'emojis en excès (max 1 par message)
-- Reste naturel, comme si un homme très confiant écrivait spontanément
+- Reste naturel, comme si un homme très confiant écrivait spontanément${previousMessages.length > 0 ? `
+
+⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS À L'UTILISATEUR (à NE PAS répéter) :
+${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
+
+Ces messages n'ont PAS plu. Tu dois impérativement :
+- Changer complètement d'angle d'attaque (si la précédente parlait du miroir, parle de la vibe/du regard/du lieu/de la bio)
+- Changer de registre (si c'était une observation, essaie une question décalée ou une affirmation directe)
+- Ne PAS reprendre les mêmes mots-clés ni la même structure de phrase
+- Surprendre — l'objectif est que cette nouvelle version soit clairement différente des précédentes` : ''}
 
 FORMAT DE RÉPONSE :
 Retourne UNIQUEMENT un JSON valide, tableau de ${tonesRequest.length} objet(s) :
