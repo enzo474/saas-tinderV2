@@ -17,7 +17,7 @@ function toPlainText(conversation: { sender: string; message: string }[]): strin
 export default function AdminConversationsClient() {
   const [activeView, setActiveView] = useState<ActiveView>('generator')
   const [result, setResult] = useState<(GeneratedConversation & { imagePreview: string; storyImagePreview?: string }) | null>(null)
-  const [editableConv, setEditableConv] = useState<{ sender: string; message: string; timestamp: string }[]>([])
+  const [editableConv, setEditableConv] = useState<import('./ConversationGenerator').ConversationMessage[]>([])
   const [copied, setCopied] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
 
