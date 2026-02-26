@@ -96,8 +96,18 @@ interface WelcomeOnboardingProps {
   redirectTo?: string
 }
 
-// ─── Composant lecteur vidéo intro (Tella embed) ─────────────────────────────
+// ─── Composant lecteur vidéo intro ───────────────────────────────────────────
 function VideoIntro({ onFinish }: { onFinish: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [muted, setMuted] = useState(true)
+
+  const toggleSound = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted
+      setMuted(videoRef.current.muted)
+    }
+  }
+
   return (
     <div style={{
       position: 'fixed', inset: 0,
@@ -127,21 +137,38 @@ function VideoIntro({ onFinish }: { onFinish: () => void }) {
         borderRadius: 18,
         border: '2px solid #E63946',
         boxShadow: '0 0 18px rgba(230,57,70,0.45)',
+        background: '#000',
       }}>
         <video
+          ref={videoRef}
           src={VIDEO_URL}
           autoPlay
           loop
           muted
           playsInline
           style={{
-            position: 'absolute',
-            top: 0, left: 0,
             width: '100%', height: '100%',
-            objectFit: 'cover',
+            objectFit: 'contain',
             borderRadius: 16,
+            display: 'block',
           }}
         />
+        {/* Bouton son */}
+        <button
+          onClick={toggleSound}
+          style={{
+            position: 'absolute', bottom: 12, right: 12,
+            width: 38, height: 38, borderRadius: '50%',
+            background: 'rgba(0,0,0,0.6)',
+            border: '1px solid rgba(255,255,255,0.2)',
+            color: '#fff', fontSize: 18,
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
       </div>
 
       {/* Boutons en bas */}
