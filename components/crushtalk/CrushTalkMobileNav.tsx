@@ -88,7 +88,7 @@ export function CrushTalkMobileNav({ userEmail, credits, isUnlimited, hasPhotosP
             ) : (
               <>
                 <Zap className="w-4 h-4" style={{ color: '#F77F00' }} />
-                <span className="font-bold text-white">{credits} crédits</span>
+                <span className="font-bold text-white">{isUnlimited ? 'Illimité' : 'Gratuit'}</span>
                 <Link
                   href="/ct/pricing"
                   onClick={() => setIsOpen(false)}

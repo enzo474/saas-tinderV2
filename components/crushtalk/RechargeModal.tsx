@@ -47,13 +47,10 @@ export function RechargeModal({ onClose, currentBalance }: RechargeModalProps) {
         <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <div>
             <h2 className="font-montserrat font-bold text-white text-xl">
-              Plus de crédits
+              Passe au Pro
             </h2>
             <p className="text-[#9da3af] text-sm mt-0.5">
-              {currentBalance === 0
-                ? 'Tu as utilisé tous tes crédits.'
-                : `Il te reste ${currentBalance} crédit${currentBalance > 1 ? 's' : ''}.`}
-              {' '}Choisis ton plan.
+              Tu as utilisé ta génération gratuite. Choisis ton plan pour continuer.
             </p>
           </div>
           <button
@@ -76,7 +73,7 @@ export function RechargeModal({ onClose, currentBalance }: RechargeModalProps) {
                 </div>
                 <div>
                   <h3 className="font-montserrat font-bold text-white text-base">Pack Chill</h3>
-                  <p className="text-[#9da3af] text-xs">500 crédits · 100 générations/mois</p>
+                  <p className="text-[#9da3af] text-xs">100 générations par mois</p>
                 </div>
               </div>
               <div className="text-right">

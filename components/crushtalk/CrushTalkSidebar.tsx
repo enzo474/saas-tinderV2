@@ -38,9 +38,9 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
         </div>
       </div>
 
-      {/* Crédits */}
+      {/* Plan */}
       <div className="mx-3 mt-4 px-4 py-3 rounded-xl border" style={{ background: 'rgba(247,127,0,0.06)', borderColor: 'rgba(247,127,0,0.2)' }}>
-        <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'rgba(247,127,0,0.7)' }}>Crédits</p>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'rgba(247,127,0,0.7)' }}>Plan</p>
         <div className="flex items-center gap-2">
           {isUnlimited ? (
             <>
@@ -51,7 +51,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
           ) : credits > 0 ? (
             <>
               <Zap className="w-5 h-5" style={{ color: '#F77F00' }} />
-              <span className="font-montserrat font-bold text-white text-xl">{credits}</span>
+              <span className="font-montserrat font-bold text-white text-sm">Gratuit</span>
               <Link
                 href="/ct/pricing"
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80 flex items-center gap-1"
@@ -63,7 +63,7 @@ export function CrushTalkSidebar({ userEmail, credits, isUnlimited, hasPhotosPro
           ) : (
             <>
               <Lock className="w-4 h-4" style={{ color: 'rgba(247,127,0,0.6)' }} />
-              <span className="font-montserrat font-bold text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>0 crédit</span>
+              <span className="font-montserrat font-bold text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>Expiré</span>
               <Link
                 href="/ct/pricing"
                 className="ml-auto text-xs px-2.5 py-1 rounded-lg font-semibold text-white transition-opacity hover:opacity-80"

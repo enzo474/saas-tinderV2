@@ -208,9 +208,9 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
           <div className="flex items-center gap-3">
             <span className="text-xl">🎁</span>
             <div>
-              <p className="text-white text-sm font-semibold">Bienvenue ! Tu as 5 crédits gratuits</p>
+              <p className="text-white text-sm font-semibold">Bienvenue ! Tu as 1 génération gratuite</p>
               <p className="text-xs" style={{ color: '#9da3af' }}>
-                Upload un screenshot pour générer ton premier message. Coût : 5 crédits.
+                Upload un screenshot pour générer ton premier message.
               </p>
             </div>
           </div>
@@ -475,7 +475,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                 style={{ borderColor: '#2A2A2A', color: '#6b7280' }}
               >
                 <RefreshCw className="w-4 h-4" />
-                {isUnlimited ? 'Regénérer' : `Regénérer (${CREDITS_PER_GENERATION} crédits)`}
+                Regénérer
               </button>
             </div>
           )}
@@ -486,7 +486,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
       {!isUnlimited && credits < CREDITS_PER_GENERATION && (
         <div className="flex items-center justify-between rounded-xl p-4 border" style={{ background: 'rgba(230,57,70,0.08)', borderColor: 'rgba(230,57,70,0.3)' }}>
           <p className="text-sm font-medium" style={{ color: '#FF4757' }}>
-            Tu as utilisé tes crédits gratuits ! Choisis un plan pour continuer.
+            Tu as utilisé ta génération gratuite ! Choisis un plan pour continuer.
           </p>
           <button
             onClick={() => router.push('/game/pricing')}
