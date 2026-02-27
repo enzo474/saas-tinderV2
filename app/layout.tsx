@@ -28,17 +28,18 @@ export const metadata: Metadata = {
   description: "Obtiens une analyse IA de ton profil et découvre exactement ce qui t'empêche d'avoir plus de matchs.",
   icons: {
     icon: [
-      { url: '/crushmaxxing_fav.png', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/Crushmaxxing_fav.png', type: 'image/png', sizes: '512x512' },
     ],
     apple: [
-      { url: '/crushmaxxing_fav.png', type: 'image/png' },
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
-    shortcut: '/crushmaxxing_fav.png',
+    shortcut: '/favicon.ico',
   },
   openGraph: {
     title: 'Crushmaxxing - Optimise ton profil Tinder',
     description: "Obtiens une analyse IA de ton profil et découvre exactement ce qui t'empêche d'avoir plus de matchs.",
-    images: [{ url: '/crushmaxxing_fav.png' }],
+    images: [{ url: '/Crushmaxxing_fav.png', width: 512, height: 512 }],
     locale: 'fr_FR',
     type: 'website',
   },
@@ -46,13 +47,13 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'Crushmaxxing - Optimise ton profil Tinder',
     description: "Obtiens une analyse IA de ton profil et découvre exactement ce qui t'empêche d'avoir plus de matchs.",
-    images: ['/crushmaxxing_fav.png'],
+    images: ['/Crushmaxxing_fav.png'],
   },
   other: {
     'theme-color': '#0A0A0A',
     'apple-mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-status-bar-style': 'black-translucent',
-    'msapplication-TileImage': '/crushmaxxing_fav.png',
+    'msapplication-TileImage': '/Crushmaxxing_fav.png',
     'msapplication-TileColor': '#0A0A0A',
   },
 };
