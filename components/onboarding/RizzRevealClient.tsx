@@ -8,9 +8,19 @@ interface RizzPending {
   analysis: RizzAnalysis
   flowType: 'test-1' | 'test-2'
   userMessage: string
+  sessionId?: string
 }
 
-export function RizzRevealClient() {
+function trackEvent(sessionId: string | undefined, event: string, data?: Record<string, unknown>) {
+  if (!sessionId) return
+  fetch('/api/tracking/rizz-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId, event, data }),
+  }).catch(() => {})
+}
+
+export function RizzRevealClient({ userId }: { userId?: string }) {
   const router = useRouter()
   const [data, setData]       = useState<RizzPending | null>(null)
   const [copied, setCopied]   = useState(false)
@@ -19,10 +29,19 @@ export function RizzRevealClient() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('rizz_pending')
-      if (raw) setData(JSON.parse(raw) as RizzPending)
+      if (raw) {
+        const parsed = JSON.parse(raw) as RizzPending
+        setData(parsed)
+        // Tracker la révélation
+        const sid = parsed.sessionId
+          || parsed.analysis.session_id
+          || localStorage.getItem('rizz_session_id')
+          || undefined
+        trackEvent(sid, 'saw_reveal', userId ? { user_id: userId } : undefined)
+      }
     } catch { /* non-bloquant */ }
     setLoading(false)
-  }, [])
+  }, [userId])
 
   const handleCopy = async () => {
     if (!data?.analysis.accroche_optimisee) return
@@ -30,6 +49,11 @@ export function RizzRevealClient() {
       await navigator.clipboard.writeText(data.analysis.accroche_optimisee)
       setCopied(true)
       setTimeout(() => setCopied(false), 2500)
+      const sid = data.sessionId
+        || data.analysis.session_id
+        || localStorage.getItem('rizz_session_id')
+        || undefined
+      trackEvent(sid, 'copied_result')
     } catch { /* non-bloquant */ }
   }
 

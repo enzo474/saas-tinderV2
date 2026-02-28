@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { RizzLoadingStep, RizzResultBlurred, type RizzAnalysis } from '@/components/onboarding/RizzSteps'
+import { useRizzTracking } from '@/hooks/useRizzTracking'
 
 type Step = 'input' | 'loading' | 'result'
 type Tone = 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
@@ -21,8 +22,20 @@ export default function OnboardingTest1() {
   const [analysis, setAnalysis]       = useState<RizzAnalysis | null>(null)
   const [storyImage, setStoryImage]   = useState<string | null>(null)
   const [storyPreview, setStoryPreview] = useState<string | null>(null)
+  const [sessionId, setSessionId]     = useState<string | null>(null)
   const inputRef                      = useRef<HTMLTextAreaElement>(null)
   const fileInputRef                  = useRef<HTMLInputElement>(null)
+  const messageStartedRef             = useRef(false)
+
+  const { track, getSessionId } = useRizzTracking('test-1')
+
+  // Capture session_id dès qu'il est disponible (le hook le stocke en ref)
+  // On le lit juste avant les actions importantes
+  const ensureSessionId = () => {
+    const id = getSessionId()
+    if (id && !sessionId) setSessionId(id)
+    return id ?? sessionId
+  }
 
   const handleStoryClick = () => fileInputRef.current?.click()
 
@@ -34,8 +47,22 @@ export default function OnboardingTest1() {
       const result = ev.target?.result as string
       setStoryPreview(result)
       setStoryImage(result.split(',')[1])
+      track('image_uploaded')
     }
     reader.readAsDataURL(file)
+  }
+
+  const handleToneSelect = (tone: Tone) => {
+    setSelectedTone(tone)
+    track('tone_selected', { tone })
+  }
+
+  const handleMessageChange = (value: string) => {
+    setMessage(value)
+    if (value.trim() && !messageStartedRef.current) {
+      messageStartedRef.current = true
+      // message_started est implicite — on le capturera dans answer_clicked avec la longueur
+    }
   }
 
   const canProceed = message.trim() && selectedTone
@@ -45,6 +72,9 @@ export default function OnboardingTest1() {
       if (!message.trim()) inputRef.current?.focus()
       return
     }
+    const sid = ensureSessionId()
+    if (sid) setSessionId(sid)
+    track('answer_clicked', { answer: chosen, message, tone: selectedTone })
     setAnswer(chosen)
     setStep('loading')
   }
@@ -62,6 +92,7 @@ export default function OnboardingTest1() {
         storyImageBase64={storyImage || undefined}
         flowType="test-1"
         tone={selectedTone}
+        sessionId={sessionId ?? undefined}
         onComplete={handleAnalysisComplete}
       />
     )
@@ -73,6 +104,7 @@ export default function OnboardingTest1() {
         userMessage={message}
         analysis={analysis}
         flowType="test-1"
+        sessionId={sessionId ?? undefined}
         onUnlock={() => {}}
       />
     )
@@ -169,7 +201,7 @@ export default function OnboardingTest1() {
           <textarea
             ref={inputRef}
             value={message}
-            onChange={e => setMessage(e.target.value)}
+            onChange={e => handleMessageChange(e.target.value)}
             placeholder="Tape ton football ici..."
             rows={3}
             className="w-full px-4 py-3 rounded-xl border text-white text-sm outline-none resize-none transition-colors"
@@ -189,7 +221,7 @@ export default function OnboardingTest1() {
             {TONES.map(t => (
               <button
                 key={t.id}
-                onClick={() => setSelectedTone(t.id)}
+                onClick={() => handleToneSelect(t.id)}
                 className="py-2.5 px-3 rounded-xl border text-sm font-semibold transition-all"
                 style={{
                   background: selectedTone === t.id ? '#E63946' : 'transparent',

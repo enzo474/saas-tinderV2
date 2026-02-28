@@ -18,10 +18,20 @@ interface RizzLoadingProps {
   flowType: 'test-1' | 'test-2'
   tone: string
   selectedGirl?: string
+  sessionId?: string
   onComplete: (analysis: RizzAnalysis) => void
 }
 
-export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flowType, tone, selectedGirl, onComplete }: RizzLoadingProps) {
+function trackEvent(sessionId: string | undefined, event: string, data?: Record<string, unknown>) {
+  if (!sessionId) return
+  fetch('/api/tracking/rizz-event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: sessionId, event, data }),
+  }).catch(() => {})
+}
+
+export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flowType, tone, selectedGirl, sessionId, onComplete }: RizzLoadingProps) {
   const [checkStep, setCheckStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
@@ -39,16 +49,22 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
           storyImageBase64,
           user_answer: userAnswer,
           tone,
+          session_id: sessionId,
         }),
       })
 
       if (!response.ok) throw new Error('Erreur API')
       const data = await response.json()
-      onComplete(data as RizzAnalysis)
+      // Mettre à jour le session_id si l'API en renvoie un
+      const finalSessionId = data.session_id || sessionId
+      if (finalSessionId) {
+        try { localStorage.setItem('rizz_session_id', finalSessionId) } catch {}
+      }
+      onComplete({ ...data, session_id: finalSessionId } as RizzAnalysis)
     } catch {
       setError('Erreur lors de l\'analyse. Réessaie.')
     }
-  }, [userMessage, userAnswer, storyImageBase64, flowType, tone, onComplete])
+  }, [userMessage, userAnswer, storyImageBase64, flowType, tone, selectedGirl, sessionId, onComplete])
 
   useEffect(() => {
     runAnalysis()
@@ -87,8 +103,8 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
           className="rounded-2xl p-6 border text-left space-y-4"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
-          <CheckItem text="Message analysé"          active={checkStep >= 1} done={checkStep >= 1} />
-          <CheckItem text="Profil analysé"           active={checkStep >= 2} done={checkStep >= 2} />
+          <CheckItem text="Message analysé"                    active={checkStep >= 1} done={checkStep >= 1} />
+          <CheckItem text="Profil analysé"                     active={checkStep >= 2} done={checkStep >= 2} />
           <CheckItem text="Génération du football optimal..." active={checkStep >= 2} done={false} pulse />
         </div>
 
@@ -136,17 +152,29 @@ interface RizzResultBlurredProps {
   userMessage: string
   analysis: RizzAnalysis
   flowType: 'test-1' | 'test-2'
+  sessionId?: string
   onUnlock: () => void
 }
 
-export function RizzResultBlurred({ userMessage, analysis, flowType, onUnlock }: RizzResultBlurredProps) {
+export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, onUnlock }: RizzResultBlurredProps) {
   const router = useRouter()
+  const sid = analysis.session_id || sessionId
+
+  // Tracking : vue du résultat flouté
+  useEffect(() => {
+    trackEvent(sid, 'saw_result', { verdict: analysis.verdict })
+  }, [sid, analysis.verdict])
 
   const handleUnlock = () => {
+    trackEvent(sid, 'clicked_unlock')
     try {
-      localStorage.setItem('rizz_pending', JSON.stringify({ analysis, flowType, userMessage }))
+      localStorage.setItem('rizz_pending', JSON.stringify({
+        analysis,
+        flowType,
+        userMessage,
+        sessionId: sid,
+      }))
     } catch { /* non-bloquant */ }
-
     onUnlock()
     router.push(`/auth?context=rizz&from=${flowType}`)
   }

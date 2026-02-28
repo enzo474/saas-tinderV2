@@ -285,17 +285,32 @@ Pourquoi ça va marcher ?
 
     // ─── 7. Tracker dans rizz_sessions ───────────────────────────────────────
     let newSessionId = session_id
-    if (!session_id) {
-      try {
-        const supabase = createServiceRoleClient()
-        const headersList = await headers()
+    try {
+      const supabase = createServiceRoleClient()
+      const headersList = await headers()
+      const selectedGirl = headersList.get('x-selected-girl') ?? undefined
+
+      if (session_id) {
+        // Mettre à jour la session existante (créée au page_view)
+        await supabase
+          .from('rizz_sessions')
+          .update({
+            user_message,
+            user_answer,
+            selected_tone: selectedTone ?? null,
+            has_uploaded_image: !!storyImageBase64,
+            selected_girl: selectedGirl ?? null,
+            verdict: 'ne_marche_pas',
+          })
+          .eq('id', session_id)
+      } else {
+        // Fallback : créer une session si aucune n'existe (ne devrait pas arriver)
         const ip =
           headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
           headersList.get('x-real-ip') ||
           'unknown'
         const flowType = headersList.get('x-flow-type') || 'unknown'
 
-        const selectedGirl = (request as NextRequest & { _selectedGirl?: string }).headers.get('x-selected-girl') ?? undefined
         const { data } = await supabase
           .from('rizz_sessions')
           .insert({
@@ -312,8 +327,8 @@ Pourquoi ça va marcher ?
           .single()
 
         newSessionId = data?.id
-      } catch { /* non-bloquant */ }
-    }
+      }
+    } catch { /* non-bloquant */ }
 
     return NextResponse.json({
       verdict: 'ne_marche_pas',

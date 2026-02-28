@@ -62,5 +62,5 @@ export default async function RizzRevealPage1() {
     }
   } catch { /* non-bloquant */ }
 
-  return <RizzRevealClient />
+  return <RizzRevealClient userId={user.id} />
 }

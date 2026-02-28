@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { RizzLoadingStep, RizzResultBlurred, type RizzAnalysis } from '@/components/onboarding/RizzSteps'
+import { useRizzTracking } from '@/hooks/useRizzTracking'
 
 type Step = 'input' | 'loading' | 'result'
 type Tone = 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
@@ -25,7 +26,26 @@ export default function OnboardingTest2() {
   const [selectedGirl, setSelectedGirl] = useState<string | null>(null)
   const [answer, setAnswer]             = useState<'oui' | 'non' | null>(null)
   const [analysis, setAnalysis]         = useState<RizzAnalysis | null>(null)
+  const [sessionId, setSessionId]       = useState<string | null>(null)
   const inputRef                        = useRef<HTMLTextAreaElement>(null)
+
+  const { track, getSessionId } = useRizzTracking('test-2')
+
+  const ensureSessionId = () => {
+    const id = getSessionId()
+    if (id && !sessionId) setSessionId(id)
+    return id ?? sessionId
+  }
+
+  const handleGirlSelect = (girlId: string) => {
+    setSelectedGirl(girlId)
+    track('girl_selected', { girl_id: girlId })
+  }
+
+  const handleToneSelect = (tone: Tone) => {
+    setSelectedTone(tone)
+    track('tone_selected', { tone })
+  }
 
   const canProceed = message.trim() && selectedTone
 
@@ -34,6 +54,9 @@ export default function OnboardingTest2() {
       if (!message.trim()) inputRef.current?.focus()
       return
     }
+    const sid = ensureSessionId()
+    if (sid) setSessionId(sid)
+    track('answer_clicked', { answer: chosen, message, tone: selectedTone })
     setAnswer(chosen)
     setStep('loading')
   }
@@ -51,6 +74,7 @@ export default function OnboardingTest2() {
         flowType="test-2"
         tone={selectedTone}
         selectedGirl={selectedGirl ?? undefined}
+        sessionId={sessionId ?? undefined}
         onComplete={handleAnalysisComplete}
       />
     )
@@ -62,6 +86,7 @@ export default function OnboardingTest2() {
         userMessage={message}
         analysis={analysis}
         flowType="test-2"
+        sessionId={sessionId ?? undefined}
         onUnlock={() => {}}
       />
     )
@@ -112,7 +137,7 @@ export default function OnboardingTest2() {
             return (
               <button
                 key={girl.id}
-                onClick={() => setSelectedGirl(girl.id)}
+                onClick={() => handleGirlSelect(girl.id)}
                 className="flex flex-col items-center gap-2 transition-all"
               >
                 <div
@@ -164,7 +189,7 @@ export default function OnboardingTest2() {
             {TONES.map(t => (
               <button
                 key={t.id}
-                onClick={() => setSelectedTone(t.id)}
+                onClick={() => handleToneSelect(t.id)}
                 className="py-2.5 px-3 rounded-xl border text-sm font-semibold transition-all"
                 style={{
                   background: selectedTone === t.id ? '#E63946' : 'transparent',
