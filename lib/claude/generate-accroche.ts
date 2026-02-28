@@ -283,6 +283,13 @@ RÈGLE ABSOLUE : tu génères un message que L'UTILISATEUR va envoyer à LA FEMM
 Ce message doit s'inscrire dans la continuité naturelle de CE QU'IL A DÉJÀ DIT, en réponse à CE QU'ELLE VIENT DE DIRE.
 Ce n'est pas une réponse générique — c'est LA réponse parfaite pour CETTE conversation précise, à CE moment précis.
 
+RÈGLE DE SIMPLICITÉ — ABSOLUE :
+Le message doit sonner comme un SMS qu'un mec confiant enverrait EN VRAI.
+❌ Pas de métaphores élaborées : "déclaration de guerre à ma productivité" → INTERDIT
+❌ Pas de langage littéraire/poétique : "m'occuper l'esprit un moment" → INTERDIT
+❌ Pas de phrase avec deux virgules ou deux sous-clauses
+✅ Le test : est-ce qu'un mec confiant normal écrirait ça en vrai ? Si non → RECOMMENCE.
+
 INSPIRATION MAXIMALE : Colle au maximum au style des exemples fournis dans les 10 principes.
 Ces exemples ne sont pas des modèles à copier mot pour mot, mais le registre exact à reproduire :
 court, sûr, sans justification, qui avance toujours vers le réel.${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
@@ -401,12 +408,19 @@ APPROCHE 3 — TRASH/DIRECTE SUR CE QUI EST VISIBLE :
 ═══════════════════════════════════════
 RÈGLES ABSOLUES
 ═══════════════════════════════════════
-- ⚠️ LONGUEUR : 1 phrase MAX pour Direct et Mystérieux. 1-2 phrases pour Drôle et Compliment.
+- ⚠️ LONGUEUR : 1 phrase MAX pour Direct et Mystérieux. 1-2 phrases MAX pour Drôle et Compliment.
 - Pas de "Salut", "Coucou", "Bonjour"
 - Pas d'emojis (zéro pour Direct, max 1 pour les autres)
 - ⚠️ OBJETS VISIBLES : GÉNÉRIQUE uniquement. "miroir" pas "miroir hexagonal", "voiture" pas "BMW"
-- ⚠️ SI UN MIROIR EST VISIBLE : accroche forte possible — "Ce miroir a une sacrée chance de te refléter tous les jours"
-- Reste naturel, comme si un homme très confiant écrivait spontanément${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
+- Reste naturel, comme si un homme très confiant envoyait un SMS à une amie
+
+⛔ COMPLEXITÉ INTERDITE — ENNEMIS DU STYLE :
+- Zéro métaphore élaborée qui demande 3 secondes à comprendre
+  ❌ "tu prépares une déclaration de guerre à ma productivité" → trop construit, trop chargé
+  ❌ "Ce que je vois dans tes yeux va m'occuper l'esprit un moment... mais j'attends qu'on se parle pour te dire quoi exactement" → trop long, trop poétique, zéro impact
+  ❌ "tu m'occupes l'esprit", "tes yeux me hantent" → langage littéraire, pas naturel
+- Zéro phrase avec deux virgules ou deux sous-clauses
+- Le test : est-ce qu'un mec normal confiant écrirait ça en vrai ? Si non → RECOMMENCE${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS (à NE PAS répéter) :
 ${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
@@ -420,13 +434,28 @@ Ces messages n'ont PAS plu. Impérativement :
 DESCRIPTION PRÉCISE DE CHAQUE TON
 ═══════════════════════════════════════
 
-- Direct : affirmation sèche sur qui elle EST (pas sur ce qu'on voit) OU question présuppositionnelle OU trash assumé sur la tenue. JAMAIS de formule "Ce X me dit que tu sais Y". Exemples qui marchent : "T'as l'air d'être exactement le genre de problème que je cherche" / "T'as l'air d'être exactement le genre de distraction dont j'ai besoin" / "Tu m'hypnotises" / "Je te veux. Point." / "T'as mis un boxer ou un string ?" / "Tu ronfles ?". 1 phrase MAX. PAS DE SMILEY. PAS DE FORMULE VIDE.
+- Direct : affirmation sèche sur qui elle EST OU question présuppositionnelle OU trash sur ce qui est visible. 1 phrase MAX, zéro smiley.
+  ✅ "T'as l'air d'être exactement le genre de problème que je cherche"
+  ✅ "Tu m'hypnotises" / "T'es clairement venue pour créer des dégâts" / "Je te veux. Point."
+  ✅ "Tu ronfles ?" / "T'as mis un boxer ou un string ?"
+  ❌ Formule "Ce X me dit que tu sais Y" → JAMAIS
 
-- Drôle : question absurde du quotidien détournée ("Tu ronfles ?"), ou observation décalée qui fait sourire malgré soi. Humour maîtrisé, pas forcé. 1-2 lignes si la chute le justifie.
+- Drôle : question absurde du quotidien ou observation décalée qui fait sourire. Simple, pas construit. 1-2 lignes MAX.
+  ✅ "Tu souris comme ça à chaque feu rouge ou c'est juste quand tu veux faire craquer les conducteurs ?"
+  ✅ "T'as l'air d'être exactement le genre de dilemme agréable à avoir"
+  ❌ Métaphores longues à déchiffrer → INTERDIT
 
-- Mystérieux : affirmation qui laisse une question en suspens. Dit quelque chose sans tout dire. Elle doit vouloir en savoir plus. Jamais d'explication. Une ligne suffit.
+- Mystérieux : UNE seule phrase courte qui laisse une question en suspens. Mots simples. Pas de poésie.
+  ✅ "Garde le mot envie pour plus tard, tu vas le redire"
+  ✅ "J'ai une idée pour que ta vie soit encore mieux... mais ça attendra"
+  ✅ "Je sais déjà comment ça va finir."
+  ❌ "Ce que je vois dans tes yeux va m'occuper l'esprit..." → trop long, trop littéraire → INTERDIT
 
-- Compliment : un détail précis valorisé avec une pointe ou un minimisant. Jamais "t'es belle". "J'admets que t'es agréable à regarder, parfois" vaut 10 fois "t'es magnifique". Toujours inattendu.
+- Compliment : 1-2 phrases MAX. Compliment minimisant ou inattendu. Jamais "t'es belle" ou "t'es magnifique".
+  ✅ "T'as dû briser pas mal de concentrations avec cette story"
+  ✅ "J'admets que t'es agréable à regarder, parfois"
+  ✅ "T'as l'air de créer des dégâts sans le faire exprès"
+  ❌ Tout ce qui ressemble à une déclaration ou à de la poésie → INTERDIT
 
 - CrushMaxxing : analyse tout — bio, photo_context, vibe, tenue — et choisis LA meilleure approche parmi les 3. LE message parfait pour CE profil précis, pas un mélange générique.
 

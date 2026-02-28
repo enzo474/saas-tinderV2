@@ -9,31 +9,40 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 // ─── Instructions par ton (issues de l'agent admin conv) ─────────────────────
 const TONE_INSTRUCTIONS: Record<string, string> = {
   Direct: `DIRECT / TRASH ASSUMÉ :
+1 phrase MAX. Zéro smiley. JAMAIS "Ce X me dit que tu sais Y".
 L'accroche peut être :
-→ PRÉSUPPOSITIONNELLE (sans rapport avec la photo) : question banale qui présuppose une intimité future.
-  Ex de style : "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'es plutôt matin ou soir ?"
-→ AFFIRMATION DIRECTE : statement bold sur QUI elle est, pas sur ce qu'on voit.
-  Ex de style : "T'as l'air d'être exactement le genre de problème que je cherche" / "Tu m'hypnotises" / "Je te veux. Point."
-→ TRASH SUR CE QUI EST VISIBLE (seulement si quelque chose de vraiment saillant).
-  Ex de style : "T'as mis un boxer ou un string sous ta robe ?" / "Ce genre de photo c'est interdit le soir. T'as pas de scrupules toi"
-RÈGLES : 1 phrase MAX. Zéro smiley. JAMAIS "Ce X me dit que tu sais Y".`,
+→ PRÉSUPPOSITIONNELLE : question banale du quotidien qui présuppose une intimité.
+  ✅ "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'es plutôt matin ou soir ?"
+→ AFFIRMATION DIRECTE : statement bold sur QUI elle est, pas sur les détails visuels.
+  ✅ "T'as l'air d'être exactement le genre de problème que je cherche"
+  ✅ "Tu m'hypnotises" / "Je te veux. Point." / "T'es clairement venue pour créer des dégâts"
+→ TRASH SUR CE QUI EST VISIBLE (seulement si vraiment saillant) :
+  ✅ "T'as mis un boxer ou un string sous ta robe ?"`,
 
   Drôle: `DRÔLE / ABSURDE :
-Question absurde du quotidien détournée, ou réplique décalée qui crée une surprise.
-L'humour vient du décalage entre la banalité et la présupposition d'intimité.
-Ex de style : "Tu ronfles ?" → "faut que je sache si je ramène des boules Quies" / "Tu dors de quel côté ?" → "pour savoir où je m'installe"
-1-2 lignes max si la chute le justifie. Naturel, pas forcé.`,
+1-2 lignes MAX. Simple. Naturel. Pas forcé.
+Question absurde du quotidien ou observation décalée qui fait sourire malgré soi.
+✅ "Tu souris comme ça à chaque feu rouge ou c'est juste quand tu veux faire craquer les conducteurs ?"
+✅ "Tu ronfles ?" / "T'as un chat ou un chien ?"
+❌ INTERDIT : métaphores élaborées qui demandent 3 secondes à comprendre
+❌ "tu prépares une déclaration de guerre à ma productivité" → trop construit, zéro naturel`,
 
   Mystérieux: `MYSTÉRIEUX / INTRIGUANT :
-Affirmation qui laisse une question en suspens. Dit quelque chose sans tout dire. Elle doit vouloir en savoir plus. Jamais d'explication.
-Ex de style : "Garde le mot envie pour plus tard, tu vas le redire" / "J'ai une idée pour que ta vie soit encore plus belle... mais ça attendra qu'on se parle"
-Une seule ligne. Intrigue, pas description.`,
+UNE SEULE phrase courte. Mots simples. Pas de poésie. Pas de langage littéraire.
+Elle doit se demander quoi — mais avec des mots qu'un mec enverrait en vrai.
+✅ "Garde le mot envie pour plus tard, tu vas le redire"
+✅ "J'ai une idée... mais ça attendra"
+✅ "Je sais déjà comment ça va finir."
+❌ INTERDIT : "Ce que je vois dans tes yeux va m'occuper l'esprit un moment..." → trop long, trop littéraire
+❌ INTERDIT : toute phrase avec deux virgules ou qui ressemble à de la prose`,
 
   Compliment: `COMPLIMENT MINIMISANT ET PERCUTANT :
-Jamais "t'es belle" ou "t'es magnifique" — trop vide.
-Le compliment qui étonne vaut 10 compliments classiques.
-Ex de style : "J'admets que t'es agréable à regarder, parfois" / "T'as l'air de créer des dégâts sans le faire exprès" / "T'as dû briser pas mal de concentrations avec cette story"
-1-2 lignes max. Toujours inattendu, jamais banal.`,
+1-2 phrases MAX. Jamais "t'es belle" ou "t'es magnifique" — trop vide.
+Compliment inattendu, qui minimise légèrement ou renverse les rôles.
+✅ "T'as dû briser pas mal de concentrations avec cette story"
+✅ "J'admets que t'es agréable à regarder, parfois"
+✅ "T'as l'air de créer des dégâts sans le faire exprès"
+❌ INTERDIT : déclarations longues, langage poétique, formules romantiques`,
 }
 
 // ─── Prompt principal de génération (agent admin adapté pour 1 accroche) ──────
@@ -60,7 +69,19 @@ Ces formules sont banies car elles sont vides d'émotion et ne provoquent rien :
 - "J'ai envie de découvrir/tester/connaître [quelque chose]" → INTERDIT
 - "Je veux découvrir si tu es aussi X que Y" → INTERDIT
 - "T'as ce genre de [X] qui me donne envie de [Y]" → INTERDIT
+- "Ce que je vois dans tes yeux va m'occuper l'esprit..." → INTERDIT (trop long, trop littéraire)
 Si tu te retrouves à écrire une de ces formules : STOP. Recommence avec un autre angle.
+
+═══════════════════════════════════════
+RÈGLE DE SIMPLICITÉ — ABSOLUE
+═══════════════════════════════════════
+⚠️ Le message doit sonner comme un SMS qu'un mec confiant enverrait EN VRAI.
+Pas de métaphores élaborées. Pas de langage littéraire ou poétique.
+❌ "tu prépares une déclaration de guerre à ma productivité" → trop construit, trop chargé
+❌ "Ce que je vois dans tes yeux va m'occuper l'esprit un moment" → trop long, trop poétique
+❌ toute phrase avec deux virgules ou deux sous-clauses
+Le test : est-ce qu'un mec normal confiant écrirait ça en vrai ? Si non → RECOMMENCE.
+Longueur : 1 phrase pour Direct et Mystérieux. 1-2 phrases MAXIMUM pour Drôle et Compliment.
 
 ═══════════════════════════════════════
 CONVERSATIONS D'ENTRAÎNEMENT — STYLE EXACT QUI FONCTIONNE
