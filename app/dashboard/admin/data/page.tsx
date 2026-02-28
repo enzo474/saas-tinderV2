@@ -13,6 +13,8 @@ async function fetchAdminData() {
     generationsResult,
     creditsResult,
     usersListResult,
+    rizzSessionsResult,
+    dashboardVisitsResult,
   ] = await Promise.all([
     // 1. Funnel onboarding (ip_tracking)
     serviceRole.from('ip_tracking').select(
@@ -31,6 +33,14 @@ async function fetchAdminData() {
 
     // 4. Liste des users via admin API
     serviceRole.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+
+    // 5. Sessions A/B onboarding
+    serviceRole.from('rizz_sessions').select(
+      'id, flow_type, ab_variant, device_type, selected_tone, selected_girl, has_uploaded_image, user_answer, message_length, saw_blurred_result, clicked_unlock, completed_auth, saw_unblurred_result, copied_result, credit_given, arrived_at, submitted_at, saw_result_at, clicked_unlock_at, auth_completed_at, saw_reveal_at, copied_at, created_at'
+    ).order('created_at', { ascending: false }),
+
+    // 6. Visites dashboard (users déjà connectés)
+    serviceRole.from('dashboard_visits').select('id, user_id, source, visited_at'),
   ])
 
   // user_profiles = source de vérité (seuls les vrais users actifs)
@@ -41,6 +51,8 @@ async function fetchAdminData() {
   const credits = creditsResult.data ?? []
   const funnel = funnelResult.data ?? []
   const profilesList = profiles ?? []
+  const rizzSessions = rizzSessionsResult.data ?? []
+  const dashboardVisits = dashboardVisitsResult.data ?? []
 
   // On ne garde que les users qui ont un user_profile (supprimés = exclus)
   const enrichedUsers = profilesList.map((profile) => {
@@ -148,6 +160,75 @@ async function fetchAdminData() {
   })
   credits.filter((c) => c.subscription_status === 'canceled').forEach(() => planDist.canceled++)
 
+  // ── A/B onboarding funnel ──────────────────────────────────────────
+  type RizzRow = typeof rizzSessions[number]
+  function abFunnel(rows: RizzRow[]) {
+    const total     = rows.length
+    const submitted = rows.filter(r => r.submitted_at).length
+    const sawResult = rows.filter(r => r.saw_blurred_result).length
+    const unlocked  = rows.filter(r => r.clicked_unlock).length
+    const converted = rows.filter(r => r.completed_auth).length
+    const revealed  = rows.filter(r => r.saw_unblurred_result).length
+    const copied    = rows.filter(r => r.copied_result).length
+    const withImage = rows.filter(r => r.has_uploaded_image).length
+    const oui       = rows.filter(r => r.user_answer === 'oui').length
+    const non       = rows.filter(r => r.user_answer === 'non').length
+    const mobile    = rows.filter(r => r.device_type === 'mobile').length
+    const desktop   = rows.filter(r => r.device_type === 'desktop').length
+    const pct = (n: number, d: number) => d > 0 ? Math.round((n / d) * 100) : 0
+
+    // Distribution des tons
+    const toneDist: Record<string, number> = {}
+    rows.forEach(r => { if (r.selected_tone) toneDist[r.selected_tone] = (toneDist[r.selected_tone] ?? 0) + 1 })
+    const topTones = Object.entries(toneDist).sort((a, b) => b[1] - a[1])
+
+    // Distribution des filles (test-2)
+    const girlDist: Record<string, number> = {}
+    rows.forEach(r => { if (r.selected_girl) girlDist[r.selected_girl] = (girlDist[r.selected_girl] ?? 0) + 1 })
+
+    // Durée moyenne arrivée → soumission (secondes)
+    const durations = rows
+      .filter(r => r.arrived_at && r.submitted_at)
+      .map(r => (new Date(r.submitted_at as string).getTime() - new Date(r.arrived_at as string).getTime()) / 1000)
+    const avgDuration = durations.length > 0 ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : null
+
+    return {
+      total, submitted, sawResult, unlocked, converted, revealed, copied,
+      withImage, oui, non, mobile, desktop, topTones, girlDist, avgDuration,
+      pct_submitted:  pct(submitted, total),
+      pct_saw_result: pct(sawResult, submitted),
+      pct_unlocked:   pct(unlocked, sawResult),
+      pct_converted:  pct(converted, unlocked),
+      pct_revealed:   pct(revealed, converted),
+      pct_copied:     pct(copied, revealed),
+    }
+  }
+
+  const test1Sessions = rizzSessions.filter(r => r.flow_type === 'test-1')
+  const test2Sessions = rizzSessions.filter(r => r.flow_type === 'test-2')
+
+  const abData = {
+    test1: abFunnel(test1Sessions),
+    test2: abFunnel(test2Sessions),
+    total: abFunnel(rizzSessions),
+    dashboardDirectVisits: dashboardVisits.length,
+    recentSessions: rizzSessions.slice(0, 50).map(r => ({
+      id: r.id as string,
+      flow_type: r.flow_type as string,
+      device_type: r.device_type as string | null,
+      selected_tone: r.selected_tone as string | null,
+      selected_girl: r.selected_girl as string | null,
+      user_answer: r.user_answer as string | null,
+      message_length: r.message_length as number | null,
+      saw_result: r.saw_blurred_result as boolean,
+      clicked_unlock: r.clicked_unlock as boolean,
+      completed_auth: r.completed_auth as boolean,
+      saw_reveal: r.saw_unblurred_result as boolean,
+      copied: r.copied_result as boolean,
+      created_at: r.created_at as string,
+    })),
+  }
+
   return {
     kpis: {
       total_users: enrichedUsers.length,
@@ -165,6 +246,7 @@ async function fetchAdminData() {
     providerCounts,
     planDist,
     enrichedUsers,
+    abData,
   }
 }
 

@@ -22,6 +22,46 @@ type EnrichedUser = {
   gen_reponse: number
 }
 
+type AbFlowStats = {
+  total: number
+  submitted: number
+  sawResult: number
+  unlocked: number
+  converted: number
+  revealed: number
+  copied: number
+  withImage: number
+  oui: number
+  non: number
+  mobile: number
+  desktop: number
+  topTones: [string, number][]
+  girlDist: Record<string, number>
+  avgDuration: number | null
+  pct_submitted: number
+  pct_saw_result: number
+  pct_unlocked: number
+  pct_converted: number
+  pct_revealed: number
+  pct_copied: number
+}
+
+type AbSession = {
+  id: string
+  flow_type: string
+  device_type: string | null
+  selected_tone: string | null
+  selected_girl: string | null
+  user_answer: string | null
+  message_length: number | null
+  saw_result: boolean
+  clicked_unlock: boolean
+  completed_auth: boolean
+  saw_reveal: boolean
+  copied: boolean
+  created_at: string
+}
+
 type Props = {
   data: {
     kpis: {
@@ -54,6 +94,13 @@ type Props = {
     providerCounts: { google: number; email: number; other: number }
     planDist: { free: number; chill: number; charo: number; canceled: number }
     enrichedUsers: EnrichedUser[]
+    abData: {
+      test1: AbFlowStats
+      test2: AbFlowStats
+      total: AbFlowStats
+      dashboardDirectVisits: number
+      recentSessions: AbSession[]
+    }
   }
 }
 
@@ -138,7 +185,7 @@ const fmt = (d: string) => {
 }
 
 export function DataDashboard({ data }: Props) {
-  const { kpis, funnelSteps, signupsByDay, gensByDay, topTones, providerCounts, planDist, enrichedUsers } = data
+  const { kpis, funnelSteps, signupsByDay, gensByDay, topTones, providerCounts, planDist, enrichedUsers, abData } = data
   const [userSort, setUserSort] = useState<'gen_count' | 'created_at' | 'last_sign_in_at'>('gen_count')
   const [userSearch, setUserSearch] = useState('')
 
@@ -228,6 +275,136 @@ export function DataDashboard({ data }: Props) {
             />
           ))}
         </div>
+      </section>
+
+      {/* ── A/B Onboarding ── */}
+      <section>
+        <SectionTitle>A/B Onboarding — Funnel complet</SectionTitle>
+
+        {/* KPIs globaux A/B */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <KpiCard label="Visites totales" value={abData.total.total} sub="test-1 + test-2" />
+          <KpiCard label="Ont soumis" value={abData.total.submitted} sub={`${abData.total.pct_submitted}% des visites`} />
+          <KpiCard label="Ont créé un compte" value={abData.total.converted} sub={`${abData.total.pct_converted}% après débloc.`} />
+          <KpiCard label="Dashboard direct" value={abData.dashboardDirectVisits} sub="users déjà connectés" />
+        </div>
+
+        {/* Comparaison test-1 vs test-2 */}
+        <div className="grid md:grid-cols-2 gap-4 mb-5">
+          {([['test-1', abData.test1, 'Onboarding 1 (story)'], ['test-2', abData.test2, 'Onboarding 2 (filles)']] as const).map(([key, stats, label]) => (
+            <div key={key} className="p-5 space-y-3" style={CARD}>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-white">{label}</p>
+                <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(230,57,70,0.15)', color: RED }}>{stats.total} visites</span>
+              </div>
+              {([
+                ['Arrivée', stats.total, stats.total, null],
+                ['Ont soumis un message', stats.submitted, stats.total, stats.pct_submitted],
+                ['Ont vu le résultat', stats.sawResult, stats.submitted, stats.pct_saw_result],
+                ['Ont cliqué "Voir le football"', stats.unlocked, stats.sawResult, stats.pct_unlocked],
+                ['Ont créé un compte', stats.converted, stats.unlocked, stats.pct_converted],
+                ['Ont vu la révélation', stats.revealed, stats.converted, stats.pct_revealed],
+                ['Ont copié le football', stats.copied, stats.revealed, stats.pct_copied],
+              ] as [string, number, number, number | null][]).map(([lbl, val, max, pct]) => (
+                <div key={lbl}>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span style={{ color: GRAY }}>{lbl}</span>
+                    <span className="text-white font-semibold">{val} {pct !== null && <span style={{ color: GRAY }}>({pct}%)</span>}</span>
+                  </div>
+                  <div className="h-1.5 rounded-full" style={{ background: '#1F1F1F' }}>
+                    <div className="h-full rounded-full" style={{ width: `${max > 0 ? Math.round((val / max) * 100) : 0}%`, background: `linear-gradient(90deg, ${RED}, ${RED2})` }} />
+                  </div>
+                </div>
+              ))}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
+                <div className="text-xs"><span style={{ color: GRAY }}>OUI :</span> <span className="text-white font-semibold">{stats.oui}</span></div>
+                <div className="text-xs"><span style={{ color: GRAY }}>NON :</span> <span className="text-white font-semibold">{stats.non}</span></div>
+                <div className="text-xs"><span style={{ color: GRAY }}>Mobile :</span> <span className="text-white font-semibold">{stats.mobile}</span></div>
+                <div className="text-xs"><span style={{ color: GRAY }}>Desktop :</span> <span className="text-white font-semibold">{stats.desktop}</span></div>
+                {stats.avgDuration !== null && (
+                  <div className="text-xs col-span-2"><span style={{ color: GRAY }}>Durée moy. :</span> <span className="text-white font-semibold">{stats.avgDuration}s</span></div>
+                )}
+                {key === 'test-1' && (
+                  <div className="text-xs col-span-2"><span style={{ color: GRAY }}>Avec photo :</span> <span className="text-white font-semibold">{stats.withImage}</span></div>
+                )}
+                {key === 'test-2' && Object.keys(stats.girlDist).length > 0 && (
+                  <div className="text-xs col-span-2">
+                    <span style={{ color: GRAY }}>Filles : </span>
+                    {Object.entries(stats.girlDist).map(([g, n]) => (
+                      <span key={g} className="text-white font-semibold ml-2">{g}: {n}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* Top tons */}
+              {stats.topTones.length > 0 && (
+                <div className="pt-2 border-t" style={{ borderColor: '#1F1F1F' }}>
+                  <p className="text-xs mb-2" style={{ color: GRAY }}>Tons choisis</p>
+                  <div className="space-y-1">
+                    {stats.topTones.map(([tone, count]) => (
+                      <div key={tone} className="flex items-center gap-2">
+                        <span className="text-xs w-20 shrink-0" style={{ color: GRAY }}>{tone}</span>
+                        <div className="flex-1 h-1.5 rounded-full" style={{ background: '#1F1F1F' }}>
+                          <div className="h-full rounded-full" style={{ width: `${stats.topTones[0]?.[1] > 0 ? Math.round((count / stats.topTones[0][1]) * 100) : 0}%`, background: RED }} />
+                        </div>
+                        <span className="text-xs text-white w-6 text-right">{count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Sessions récentes */}
+        {abData.recentSessions.length > 0 && (
+          <div className="p-5" style={CARD}>
+            <p className="text-xs font-semibold mb-4" style={{ color: GRAY }}>Sessions récentes (50 dernières)</p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ color: GRAY, borderBottom: '1px solid #1F1F1F' }}>
+                    <th className="text-left py-2 pr-3 font-semibold">Flow</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Device</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Ton</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Réponse</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Résultat</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Débloqué</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Compte</th>
+                    <th className="text-center py-2 pr-3 font-semibold">Copié</th>
+                    <th className="text-right py-2 font-semibold">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {abData.recentSessions.map((s) => (
+                    <tr key={s.id} style={{ borderBottom: '1px solid #111' }}>
+                      <td className="py-1.5 pr-3">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: 'rgba(230,57,70,0.1)', color: RED }}>
+                          {s.flow_type}
+                        </span>
+                      </td>
+                      <td className="py-1.5 pr-3 text-center" style={{ color: GRAY }}>{s.device_type ?? '—'}</td>
+                      <td className="py-1.5 pr-3 text-center text-white">{s.selected_tone ?? '—'}</td>
+                      <td className="py-1.5 pr-3 text-center">
+                        <span style={{ color: s.user_answer === 'oui' ? '#22c55e' : s.user_answer === 'non' ? RED : GRAY }}>
+                          {s.user_answer ?? '—'}
+                        </span>
+                      </td>
+                      <td className="py-1.5 pr-3 text-center">{s.saw_result ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-1.5 pr-3 text-center">{s.clicked_unlock ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-1.5 pr-3 text-center">{s.completed_auth ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-1.5 pr-3 text-center">{s.copied ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-1.5 text-right" style={{ color: GRAY }}>
+                        {new Date(s.created_at).toLocaleDateString('fr-FR')}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* ── 3. Acquisitions ── */}

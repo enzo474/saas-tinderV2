@@ -23,7 +23,8 @@ ALTER TABLE rizz_sessions
   ADD COLUMN IF NOT EXISTS ab_variant          TEXT;          -- 'test-1' | 'test-2' (cookie)
 
 -- ── Vue de funnel mise à jour avec les timestamps ────────────────────
-CREATE OR REPLACE VIEW v_ab_funnel AS
+DROP VIEW IF EXISTS v_ab_funnel;
+CREATE VIEW v_ab_funnel AS
 SELECT
   flow_type,
   COUNT(*)                                                                  AS total_visits,
