@@ -138,7 +138,7 @@ export default function OnboardingTest2() {
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-white font-semibold text-sm mb-3 text-center">
-            Qu'est-ce que tu lui aurais envoyé comme accroche ?
+            Qu'est-ce que tu lui aurais envoyé comme football ?
           </p>
           <textarea
             ref={inputRef}
@@ -207,7 +207,7 @@ export default function OnboardingTest2() {
 
           {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              {!message.trim() ? 'Tape ton accroche et choisis un ton' : 'Choisis un ton pour continuer'}
+              {!message.trim() ? 'Tape ton football et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
@@ -216,7 +216,7 @@ export default function OnboardingTest2() {
         <div className="flex items-center justify-center gap-6">
           <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
           <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
-          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Football optimisé généré</span>
         </div>
       </div>
     </div>

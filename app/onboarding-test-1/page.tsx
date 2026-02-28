@@ -164,13 +164,13 @@ export default function OnboardingTest1() {
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-white font-semibold text-sm mb-3 text-center">
-            À cette story, qu'est-ce que tu lui aurais envoyé ?
+            Qu'est-ce que tu lui aurais envoyé ?
           </p>
           <textarea
             ref={inputRef}
             value={message}
             onChange={e => setMessage(e.target.value)}
-            placeholder="Tape ton accroche ici..."
+            placeholder="Tape ton football ici..."
             rows={3}
             className="w-full px-4 py-3 rounded-xl border text-white text-sm outline-none resize-none transition-colors"
             style={{ background: '#0D0D0D', borderColor: message.trim() ? '#E63946' : '#2A2A2A', color: '#fff' }}
@@ -231,7 +231,7 @@ export default function OnboardingTest1() {
 
           {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              {!message.trim() ? 'Tape ton accroche et choisis un ton' : 'Choisis un ton pour continuer'}
+              {!message.trim() ? 'Tape ton football et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
@@ -240,7 +240,7 @@ export default function OnboardingTest1() {
         <div className="flex items-center justify-center gap-6">
           <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
           <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
-          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Football optimisé généré</span>
         </div>
       </div>
     </div>

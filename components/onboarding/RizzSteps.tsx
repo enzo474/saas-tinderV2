@@ -74,7 +74,7 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
             <div className="w-10 h-10 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#E63946', borderTopColor: 'transparent' }} />
           </div>
           <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
-            Analyse de ton accroche...
+            Analyse de ton football...
           </h1>
           <p className="text-sm" style={{ color: '#6b7280' }}>
             Ton : <span className="font-semibold" style={{ color: '#E63946' }}>{tone}</span>
@@ -87,11 +87,11 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
         >
           <CheckItem text="Message analysé"          active={checkStep >= 1} done={checkStep >= 1} />
           <CheckItem text="Profil analysé"           active={checkStep >= 2} done={checkStep >= 2} />
-          <CheckItem text="Génération de l'accroche optimale..." active={checkStep >= 2} done={false} pulse />
+          <CheckItem text="Génération du football optimal..." active={checkStep >= 2} done={false} pulse />
         </div>
 
         <p className="text-sm mt-6" style={{ color: '#6b7280' }}>
-          L'IA analyse ton message et génère l'accroche parfaite...
+          L'IA analyse ton message et génère le football parfait...
         </p>
 
         {error && (
@@ -172,7 +172,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, onUnlock }:
           className="rounded-2xl p-5 border mb-4"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
-          <p className="text-xs font-semibold mb-2" style={{ color: '#6b7280' }}>TON ACCROCHE :</p>
+          <p className="text-xs font-semibold mb-2" style={{ color: '#6b7280' }}>TON FOOTBALL :</p>
           <p className="text-white font-medium">"{userMessage}"</p>
           <div
             className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-xs font-bold"
@@ -203,7 +203,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, onUnlock }:
         {/* Séparateur */}
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px" style={{ background: '#2A2A2A' }} />
-          <span className="text-xs font-bold" style={{ color: '#6b7280' }}>ACCROCHE OPTIMISÉE</span>
+          <span className="text-xs font-bold" style={{ color: '#6b7280' }}>FOOTBALL OPTIMISÉ</span>
           <div className="flex-1 h-px" style={{ background: '#2A2A2A' }} />
         </div>
 
@@ -226,7 +226,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, onUnlock }:
             </p>
           </div>
           <p className="text-xs text-center" style={{ color: '#6b7280' }}>
-            Cette accroche a beaucoup plus de chances de la faire répondre.
+            Ce football a beaucoup plus de chances de la faire répondre.
           </p>
         </div>
 
@@ -256,7 +256,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, onUnlock }:
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
-          Voir l'accroche
+          Voir le football
         </button>
 
         <div className="flex items-center justify-center gap-4 mt-4">

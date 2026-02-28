@@ -98,7 +98,7 @@ export function RizzRevealClient() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-bold text-white text-2xl">
-            TON ACCROCHE OPTIMISÉE
+            TON FOOTBALL OPTIMISÉ
           </h1>
         </div>
 
@@ -112,7 +112,7 @@ export function RizzRevealClient() {
         >
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} />
-            <span className="text-xs font-bold" style={{ color: '#22c55e' }}>ACCROCHE DÉBLOQUÉE</span>
+            <span className="text-xs font-bold" style={{ color: '#22c55e' }}>FOOTBALL DÉBLOQUÉ</span>
           </div>
           <p className="text-white font-bold text-xl leading-relaxed">"{accroche}"</p>
         </div>
@@ -123,7 +123,7 @@ export function RizzRevealClient() {
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
           style={{ background: copied ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
-          {copied ? 'Copié !' : 'Copier l\'accroche'}
+          {copied ? 'Copié !' : 'Copier le football'}
         </button>
 
         {/* Raisons succès */}
