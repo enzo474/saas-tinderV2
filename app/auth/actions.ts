@@ -22,36 +22,53 @@ export async function signUpWithEmail(formData: FormData) {
   const password   = formData.get('password') as string
   const redirectTo = (formData.get('redirectTo') as string) || '/game/accroche'
 
-  const { data, error } = await supabase.auth.signUp({ email, password })
-  if (error) return { error: error.message }
+  const admin = createServiceRoleClient()
 
-  if (data.user) {
+  // Utiliser l'admin API pour créer l'user directement avec email confirmé
+  // Évite l'erreur "Database error saving new user" causée par les triggers
+  const { data: adminData, error: createError } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  })
+
+  if (createError) {
+    // Si l'user existe déjà, on tente simplement la connexion
+    const alreadyExists =
+      createError.message.toLowerCase().includes('already') ||
+      createError.message.toLowerCase().includes('exists') ||
+      createError.message.toLowerCase().includes('registered')
+
+    if (!alreadyExists) {
+      return { error: createError.message }
+    }
+    // Sinon on continue vers le signIn ci-dessous
+  }
+
+  const userId = adminData?.user?.id
+
+  if (userId) {
     try {
-      const admin = createServiceRoleClient()
-
-      // Forcer la confirmation email pour éviter le blocage de session
-      await admin.auth.admin.updateUserById(data.user.id, { email_confirm: true })
-
-      // Créer les crédits de bienvenue
+      // Créer les crédits de bienvenue si pas encore fait
       const { data: existing } = await admin
         .from('crushtalk_credits')
         .select('user_id')
-        .eq('user_id', data.user.id)
+        .eq('user_id', userId)
         .single()
 
       if (!existing) {
         await admin.from('crushtalk_credits').insert({
-          user_id:    data.user.id,
+          user_id:    userId,
           balance:    5,
           used_total: 0,
         })
       }
     } catch { /* non-bloquant */ }
-
-    // Connecter l'utilisateur immédiatement après inscription
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-    if (signInError) return { error: signInError.message }
   }
+
+  // Connecter l'utilisateur
+  const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+  if (signInError) return { error: signInError.message }
 
   redirect(redirectTo)
 }
