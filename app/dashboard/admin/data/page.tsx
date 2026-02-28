@@ -36,7 +36,7 @@ async function fetchAdminData() {
 
     // 5. Sessions A/B onboarding
     serviceRole.from('rizz_sessions').select(
-      'id, flow_type, ab_variant, device_type, selected_tone, selected_girl, has_uploaded_image, user_answer, message_length, saw_blurred_result, clicked_unlock, completed_auth, saw_unblurred_result, copied_result, credit_given, arrived_at, submitted_at, saw_result_at, clicked_unlock_at, auth_completed_at, saw_reveal_at, copied_at, created_at'
+      'id, flow_type, ab_variant, device_type, selected_tone, selected_girl, has_uploaded_image, user_answer, message_length, saw_blurred_result, clicked_unlock, completed_auth, saw_unblurred_result, copied_result, credit_given, generated_football, arrived_at, submitted_at, saw_result_at, clicked_unlock_at, auth_completed_at, saw_reveal_at, copied_at, created_at'
     ).order('created_at', { ascending: false }),
 
     // 6. Visites dashboard (users déjà connectés)
@@ -225,6 +225,7 @@ async function fetchAdminData() {
       completed_auth: r.completed_auth as boolean,
       saw_reveal: r.saw_unblurred_result as boolean,
       copied: r.copied_result as boolean,
+      generated_football: r.generated_football as string | null,
       created_at: r.created_at as string,
     })),
   }

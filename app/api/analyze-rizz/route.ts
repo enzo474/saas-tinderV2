@@ -301,6 +301,7 @@ Pourquoi ça va marcher ?
             has_uploaded_image: !!storyImageBase64,
             selected_girl: selectedGirl ?? null,
             verdict: 'ne_marche_pas',
+            generated_football: accrocheOptimisee ?? null,
           })
           .eq('id', session_id)
       } else {
@@ -322,6 +323,7 @@ Pourquoi ça va marcher ?
             has_uploaded_image: !!storyImageBase64,
             selected_girl: selectedGirl ?? null,
             verdict: 'ne_marche_pas',
+            generated_football: accrocheOptimisee ?? null,
           })
           .select('id')
           .single()

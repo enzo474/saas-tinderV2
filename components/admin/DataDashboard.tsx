@@ -59,6 +59,7 @@ type AbSession = {
   completed_auth: boolean
   saw_reveal: boolean
   copied: boolean
+  generated_football: string | null
   created_at: string
 }
 
@@ -373,29 +374,39 @@ export function DataDashboard({ data }: Props) {
                     <th className="text-center py-2 pr-3 font-semibold">Débloqué</th>
                     <th className="text-center py-2 pr-3 font-semibold">Compte</th>
                     <th className="text-center py-2 pr-3 font-semibold">Copié</th>
+                    <th className="text-left py-2 pr-3 font-semibold">Football généré</th>
                     <th className="text-right py-2 font-semibold">Date</th>
                   </tr>
                 </thead>
                 <tbody>
                   {abData.recentSessions.map((s) => (
                     <tr key={s.id} style={{ borderBottom: '1px solid #111' }}>
-                      <td className="py-1.5 pr-3">
+                      <td className="py-2 pr-3">
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-bold" style={{ background: 'rgba(230,57,70,0.1)', color: RED }}>
                           {s.flow_type}
                         </span>
                       </td>
-                      <td className="py-1.5 pr-3 text-center" style={{ color: GRAY }}>{s.device_type ?? '—'}</td>
-                      <td className="py-1.5 pr-3 text-center text-white">{s.selected_tone ?? '—'}</td>
-                      <td className="py-1.5 pr-3 text-center">
+                      <td className="py-2 pr-3 text-center" style={{ color: GRAY }}>{s.device_type ?? '—'}</td>
+                      <td className="py-2 pr-3 text-center text-white">{s.selected_tone ?? '—'}</td>
+                      <td className="py-2 pr-3 text-center">
                         <span style={{ color: s.user_answer === 'oui' ? '#22c55e' : s.user_answer === 'non' ? RED : GRAY }}>
                           {s.user_answer ?? '—'}
                         </span>
                       </td>
-                      <td className="py-1.5 pr-3 text-center">{s.saw_result ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
-                      <td className="py-1.5 pr-3 text-center">{s.clicked_unlock ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
-                      <td className="py-1.5 pr-3 text-center">{s.completed_auth ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
-                      <td className="py-1.5 pr-3 text-center">{s.copied ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
-                      <td className="py-1.5 text-right" style={{ color: GRAY }}>
+                      <td className="py-2 pr-3 text-center">{s.saw_result ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-2 pr-3 text-center">{s.clicked_unlock ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-2 pr-3 text-center">{s.completed_auth ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-2 pr-3 text-center">{s.copied ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
+                      <td className="py-2 pr-3 max-w-[280px]">
+                        {s.saw_reveal && s.generated_football ? (
+                          <span className="text-white italic leading-snug line-clamp-2" title={s.generated_football}>
+                            &ldquo;{s.generated_football}&rdquo;
+                          </span>
+                        ) : (
+                          <span style={{ color: '#374151' }}>—</span>
+                        )}
+                      </td>
+                      <td className="py-2 text-right shrink-0" style={{ color: GRAY }}>
                         {new Date(s.created_at).toLocaleDateString('fr-FR')}
                       </td>
                     </tr>
