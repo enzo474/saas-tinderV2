@@ -85,6 +85,32 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/game', request.url))
   }
 
+  // ── Page d'accueil : A/B testing ou dashboard selon auth ──────────────────
+  if (path === '/') {
+    if (user) {
+      // Utilisateur déjà connecté → dashboard direct
+      return copyCookiesToResponse(
+        response,
+        NextResponse.redirect(new URL('/game/accroche', request.url))
+      )
+    }
+    // Non connecté → A/B test : test-1 ou test-2 (cookie 30j pour cohérence)
+    let variant = request.cookies.get('ab_test')?.value
+    if (!variant || (variant !== 'test-1' && variant !== 'test-2')) {
+      variant = Math.random() < 0.5 ? 'test-1' : 'test-2'
+    }
+    const redirectRes = NextResponse.redirect(
+      new URL(`/onboarding-${variant}`, request.url)
+    )
+    redirectRes.cookies.set('ab_test', variant, {
+      maxAge: 60 * 60 * 24 * 30,
+      httpOnly: false,
+      sameSite: 'lax',
+      path: '/',
+    })
+    return copyCookiesToResponse(response, redirectRes)
+  }
+
   // ── Routes publiques (pas d'auth requise) ──────────────────────────────────
   if (
     path === '/' ||

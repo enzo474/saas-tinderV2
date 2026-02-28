@@ -1,13 +1,7 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { WelcomeOnboarding } from '@/components/onboarding/WelcomeOnboarding'
 
-export default async function Home() {
-  // Utilisateur authentifié → dashboard direct
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (user) redirect('/game/accroche')
-
-  // Nouvelle IP → onboarding, puis auth
-  return <WelcomeOnboarding redirectTo="/auth" />
+// Le middleware gère la redirection A/B (test-1 / test-2) et l'auth.
+// Cette page n'est atteinte que si le middleware laisse passer (fallback).
+export default function Home() {
+  redirect('/onboarding-test-1')
 }

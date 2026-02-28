@@ -17,10 +17,11 @@ interface RizzLoadingProps {
   storyImageBase64?: string
   flowType: 'test-1' | 'test-2'
   tone: string
+  selectedGirl?: string
   onComplete: (analysis: RizzAnalysis) => void
 }
 
-export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flowType, tone, onComplete }: RizzLoadingProps) {
+export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flowType, tone, selectedGirl, onComplete }: RizzLoadingProps) {
   const [checkStep, setCheckStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,6 +32,7 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
         headers: {
           'Content-Type': 'application/json',
           'x-flow-type': flowType,
+          ...(selectedGirl ? { 'x-selected-girl': selectedGirl } : {}),
         },
         body: JSON.stringify({
           user_message: userMessage,

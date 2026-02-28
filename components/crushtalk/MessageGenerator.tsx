@@ -21,8 +21,6 @@ const TONES = [
   { label: 'Drôle', description: null },
   { label: 'Mystérieux', description: null },
   { label: 'Compliment', description: null },
-  { label: 'CrushMaxxing', description: 'Adapté par l\'IA' },
-  { label: 'Mon Ton', description: 'Selon ton profil' },
 ]
 
 interface OnboardingProfile {
@@ -110,7 +108,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
   const activeType = initialType
   const [screenshot, setScreenshot] = useState<File | null>(null)
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null)
-  const [selectedTone, setSelectedTone] = useState<string>('CrushMaxxing')
+  const [selectedTone, setSelectedTone] = useState<string>('Direct')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<GeneratedMessage[] | null>(null)
@@ -370,9 +368,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               <div className="flex items-center gap-2">
                 <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: 'rgba(230,57,70,0.8)' }}>Ton</p>
                 <span className="text-sm font-semibold" style={{ color: '#fff' }}>{selectedTone}</span>
-                {selectedTone === 'Mon Ton' && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ background: 'rgba(230,57,70,0.2)', color: '#FF4757' }}>Ton profil</span>
-                )}
               </div>
               <ChevronDown
                 className="w-4 h-4 transition-transform duration-200"
@@ -385,7 +380,7 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               <div className="px-4 pb-4 grid grid-cols-2 gap-2" style={{ borderTop: '1px solid #1F1F1F' }}>
                 <div style={{ height: 12 }} />
                 <div style={{ height: 12 }} />
-                {TONES.filter(t => t.label !== 'CrushMaxxing' && t.label !== 'Mon Ton').map(tone => {
+                {TONES.map(tone => {
                   const isActive = selectedTone === tone.label
                   return (
                     <button
@@ -402,42 +397,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
                       }}
                     >
                       {tone.label}
-                    </button>
-                  )
-                })}
-
-                {/* CrushMaxxing + Mon Ton */}
-                {(['CrushMaxxing', 'Mon Ton'] as const).map((toneName) => {
-                  const isActive = selectedTone === toneName
-                  const isCrushTalk = toneName === 'CrushMaxxing'
-                  const isMonTon = toneName === 'Mon Ton'
-                  const hasProfile = !!onboardingProfile?.style || !!onboardingProfile?.approach
-                  const disabled = isMonTon && !hasProfile
-                  return (
-                    <button
-                      key={toneName}
-                      onClick={() => { if (!disabled) { selectTone(toneName); setToneDrawerOpen(false) } }}
-                      className="flex items-center justify-center gap-2 px-3 py-3 rounded-xl border-2 text-sm font-medium transition-all duration-200"
-                      style={disabled ? {
-                        borderColor: '#1F1F1F',
-                        color: '#444',
-                        cursor: 'not-allowed',
-                        opacity: 0.5,
-                      } : isActive ? {
-                        borderColor: '#E63946',
-                        background: 'rgba(230,57,70,0.1)',
-                        color: '#fff',
-                      } : {
-                        borderColor: '#1F1F1F',
-                        color: '#9da3af',
-                      }}
-                    >
-                      <span>{toneName}</span>
-                      {!isCrushTalk && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full whitespace-nowrap" style={{ background: isActive ? 'rgba(230,57,70,0.2)' : 'rgba(255,255,255,0.06)', color: isActive ? '#FF4757' : '#6b7280' }}>
-                          {disabled ? 'Fais l\'onboarding' : 'Ton profil'}
-                        </span>
-                      )}
                     </button>
                   )
                 })}

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { GameShell } from '@/components/game/GameShell'
 import PseudoSync from '@/components/game/PseudoSync'
+import { DashboardTracker } from '@/components/game/DashboardTracker'
 
 export default async function GameLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -22,6 +23,7 @@ export default async function GameLayout({ children }: { children: React.ReactNo
   return (
     <GameShell userEmail={user.email ?? ''} isAdmin={isAdmin}>
       <PseudoSync />
+      <DashboardTracker />
       {children}
     </GameShell>
   )

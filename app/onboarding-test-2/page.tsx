@@ -50,6 +50,7 @@ export default function OnboardingTest2() {
         userAnswer={answer}
         flowType="test-2"
         tone={selectedTone}
+        selectedGirl={selectedGirl ?? undefined}
         onComplete={handleAnalysisComplete}
       />
     )

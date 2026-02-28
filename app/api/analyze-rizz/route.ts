@@ -274,9 +274,19 @@ Pourquoi ça va marcher ?
           'unknown'
         const flowType = headersList.get('x-flow-type') || 'unknown'
 
+        const selectedGirl = (request as NextRequest & { _selectedGirl?: string }).headers.get('x-selected-girl') ?? undefined
         const { data } = await supabase
           .from('rizz_sessions')
-          .insert({ ip_address: ip, flow_type: flowType, user_message, user_answer })
+          .insert({
+            ip_address: ip,
+            flow_type: flowType,
+            user_message,
+            user_answer,
+            selected_tone: selectedTone ?? null,
+            has_uploaded_image: !!storyImageBase64,
+            selected_girl: selectedGirl ?? null,
+            verdict: 'ne_marche_pas',
+          })
           .select('id')
           .single()
 
