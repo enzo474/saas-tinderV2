@@ -14,8 +14,8 @@ const TONES: { id: Tone; label: string }[] = [
 ]
 
 const GIRLS = [
-  { id: 'emma',  name: 'Emma, 23 ans',  placeholder: 'https://placehold.co/300x450/1A1A1A/888888?text=Emma' },
-  { id: 'sarah', name: 'Sarah, 24 ans', placeholder: 'https://placehold.co/300x450/151515/888888?text=Sarah' },
+  { id: 'emma',  img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/fille%20unbor%202/lingerie.jpeg' },
+  { id: 'sarah', img: 'https://pnmajvnkvyjlkbscwsto.supabase.co/storage/v1/object/public/fille%20unbor%202/_%20(33).jpeg' },
 ]
 
 export default function OnboardingTest2() {
@@ -95,7 +95,7 @@ export default function OnboardingTest2() {
         {/* Titre */}
         <div className="text-center mb-5">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            TESTE TON RIZZ EN 10 SECONDES
+            TESTE TON FOOTBALL EN 10S
           </h1>
         </div>
 
@@ -103,7 +103,7 @@ export default function OnboardingTest2() {
 
         {/* 2 photos sélectionnables */}
         <p className="text-center text-xs font-semibold mb-3" style={{ color: '#9da3af' }}>
-          Choisis une fille pour tester ton rizz :
+          Choisis une fille pour tester ton football :
         </p>
         <div className="grid grid-cols-2 gap-3 mb-5">
           {GIRLS.map((girl) => {
@@ -123,14 +123,8 @@ export default function OnboardingTest2() {
                     transform: isSelected ? 'scale(1.03)' : 'scale(1)',
                   }}
                 >
-                  <img src={girl.placeholder} alt={girl.name} className="w-full h-full object-cover" />
+                  <img src={girl.img} alt="profil" className="w-full h-full object-cover" />
                 </div>
-                <span
-                  className="text-xs font-semibold transition-colors"
-                  style={{ color: isSelected ? '#E63946' : '#9da3af' }}
-                >
-                  {girl.name}
-                </span>
               </button>
             )
           })}

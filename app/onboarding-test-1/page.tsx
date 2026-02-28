@@ -107,9 +107,14 @@ export default function OnboardingTest1() {
         {/* Titre */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            TESTE TON RIZZ EN 10 SECONDES
+            TESTE TON FOOTBALL EN 10S
           </h1>
         </div>
+
+        {/* Phrase d'instruction upload */}
+        <p className="text-center text-xs mb-3" style={{ color: '#9da3af' }}>
+          Importe le screen d'une story ou du profil de la fille sur qui tu veux tester ton football
+        </p>
 
         {/* Zone story — clickable pour upload */}
         <div className="flex justify-center mb-5">
