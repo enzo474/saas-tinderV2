@@ -116,6 +116,8 @@ Retourne UNIQUEMENT un JSON valide avec cette structure exacte :
 - Objets et décor : GÉNÉRIQUE uniquement. "miroir" (jamais "miroir hexagonal"), "voiture" (jamais "BMW grise"), "canapé" (jamais "canapé en velours").
 - Si un objet notable est visible (miroir, animal, voiture, paysage, salle de sport…), il DOIT apparaître dans photo_context — ne l'omets pas au profit d'une description vague.
 - Décris l'ensemble : objet principal + attitude + vibe. Pas seulement la vibe.
+- ⚠️ NE JAMAIS inventer ou supposer ce qui n'est PAS visible : si le visage est masqué par un téléphone → ne dis pas "sourire", si la tenue n'est pas sportive → ne dis pas "tenue de sport". Décris UNIQUEMENT ce que tu vois réellement.
+- Si c'est un selfie miroir avec téléphone devant le visage : note-le tel quel ("selfie miroir, téléphone devant le visage, corps visible").
 
 Si une info n'est pas visible, mets null ou un tableau vide. Retourne uniquement le JSON, rien d'autre.`,
           },
@@ -420,7 +422,14 @@ RÈGLES ABSOLUES
   ❌ "Ce que je vois dans tes yeux va m'occuper l'esprit un moment... mais j'attends qu'on se parle pour te dire quoi exactement" → trop long, trop poétique, zéro impact
   ❌ "tu m'occupes l'esprit", "tes yeux me hantent" → langage littéraire, pas naturel
 - Zéro phrase avec deux virgules ou deux sous-clauses
-- Le test : est-ce qu'un mec normal confiant écrirait ça en vrai ? Si non → RECOMMENCE${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
+- Le test : est-ce qu'un mec normal confiant écrirait ça en vrai ? Si non → RECOMMENCE
+
+⛔ SUJETS BANALS INTERDITS — VONT DIRECT À LA POUBELLE :
+Ces sujets sont les plus utilisés, les plus prévisibles, les plus nuls — si tu vois une de ces idées dans ta tête, CHANGE D'APPROCHE :
+- ❌ Salle de bain, miroir, éclairage, lumière, "lighting" → TOUT LE MONDE le fait, aucun impact
+- ❌ Selfie + commentaire sur le selfie → trop attendu
+- ❌ Mots anglais dans le message final → français uniquement
+Si l'image est un selfie miroir banal : utilise obligatoirement APPROCHE 1 (présuppositionnelle) ou APPROCHE 2 (affirmation directe). Ne commente PAS ce qui est visible.${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS (à NE PAS répéter) :
 ${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
@@ -441,9 +450,11 @@ DESCRIPTION PRÉCISE DE CHAQUE TON
   ❌ Formule "Ce X me dit que tu sais Y" → JAMAIS
 
 - Drôle : question absurde du quotidien ou observation décalée qui fait sourire. Simple, pas construit. 1-2 lignes MAX.
+  ✅ "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'as un chat ou un chien ?"
   ✅ "Tu souris comme ça à chaque feu rouge ou c'est juste quand tu veux faire craquer les conducteurs ?"
-  ✅ "T'as l'air d'être exactement le genre de dilemme agréable à avoir"
   ❌ Métaphores longues à déchiffrer → INTERDIT
+  ⛔ INTERDIT ABSOLU pour Drôle : commenter la salle de bain, le miroir, l'éclairage, la lumière, le "lighting" → CLICHÉ, tout le monde le fait, ça ne fait pas rire. Utilise APPROCHE 1 (présuppositionnelle) à la place.
+  ⛔ Mots anglais interdits dans le message final ("lighting", "vibe"...) → utilise le français uniquement.
 
 - Mystérieux : UNE seule phrase courte qui laisse une question en suspens. Mots simples. Pas de poésie.
   ✅ "Garde le mot envie pour plus tard, tu vas le redire"
