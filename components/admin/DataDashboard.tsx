@@ -398,7 +398,7 @@ export function DataDashboard({ data }: Props) {
                       <td className="py-2 pr-3 text-center">{s.completed_auth ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
                       <td className="py-2 pr-3 text-center">{s.copied ? <span style={{ color: '#22c55e' }}>✓</span> : <span style={{ color: '#374151' }}>✗</span>}</td>
                       <td className="py-2 pr-3 max-w-[280px]">
-                        {s.saw_reveal && s.generated_football ? (
+                        {s.generated_football ? (
                           <span className="text-white italic leading-snug line-clamp-2" title={s.generated_football}>
                             &ldquo;{s.generated_football}&rdquo;
                           </span>
