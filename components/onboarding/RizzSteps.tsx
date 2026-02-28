@@ -14,12 +14,12 @@ export interface RizzAnalysis {
 interface RizzLoadingProps {
   userMessage: string
   userAnswer: 'oui' | 'non'
-  screenshotUrl?: string
+  storyImageBase64?: string
   flowType: 'test-1' | 'test-2'
   onComplete: (analysis: RizzAnalysis) => void
 }
 
-export function RizzLoadingStep({ userMessage, userAnswer, screenshotUrl, flowType, onComplete }: RizzLoadingProps) {
+export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flowType, onComplete }: RizzLoadingProps) {
   const [checkStep, setCheckStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
@@ -33,7 +33,7 @@ export function RizzLoadingStep({ userMessage, userAnswer, screenshotUrl, flowTy
         },
         body: JSON.stringify({
           user_message: userMessage,
-          screenshot_url: screenshotUrl,
+          storyImageBase64: storyImageBase64,
           user_answer: userAnswer,
         }),
       })
@@ -44,7 +44,7 @@ export function RizzLoadingStep({ userMessage, userAnswer, screenshotUrl, flowTy
     } catch {
       setError('Erreur lors de l\'analyse. Réessaie.')
     }
-  }, [userMessage, userAnswer, screenshotUrl, flowType, onComplete])
+  }, [userMessage, userAnswer, storyImageBase64, flowType, onComplete])
 
   useEffect(() => {
     runAnalysis()

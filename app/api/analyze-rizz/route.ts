@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { analyzeProfileWithVision, generateMessages } from '@/lib/claude/generate-accroche'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 
@@ -10,9 +11,9 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { user_message, screenshot_url, user_answer, session_id } = body as {
+    const { user_message, storyImageBase64, user_answer, session_id } = body as {
       user_message: string
-      screenshot_url?: string
+      storyImageBase64?: string   // base64 sans prefix data:...
       user_answer: 'oui' | 'non'
       session_id?: string
     }
@@ -21,124 +22,96 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'user_message requis' }, { status: 400 })
     }
 
-    const systemPrompt = `Tu es CrushMaxxing, l'expert numéro 1 de la drague par message en France.
-
-Tu maîtrises parfaitement les techniques d'accroche qui font répondre les filles :
-
-TECHNIQUES VALIDÉES PAR DES CONVERSATIONS RÉELLES :
-
-1. PRÉSUPPOSITIONNELLE : Suppose une intimité future déjà décidée
-   Exemples : "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'as une place pour moi sur ton canapé ?"
-   → La fille répond parce qu'elle doit corriger/confirmer
-
-2. TRASH/DIRECTE sur ce qui est visible ou quotidien
-   Exemples : "T'as mis un boxer ou un string sous ta robe ?" / "T'abuses" / "Je suis pas branché trio"
-   → Choc positif, elle répond par curiosité ou pour défendre
-
-3. AFFIRMATION DIRECTE qui crée une émotion
-   Exemples : "Tu m'hypnotises" / "T'as l'air d'être le problème que je cherche" / "Être aussi belle est un crime"
-   → Court, percutant, elle ressent quelque chose
-
-4. PUSH-PULL : Compliment + retrait immédiat
-   → Crée de la tension et du désir
-
-RÈGLES ABSOLUES :
-- 1 phrase, 2 max. JAMAIS plus.
-- Pas de "je voulais te dire que..." ni de formules de politesse
-- Pas de référence aux vêtements de couleur précise
-- Pas de "Ce [détail] me dit que..." (formulaique)
-- Le mot "smooth" est BANNI
-- Cash, direct, sans s'excuser
-
-Ta mission : analyser l'accroche de l'user, expliquer pourquoi elle ne marche pas (ou pourrait mieux marcher), et générer une accroche INFINIMENT meilleure.`
-
-    const userPrompt = `Analyse cette accroche envoyée à une fille${screenshot_url ? ' (réponse à sa story)' : ''} :
-
-ACCROCHE DE L'USER : "${user_message}"
-L'USER PENSAIT QUE : elle allait ${user_answer === 'oui' ? 'répondre' : 'ignorer'}
-
-Génère une analyse structurée et une meilleure accroche.
-
-Réponds UNIQUEMENT en JSON valide avec ce format exact :
-{
-  "verdict": "ne_marche_pas",
-  "raisons_echec": [
-    "Raison courte et percutante 1",
-    "Raison courte et percutante 2", 
-    "Raison courte et percutante 3"
-  ],
-  "accroche_optimisee": "L'accroche parfaite en 1-2 phrases max",
-  "raisons_succes": [
-    "Pourquoi ça marche 1",
-    "Pourquoi ça marche 2",
-    "Pourquoi ça marche 3"
-  ]
-}
-
-Les raisons doivent être directes, sans bullshit, 5-10 mots chacune.
-L'accroche optimisée doit utiliser une des techniques validées ci-dessus.`
-
-    const messageContent: Anthropic.MessageParam['content'] = screenshot_url
-      ? [
-          {
-            type: 'image',
-            source: { type: 'url', url: screenshot_url },
-          },
-          { type: 'text', text: userPrompt },
-        ]
-      : userPrompt
-
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 800,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: messageContent }],
-    })
-
-    const rawText = response.content[0].type === 'text' ? response.content[0].text : ''
-
-    // Parse JSON robuste
-    let analysis: {
-      verdict: string
-      raisons_echec: string[]
-      accroche_optimisee: string
-      raisons_succes: string[]
-    }
-
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) throw new Error('No JSON found')
-      analysis = JSON.parse(jsonMatch[0])
-    } catch {
-      // Fallback en cas d'échec du parsing
-      analysis = {
-        verdict: 'ne_marche_pas',
-        raisons_echec: [
-          'Trop générique, elle a vu ça 100 fois',
-          'Aucune tension ni surprise',
-          'Elle peut ignorer sans effort',
-        ],
-        accroche_optimisee: 'Tu ronfles ?',
-        raisons_succes: [
-          'Présuppose une intimité future',
-          'Elle doit répondre pour corriger',
-          'Court, percutant, inattendu',
-        ],
+    // ─── 1. Analyser le profil si une image est fournie ──────────────────────
+    let profileAnalysis = null
+    if (storyImageBase64) {
+      try {
+        profileAnalysis = await analyzeProfileWithVision(storyImageBase64, 'image/jpeg')
+      } catch {
+        // Si l'analyse échoue, on continue sans image
       }
     }
 
-    // Tracker l'événement si session_id fourni
-    if (session_id) {
-      try {
-        const supabase = createServiceRoleClient()
-        await supabase
-          .from('rizz_sessions')
-          .update({ saw_blurred_result: true })
-          .eq('id', session_id)
-      } catch { /* non-bloquant */ }
+    // Profil par défaut si pas d'image
+    if (!profileAnalysis) {
+      profileAnalysis = {
+        name: null,
+        age: null,
+        bio: null,
+        interests: [],
+        vibe: 'profil Instagram, story partagée',
+        photo_context: 'story Instagram, personne attrayante',
+      }
     }
 
-    // Tracker la création de session sinon
+    // ─── 2. Générer l'accroche optimisée via l'agent CrushMaxxing ────────────
+    const [generatedMessages, evaluation] = await Promise.all([
+      // Générer l'accroche optimisée avec le vrai agent
+      generateMessages(profileAnalysis, 'accroche', ['CrushMaxxing']),
+
+      // Évaluer le message de l'user + générer les raisons
+      anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: `Tu es un expert en séduction et en analyse de messages. Tu vas évaluer l'accroche d'un homme et expliquer pourquoi elle fonctionne ou non, de façon directe, cash, et sans filtre.`,
+        messages: [
+          {
+            role: 'user',
+            content: `Un homme a envoyé cette accroche à une fille sur Instagram :
+"${user_message}"
+
+L'homme pensait qu'elle allait ${user_answer === 'oui' ? 'répondre' : 'ignorer'}.
+
+Donne 3 raisons pourquoi cette accroche ne va probablement PAS provoquer de réponse (sois cash, direct, 5-8 mots max par raison).
+
+Réponds UNIQUEMENT en JSON :
+{
+  "raisons_echec": ["raison 1", "raison 2", "raison 3"]
+}`,
+          },
+        ],
+      }),
+    ])
+
+    // ─── 3. Extraire l'accroche optimisée ────────────────────────────────────
+    const bestMessage = generatedMessages.find(m => m.tone === 'CrushMaxxing') || generatedMessages[0]
+    const accrocheOptimisee = bestMessage?.content || 'Tu ronfles ?'
+
+    // ─── 4. Parser les raisons d'échec ────────────────────────────────────────
+    let raisonsEchec = ['Trop générique, pas d\'impact', 'Aucune tension ni surprise', 'Elle peut ignorer sans effort']
+    try {
+      const evalText = evaluation.content[0].type === 'text' ? evaluation.content[0].text : ''
+      const jsonMatch = evalText.match(/\{[\s\S]*\}/)
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0])
+        if (Array.isArray(parsed.raisons_echec)) raisonsEchec = parsed.raisons_echec
+      }
+    } catch { /* fallback */ }
+
+    // ─── 5. Générer les raisons de succès pour l'accroche optimisée ──────────
+    let raisonsSucces = ['Présuppose une intimité', 'Elle doit répondre pour corriger', 'Court, percutant, inattendu']
+    try {
+      const successEval = await anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        system: 'Tu es un expert en séduction. Explique en 3 raisons courtes (5-8 mots max) pourquoi une accroche fonctionne. Réponds uniquement en JSON.',
+        messages: [
+          {
+            role: 'user',
+            content: `Accroche : "${accrocheOptimisee}"\n\nPourquoi ça va marcher ?\n\n{"raisons_succes": ["raison 1", "raison 2", "raison 3"]}`,
+          },
+        ],
+      })
+      const successText = successEval.content[0].type === 'text' ? successEval.content[0].text : ''
+      const jsonMatch = successText.match(/\{[\s\S]*\}/)
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0])
+        if (Array.isArray(parsed.raisons_succes)) raisonsSucces = parsed.raisons_succes
+      }
+    } catch { /* fallback */ }
+
+    // ─── 6. Tracker dans rizz_sessions si pas de session_id ─────────────────
+    let newSessionId = session_id
     if (!session_id) {
       try {
         const supabase = createServiceRoleClient()
@@ -147,7 +120,6 @@ L'accroche optimisée doit utiliser une des techniques validées ci-dessus.`
           headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
           headersList.get('x-real-ip') ||
           'unknown'
-
         const flowType = headersList.get('x-flow-type') || 'unknown'
 
         const { data } = await supabase
@@ -161,11 +133,17 @@ L'accroche optimisée doit utiliser une des techniques validées ci-dessus.`
           .select('id')
           .single()
 
-        return NextResponse.json({ ...analysis, session_id: data?.id })
+        newSessionId = data?.id
       } catch { /* non-bloquant */ }
     }
 
-    return NextResponse.json(analysis)
+    return NextResponse.json({
+      verdict: 'ne_marche_pas',
+      raisons_echec: raisonsEchec,
+      accroche_optimisee: accrocheOptimisee,
+      raisons_succes: raisonsSucces,
+      session_id: newSessionId,
+    })
   } catch (error) {
     console.error('[analyze-rizz] Error:', error)
     return NextResponse.json(
