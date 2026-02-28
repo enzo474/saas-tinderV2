@@ -3,11 +3,19 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AuthForm } from './AuthForm'
 
-export default async function AuthPage() {
+export default async function AuthPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (user) redirect('/game/accroche')
+  if (user) {
+    const params = await searchParams
+    const context = params?.context
+    const from    = params?.from
+    // Si l'user arrive depuis les flows rizz, le renvoyer vers la page reveal
+    if (context === 'rizz' && from === 'test-1') redirect('/onboarding-test-1/reveal')
+    if (context === 'rizz' && from === 'test-2') redirect('/onboarding-test-2/reveal')
+    redirect('/game/accroche')
+  }
 
   return (
     <Suspense fallback={
