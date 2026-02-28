@@ -19,10 +19,7 @@ export function RizzRevealClient() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('rizz_pending')
-      if (raw) {
-        const parsed = JSON.parse(raw) as RizzPending
-        setData(parsed)
-      }
+      if (raw) setData(JSON.parse(raw) as RizzPending)
     } catch { /* non-bloquant */ }
     setLoading(false)
   }, [])
@@ -55,10 +52,7 @@ export function RizzRevealClient() {
         className="min-h-screen flex flex-col items-center justify-center px-4 text-center"
         style={{ background: '#0A0A0A' }}
       >
-        <div className="text-4xl mb-4">😕</div>
-        <h1 className="font-montserrat font-bold text-white text-xl mb-3">
-          Session expirée
-        </h1>
+        <h1 className="font-montserrat font-bold text-white text-xl mb-3">Session expirée</h1>
         <p className="text-sm mb-6" style={{ color: '#6b7280' }}>
           Les données de ton analyse n'ont pas été retrouvées.
         </p>
@@ -101,9 +95,8 @@ export function RizzRevealClient() {
           </span>
         </div>
 
-        {/* Header succès */}
+        {/* Header */}
         <div className="text-center mb-6">
-          <div className="text-4xl mb-3">✅</div>
           <h1 className="font-montserrat font-bold text-white text-2xl">
             TON ACCROCHE OPTIMISÉE
           </h1>
@@ -118,15 +111,10 @@ export function RizzRevealClient() {
           }}
         >
           <div className="flex items-center gap-2 mb-3">
-            <div
-              className="w-2 h-2 rounded-full"
-              style={{ background: '#22c55e' }}
-            />
+            <div className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} />
             <span className="text-xs font-bold" style={{ color: '#22c55e' }}>ACCROCHE DÉBLOQUÉE</span>
           </div>
-          <p className="text-white font-bold text-xl leading-relaxed">
-            "{accroche}"
-          </p>
+          <p className="text-white font-bold text-xl leading-relaxed">"{accroche}"</p>
         </div>
 
         {/* Bouton copier */}
@@ -135,31 +123,30 @@ export function RizzRevealClient() {
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
           style={{ background: copied ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
-          {copied ? '✓ Copié !' : 'Copier l\'accroche'}
+          {copied ? 'Copié !' : 'Copier l\'accroche'}
         </button>
 
-        {/* Raisons du succès */}
+        {/* Raisons succès */}
         <div
           className="rounded-2xl p-5 border mb-5"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-xs font-semibold mb-3" style={{ color: '#22c55e' }}>
-            POURQUOI ÇA VA MARCHER :
+            POURQUOI CA VA MARCHER :
           </p>
           <div className="space-y-2">
             {(data.analysis.raisons_succes || []).map((r, i) => (
               <div key={i} className="flex items-start gap-2">
-                <span style={{ color: '#22c55e' }}>✓</span>
+                <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: '#22c55e' }}>—</span>
                 <span className="text-sm" style={{ color: '#9da3af' }}>{r}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Séparateur */}
         <div className="h-px mb-5" style={{ background: '#2A2A2A' }} />
 
-        {/* Bonus 1 analyse */}
+        {/* Bonus analyse */}
         <div
           className="rounded-2xl p-5 border mb-5"
           style={{
@@ -167,22 +154,18 @@ export function RizzRevealClient() {
             borderColor: 'rgba(230,57,70,0.2)',
           }}
         >
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-lg">🎁</span>
-            <span className="font-bold text-white text-sm">1 ANALYSE GRATUITE</span>
-          </div>
+          <p className="font-bold text-white text-sm mb-1">1 ANALYSE GRATUITE</p>
           <p className="text-xs" style={{ color: '#9da3af' }}>
-            Tu as reçu 1 analyse gratuite dans le dashboard. Utilise-la pour optimiser ta prochaine accroche.
+            Tu as reçu 1 analyse gratuite dans le dashboard.
           </p>
         </div>
 
-        {/* CTA dashboard */}
         <button
           onClick={handleNewAnalysis}
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] border"
           style={{ background: '#111111', borderColor: '#2A2A2A' }}
         >
-          Analyser un nouveau profil →
+          Analyser un nouveau profil
         </button>
 
         <p className="text-center text-xs mt-4" style={{ color: '#6b7280' }}>

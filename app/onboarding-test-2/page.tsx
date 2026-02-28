@@ -4,32 +4,34 @@ import { useState, useRef } from 'react'
 import { RizzLoadingStep, RizzResultBlurred, type RizzAnalysis } from '@/components/onboarding/RizzSteps'
 
 type Step = 'input' | 'loading' | 'result'
+type Tone = 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
+
+const TONES: { id: Tone; label: string }[] = [
+  { id: 'Direct',     label: 'Direct' },
+  { id: 'Drôle',      label: 'Drôle' },
+  { id: 'Mystérieux', label: 'Mystérieux' },
+  { id: 'Compliment', label: 'Compliment' },
+]
 
 const GIRLS = [
-  {
-    id: 'emma',
-    name: '👱‍♀️ Emma, 23 ans',
-    placeholder: 'https://placehold.co/300x450/1A1A1A/888888?text=Emma',
-  },
-  {
-    id: 'sarah',
-    name: '👩 Sarah, 24 ans',
-    placeholder: 'https://placehold.co/300x450/151515/888888?text=Sarah',
-  },
+  { id: 'emma',  name: 'Emma, 23 ans',  placeholder: 'https://placehold.co/300x450/1A1A1A/888888?text=Emma' },
+  { id: 'sarah', name: 'Sarah, 24 ans', placeholder: 'https://placehold.co/300x450/151515/888888?text=Sarah' },
 ]
 
 export default function OnboardingTest2() {
-  const [step, setStep]               = useState<Step>('input')
-  const [message, setMessage]         = useState('')
-  const [answer, setAnswer]           = useState<'oui' | 'non' | null>(null)
-  const [analysis, setAnalysis]       = useState<RizzAnalysis | null>(null)
+  const [step, setStep]                 = useState<Step>('input')
+  const [message, setMessage]           = useState('')
+  const [selectedTone, setSelectedTone] = useState<Tone | null>(null)
   const [selectedGirl, setSelectedGirl] = useState<string | null>(null)
-  const inputRef                      = useRef<HTMLTextAreaElement>(null)
+  const [answer, setAnswer]             = useState<'oui' | 'non' | null>(null)
+  const [analysis, setAnalysis]         = useState<RizzAnalysis | null>(null)
+  const inputRef                        = useRef<HTMLTextAreaElement>(null)
+
+  const canProceed = message.trim() && selectedTone
 
   const handleAnswer = (chosen: 'oui' | 'non') => {
-    if (!message.trim()) {
-      inputRef.current?.focus()
-      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (!canProceed) {
+      if (!message.trim()) inputRef.current?.focus()
       return
     }
     setAnswer(chosen)
@@ -41,18 +43,19 @@ export default function OnboardingTest2() {
     setStep('result')
   }
 
-  if (step === 'loading' && answer) {
+  if (step === 'loading' && answer && selectedTone) {
     return (
       <RizzLoadingStep
         userMessage={message}
         userAnswer={answer}
         flowType="test-2"
+        tone={selectedTone}
         onComplete={handleAnalysisComplete}
       />
     )
   }
 
-  if (step === 'result' && analysis && answer) {
+  if (step === 'result' && analysis) {
     return (
       <RizzResultBlurred
         userMessage={message}
@@ -92,11 +95,10 @@ export default function OnboardingTest2() {
         {/* Titre */}
         <div className="text-center mb-5">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            🎯 TESTE TON RIZZ<br />EN 10 SECONDES
+            TESTE TON RIZZ EN 10 SECONDES
           </h1>
         </div>
 
-        {/* Séparateur */}
         <div className="h-px mb-5" style={{ background: '#2A2A2A' }} />
 
         {/* 2 photos sélectionnables */}
@@ -121,30 +123,19 @@ export default function OnboardingTest2() {
                     transform: isSelected ? 'scale(1.03)' : 'scale(1)',
                   }}
                 >
-                  <img
-                    src={girl.placeholder}
-                    alt={girl.name}
-                    className="w-full h-full object-cover"
-                  />
-                  {isSelected && (
-                    <div
-                      className="absolute inset-0 rounded-2xl pointer-events-none"
-                      style={{ background: 'rgba(230,57,70,0.08)' }}
-                    />
-                  )}
+                  <img src={girl.placeholder} alt={girl.name} className="w-full h-full object-cover" />
                 </div>
                 <span
                   className="text-xs font-semibold transition-colors"
                   style={{ color: isSelected ? '#E63946' : '#9da3af' }}
                 >
-                  {isSelected ? '✓ ' : ''}{girl.name}
+                  {girl.name}
                 </span>
               </button>
             )
           })}
         </div>
 
-        {/* Séparateur */}
         <div className="h-px mb-5" style={{ background: '#2A2A2A' }} />
 
         {/* Question accroche */}
@@ -162,15 +153,36 @@ export default function OnboardingTest2() {
             placeholder="Tape ton message ici..."
             rows={3}
             className="w-full px-4 py-3 rounded-xl border text-white text-sm outline-none resize-none transition-colors"
-            style={{
-              background: '#0D0D0D',
-              borderColor: message.trim() ? '#E63946' : '#2A2A2A',
-              color: '#fff',
-            }}
+            style={{ background: '#0D0D0D', borderColor: message.trim() ? '#E63946' : '#2A2A2A', color: '#fff' }}
           />
         </div>
 
-        {/* Séparateur */}
+        {/* Choix du ton */}
+        <div
+          className="rounded-2xl p-5 border mb-4"
+          style={{ background: '#111111', borderColor: '#1F1F1F' }}
+        >
+          <p className="text-white font-semibold text-sm mb-3 text-center">
+            Quel ton veux-tu utiliser ?
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {TONES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTone(t.id)}
+                className="py-2.5 px-3 rounded-xl border text-sm font-semibold transition-all"
+                style={{
+                  background: selectedTone === t.id ? '#E63946' : 'transparent',
+                  borderColor: selectedTone === t.id ? '#E63946' : '#2A2A2A',
+                  color: selectedTone === t.id ? '#fff' : '#9da3af',
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="h-px mb-4" style={{ background: '#2A2A2A' }} />
 
         {/* Question Oui/Non */}
@@ -186,42 +198,31 @@ export default function OnboardingTest2() {
             <button
               onClick={() => handleAnswer('oui')}
               className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                opacity: message.trim() ? 1 : 0.5,
-              }}
+              style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', opacity: canProceed ? 1 : 0.4 }}
             >
               OUI, elle va répondre
             </button>
             <button
               onClick={() => handleAnswer('non')}
               className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #E63946, #FF4757)',
-                opacity: message.trim() ? 1 : 0.5,
-              }}
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', opacity: canProceed ? 1 : 0.4 }}
             >
               NON, elle va ignorer
             </button>
           </div>
 
-          {!message.trim() && (
+          {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              ↑ Tape d'abord ton accroche
+              {!message.trim() ? 'Tape ton accroche et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">⚡</span>
-            <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">💬</span>
-            <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
-          </div>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
+          <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
         </div>
       </div>
     </div>

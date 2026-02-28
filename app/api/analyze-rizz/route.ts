@@ -11,10 +11,11 @@ const anthropic = new Anthropic({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { user_message, storyImageBase64, user_answer, session_id } = body as {
+    const { user_message, storyImageBase64, user_answer, tone, session_id } = body as {
       user_message: string
-      storyImageBase64?: string   // base64 sans prefix data:...
+      storyImageBase64?: string
       user_answer: 'oui' | 'non'
+      tone?: string               // 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
       session_id?: string
     }
 
@@ -44,10 +45,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ─── 2. Générer l'accroche optimisée via l'agent CrushMaxxing ────────────
+    // ─── 2. Générer l'accroche optimisée via l'agent avec le ton choisi ─────
+    // Si un ton est fourni, l'utiliser ; sinon utiliser CrushMaxxing par défaut
+    const validTones = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushMaxxing']
+    const selectedTone = tone && validTones.includes(tone) ? tone : 'CrushMaxxing'
+
     const [generatedMessages, evaluation] = await Promise.all([
-      // Générer l'accroche optimisée avec le vrai agent
-      generateMessages(profileAnalysis, 'accroche', ['CrushMaxxing']),
+      generateMessages(profileAnalysis, 'accroche', [selectedTone]),
 
       // Évaluer le message de l'user + générer les raisons
       anthropic.messages.create({
@@ -74,7 +78,7 @@ Réponds UNIQUEMENT en JSON :
     ])
 
     // ─── 3. Extraire l'accroche optimisée ────────────────────────────────────
-    const bestMessage = generatedMessages.find(m => m.tone === 'CrushMaxxing') || generatedMessages[0]
+    const bestMessage = generatedMessages.find(m => m.tone === selectedTone) || generatedMessages[0]
     const accrocheOptimisee = bestMessage?.content || 'Tu ronfles ?'
 
     // ─── 4. Parser les raisons d'échec ────────────────────────────────────────

@@ -4,40 +4,45 @@ import { useState, useRef } from 'react'
 import { RizzLoadingStep, RizzResultBlurred, type RizzAnalysis } from '@/components/onboarding/RizzSteps'
 
 type Step = 'input' | 'loading' | 'result'
+type Tone = 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
+
+const TONES: { id: Tone; label: string }[] = [
+  { id: 'Direct',     label: 'Direct' },
+  { id: 'Drôle',      label: 'Drôle' },
+  { id: 'Mystérieux', label: 'Mystérieux' },
+  { id: 'Compliment', label: 'Compliment' },
+]
 
 export default function OnboardingTest1() {
   const [step, setStep]               = useState<Step>('input')
   const [message, setMessage]         = useState('')
+  const [selectedTone, setSelectedTone] = useState<Tone | null>(null)
   const [answer, setAnswer]           = useState<'oui' | 'non' | null>(null)
   const [analysis, setAnalysis]       = useState<RizzAnalysis | null>(null)
-  const [storyImage, setStoryImage]   = useState<string | null>(null)  // base64
+  const [storyImage, setStoryImage]   = useState<string | null>(null)
   const [storyPreview, setStoryPreview] = useState<string | null>(null)
   const inputRef                      = useRef<HTMLTextAreaElement>(null)
   const fileInputRef                  = useRef<HTMLInputElement>(null)
 
-  const handleStoryClick = () => {
-    fileInputRef.current?.click()
-  }
+  const handleStoryClick = () => fileInputRef.current?.click()
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     const reader = new FileReader()
     reader.onload = (ev) => {
       const result = ev.target?.result as string
       setStoryPreview(result)
-      // Extraire uniquement le base64 (sans le prefix data:...)
-      const base64 = result.split(',')[1]
-      setStoryImage(base64)
+      setStoryImage(result.split(',')[1])
     }
     reader.readAsDataURL(file)
   }
 
+  const canProceed = message.trim() && selectedTone
+
   const handleAnswer = (chosen: 'oui' | 'non') => {
-    if (!message.trim()) {
-      inputRef.current?.focus()
-      inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (!canProceed) {
+      if (!message.trim()) inputRef.current?.focus()
       return
     }
     setAnswer(chosen)
@@ -49,19 +54,20 @@ export default function OnboardingTest1() {
     setStep('result')
   }
 
-  if (step === 'loading' && answer) {
+  if (step === 'loading' && answer && selectedTone) {
     return (
       <RizzLoadingStep
         userMessage={message}
         userAnswer={answer}
         storyImageBase64={storyImage || undefined}
         flowType="test-1"
+        tone={selectedTone}
         onComplete={handleAnalysisComplete}
       />
     )
   }
 
-  if (step === 'result' && analysis && answer) {
+  if (step === 'result' && analysis) {
     return (
       <RizzResultBlurred
         userMessage={message}
@@ -101,19 +107,13 @@ export default function OnboardingTest1() {
         {/* Titre */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            🎯 TESTE TON RIZZ<br />EN 10 SECONDES
+            TESTE TON RIZZ EN 10 SECONDES
           </h1>
         </div>
 
         {/* Zone story — clickable pour upload */}
         <div className="flex justify-center mb-5">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
+          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
           <button
             onClick={handleStoryClick}
             className="relative overflow-hidden rounded-2xl border transition-all hover:border-opacity-80 active:scale-[0.98]"
@@ -125,11 +125,15 @@ export default function OnboardingTest1() {
             }}
           >
             {storyPreview ? (
-              <img
-                src={storyPreview}
-                alt="Story uploadée"
-                className="w-full h-full object-cover"
-              />
+              <>
+                <img src={storyPreview} alt="Story" className="w-full h-full object-cover" />
+                <div
+                  className="absolute bottom-2 inset-x-2 text-center text-xs font-bold py-1 rounded-lg"
+                  style={{ background: 'rgba(0,0,0,0.6)', color: '#22c55e' }}
+                >
+                  Story ajoutée
+                </div>
+              </>
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-4">
                 <div
@@ -146,19 +150,10 @@ export default function OnboardingTest1() {
                 </div>
               </div>
             )}
-            {/* Badge overlay si image présente */}
-            {storyPreview && (
-              <div
-                className="absolute bottom-2 inset-x-2 text-center text-xs font-bold py-1 rounded-lg"
-                style={{ background: 'rgba(0,0,0,0.6)', color: '#22c55e' }}
-              >
-                ✓ Story ajoutée
-              </div>
-            )}
           </button>
         </div>
 
-        {/* Question */}
+        {/* Question accroche */}
         <div
           className="rounded-2xl p-5 border mb-4"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
@@ -177,6 +172,32 @@ export default function OnboardingTest1() {
           />
         </div>
 
+        {/* Choix du ton */}
+        <div
+          className="rounded-2xl p-5 border mb-4"
+          style={{ background: '#111111', borderColor: '#1F1F1F' }}
+        >
+          <p className="text-white font-semibold text-sm mb-3 text-center">
+            Quel ton veux-tu utiliser ?
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {TONES.map(t => (
+              <button
+                key={t.id}
+                onClick={() => setSelectedTone(t.id)}
+                className="py-2.5 px-3 rounded-xl border text-sm font-semibold transition-all"
+                style={{
+                  background: selectedTone === t.id ? '#E63946' : 'transparent',
+                  borderColor: selectedTone === t.id ? '#E63946' : '#2A2A2A',
+                  color: selectedTone === t.id ? '#fff' : '#9da3af',
+                }}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Question Oui/Non */}
         <div
           className="rounded-2xl p-5 border mb-5"
@@ -190,42 +211,31 @@ export default function OnboardingTest1() {
             <button
               onClick={() => handleAnswer('oui')}
               className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                opacity: message.trim() ? 1 : 0.5,
-              }}
+              style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', opacity: canProceed ? 1 : 0.4 }}
             >
               OUI, elle va répondre
             </button>
             <button
               onClick={() => handleAnswer('non')}
               className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #E63946, #FF4757)',
-                opacity: message.trim() ? 1 : 0.5,
-              }}
+              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', opacity: canProceed ? 1 : 0.4 }}
             >
               NON, elle va ignorer
             </button>
           </div>
 
-          {!message.trim() && (
+          {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              ↑ Tape d'abord ton accroche
+              {!message.trim() ? 'Tape ton accroche et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
 
         {/* Footer */}
         <div className="flex items-center justify-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="text-sm">⚡</span>
-            <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm">💬</span>
-            <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
-          </div>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
+          <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
         </div>
       </div>
     </div>
