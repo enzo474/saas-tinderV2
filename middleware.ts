@@ -134,6 +134,7 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/api/analyze-rizz') ||
     path.startsWith('/onboarding-test-1') ||
     path.startsWith('/onboarding-test-2') ||
+    path === '/stats' ||
     path === '/admin1'
   ) {
     return response
