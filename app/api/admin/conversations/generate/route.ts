@@ -24,21 +24,24 @@ const FEMALE_PROFILES_BY_LENGTH: Record<string, Array<{ name: string; descriptio
       name: 'La Légère',
       description: `PROFIL ELLE — LA LÉGÈRE / AMUSÉE (version courte) :
 Elle est réactive, souriante malgré elle, elle trouve ça drôle. Elle résiste mais pas méchamment — sa résistance est légère, joueuse.
-Messages rythmés : "ptdr", "nan mais attends", "sérieux ?", "mdrr". Emojis présents (😂😭😏) mais utilisés pour montrer qu'elle trouve ça marrant, pas pour valider.
+Messages rythmés : "ptdr", "nan mais attends", "ok j'avoue c'est pas mal", "mdrr", "t'as trouvé ça tout seul ?". Emojis présents (😂😭😏).
 Elle engage vite et naturellement — c'est ce qui rend la conv captivante pour le viewer.
 Son répondant : elle a des répliques, elle contre-attaque avec de l'humour, elle teste lui — mais jamais avec hostilité.
-Sa progression : un peu méfiante au début → amusée au milieu → une ouverture claire à la fin (numéro, date ou "pourquoi pas").
-⚠️ Elle ne complimente PAS lui. Son intérêt se lit dans son engagement, pas dans ses mots.`,
+Sa progression : légèrement méfiante au début → clairement amusée au milieu → ouverture franche à la fin (numéro, date ou "pourquoi pas").
+
+⚠️ RÈGLE ÉMOTIONNELLE : Si lui envoie quelque chose de DRÔLE ou d'ABSURDE bien trouvé, sa première réaction DOIT montrer qu'elle a ri ou souri — "mdrr", "ok c'est pas mal", "t'es bizarre mais j'aime bien". Elle ne dit JAMAIS "c'est ta technique ça" froidement sur un bon message drôle — ça dénote de l'hostilité, pas de la légèreté.
+Elle peut faire des compliments indirects et amusants sur son sens de l'humour : "j'avoue t'es drôle", "ok t'as du répondant", "c'est toi qui fait ça tout seul ?" — ces phrases montrent son intérêt sans le flatter platement.`,
     },
     {
       name: 'La Curieuse Joueuse',
       description: `PROFIL ELLE — LA CURIEUSE JOUEUSE (version courte) :
 Elle est intriguée dès le départ et le montre à moitié. Elle pose des vraies questions sans le vouloir, elle est prise dans le jeu.
 Messages de longueur variable : courts quand elle se ressaisit ("et ?", "genre"), plus longs quand ça l'accroche vraiment.
-Quelques emojis (👀, 😐, 😏) qui trahissent son intérêt mieux que ses mots.
+Quelques emojis (👀, 😏, 😂) qui trahissent son intérêt mieux que ses mots.
 Son répondant : elle creuse, elle teste, elle met lui en situation. Elle veut comprendre qui il est.
-Sa progression : neutre/curieuse → de plus en plus impliquée → fin ouverte et chaleureuse.
-⚠️ Elle ne complimente PAS lui. Elle montre son intérêt par ses questions et sa présence, jamais par des phrases flatteuses.`,
+Sa progression : neutre/curieuse → de plus en plus impliquée → fin chaleureuse et ouverte.
+
+⚠️ RÈGLE ÉMOTIONNELLE : Si lui dit quelque chose de drôle ou de bien trouvé, elle DOIT entrer dans le jeu — "attend c'est quoi l'idée derrière ça", "nan mais t'es sérieux là 😂", "ok je comprends pas mais j'aime bien". Sa curiosité se transforme en amusement. Elle peut dire "t'es original je te l'accorde" ou "ok t'as du répondant" — ce sont des remarques naturelles, pas des compliments plats.`,
     },
   ],
 
@@ -108,7 +111,23 @@ EXEMPLES D'ACCROCHES TRASH QUI ONT MARCHÉ (inspirées de vraies conversations v
 TON GLOBAL TRASH : direct, sûr de lui, jamais sur la défensive, légèrement provocateur. Il assume tout ce qu'il dit.
 La fille peut être choquée, amusée ou agacée — les 3 créent de l'engagement viral.`,
 
-  drole: 'DRÔLE / ABSURDE : Humour décalé, répliques inattendues, situations absurdes. Fait sourire en lisant. Le mec utilise l\'humour comme arme de séduction.',
+  drole: `DRÔLE / ABSURDE :
+Lui utilise l'humour absurde ou décalé comme arme de séduction. Ses messages font sourire ou surprennent par leur décalage.
+
+⚠️ RÈGLE FONDAMENTALE SUR "ELLE" EN MODE DRÔLE :
+Sa réaction DOIT correspondre à la qualité du message. Si lui dit quelque chose de vraiment drôle ou d'absurde bien trouvé, elle ne peut pas faire semblant que ça l'a laissée de marbre — même les filles froides réagissent à l'humour.
+
+RÉACTIONS NATURELLES D'UNE FILLE À UN BON MESSAGE DRÔLE :
+→ Elle rit malgré elle : "mdrr", "ptdrr", "ok j'avoue c'est pas mal", "nan mais c'est quoi cette phrase"
+→ Elle entre dans le jeu absurde : "et si c'est un chien ?" / "ok t'as gagné je réponds"
+→ Elle questionne avec intérêt réel : "t'as trouvé ça tout seul ?", "attends c'est quoi l'idée derrière"
+→ Elle ne se contente PAS d'une réplique froide style "MDR sérieux ? C'est ta technique ça" — c'est trop défensif pour un bon message drôle
+
+COHÉRENCE ÉMOTIONNELLE OBLIGATOIRE :
+Si son message est clairement absurde/bien trouvé → sa première réponse doit montrer qu'elle a souri (même les profils froids peuvent rire UNE FOIS malgré eux avant de reprendre leurs gardes).
+Si son message est plat → elle peut être plus neutre ou taquine.
+La résistance existe mais elle est JOUÉE, pas hostile — "nan mais sérieux t'es bizarre" dit avec le sourire ≠ "c'est ta technique ça" dit avec mépris.`,
+
   direct: 'DIRECT / OSÉ : Droit au but, honnête sur ses intentions, sans détour. Efficace et court. Chaque message va à l\'essentiel.',
   mysterieux: 'MYSTÉRIEUX / INTRIGUANT : Messages qui laissent des questions en suspens. La fille doit se demander qui il est. Crée de l\'intrigue et de la tension.',
   flirt: 'FLIRT HEAVY : Flirt intense et constant, sous-entendus permanents, jeu de séduction élaboré. Chaque message est une invitation voilée.',
@@ -232,6 +251,14 @@ ${
     ? '⚠️ VERSION MOYENNE (14-18 slides) : Rythme plus posé. La fille est moins accessible, légèrement froide — elle teste lui plus longtemps avant de s\'ouvrir légèrement. Fin ambiguë avec une porte entrouverte mais pas de victoire totale.'
     : '⚠️ VERSION LONGUE (18-20 slides MAX — ne pas dépasser) : La fille est froide tout du long. Résistance forte et durable. Lui doit travailler chaque échange pour gratter un centimètre. La "victoire" est une ouverture très partielle à la fin ("on verra", "peut-être"), jamais un numéro ou un date explicite.'
 }
+
+COHÉRENCE ÉMOTIONNELLE — RÈGLE FONDAMENTALE :
+⚠️ La réponse de "elle" doit être PROPORTIONNELLE et COHÉRENTE avec ce que "lui" vient d'envoyer.
+- Si son message est DRÔLE ou ABSURDE → elle réagit à l'humour. Elle ne peut pas répondre froidement à quelque chose de bien trouvé — même les profils distants laissent échapper un sourire une fois.
+- Si son message est TRASH/DIRECT → elle peut être choquée, amusée ou agacée — les 3 sont naturels.
+- Si son message est MYSTÉRIEUX → elle est intriguée et cherche à comprendre.
+- Si son message est PLAT ou BANAL → là elle peut être indifférente ou moqueuse.
+La règle : l'émotion de sa réponse correspond à l'énergie du message — jamais une réponse hostile sur un bon message drôle, jamais une réponse enthousiaste sur un message plat.
 
 FLUIDITÉ ET PROGRESSION NATURELLE — RÈGLES IMPÉRATIVES :
 1. La conversation DOIT avoir une courbe narrative : accroche → résistance → pic de tension → résolution. Pas de changement brutal de registre sans transition.
