@@ -37,24 +37,30 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (!error) {
-      // Créer 5 crédits pour les nouveaux utilisateurs (non-bloquant)
+      // Créer toutes les entrées nécessaires pour un nouveau user (non-bloquant)
       try {
         const { createServiceRoleClient } = await import('@/lib/supabase/server')
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           const admin = createServiceRoleClient()
-          const { data: existing } = await admin
-            .from('crushtalk_credits')
-            .select('user_id')
-            .eq('user_id', user.id)
-            .single()
-          if (!existing) {
-            await admin.from('crushtalk_credits').insert({
-              user_id: user.id,
-              balance: 5,
-              used_total: 0,
-            })
-          }
+
+          // user_profiles
+          await admin.from('user_profiles').upsert(
+            { id: user.id, credits: 0, role: 'user' },
+            { onConflict: 'id', ignoreDuplicates: true }
+          )
+
+          // user_progression
+          await admin.from('user_progression').upsert(
+            { user_id: user.id },
+            { onConflict: 'user_id', ignoreDuplicates: true }
+          )
+
+          // crushtalk_credits
+          await admin.from('crushtalk_credits').upsert(
+            { user_id: user.id, balance: 5, used_total: 0 },
+            { onConflict: 'user_id', ignoreDuplicates: true }
+          )
         }
       } catch { /* non-bloquant */ }
 

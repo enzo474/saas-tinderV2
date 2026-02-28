@@ -3,6 +3,37 @@
 import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+/**
+ * Crée toutes les entrées nécessaires pour un nouvel utilisateur.
+ * Remplace les triggers Supabase pour éviter "Database error saving new user".
+ */
+async function ensureUserProfiles(admin: SupabaseClient, userId: string) {
+  // user_profiles (credits + role)
+  try {
+    await admin.from('user_profiles').upsert(
+      { id: userId, credits: 0, role: 'user' },
+      { onConflict: 'id', ignoreDuplicates: true }
+    )
+  } catch { /* non-bloquant */ }
+
+  // user_progression
+  try {
+    await admin.from('user_progression').upsert(
+      { user_id: userId },
+      { onConflict: 'user_id', ignoreDuplicates: true }
+    )
+  } catch { /* non-bloquant */ }
+
+  // crushtalk_credits (5 analyses offertes)
+  try {
+    await admin.from('crushtalk_credits').upsert(
+      { user_id: userId, balance: 5, used_total: 0 },
+      { onConflict: 'user_id', ignoreDuplicates: true }
+    )
+  } catch { /* non-bloquant */ }
+}
 
 export async function signInWithEmail(formData: FormData) {
   const supabase   = await createClient()
@@ -48,22 +79,7 @@ export async function signUpWithEmail(formData: FormData) {
   const userId = adminData?.user?.id
 
   if (userId) {
-    try {
-      // Créer les crédits de bienvenue si pas encore fait
-      const { data: existing } = await admin
-        .from('crushtalk_credits')
-        .select('user_id')
-        .eq('user_id', userId)
-        .single()
-
-      if (!existing) {
-        await admin.from('crushtalk_credits').insert({
-          user_id:    userId,
-          balance:    5,
-          used_total: 0,
-        })
-      }
-    } catch { /* non-bloquant */ }
+    await ensureUserProfiles(admin, userId)
   }
 
   // Connecter l'utilisateur
