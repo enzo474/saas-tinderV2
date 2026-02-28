@@ -55,19 +55,11 @@ export async function signUpWithEmail(formData: FormData) {
 
   const admin = createServiceRoleClient()
 
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'actions.ts:signUpWithEmail:entry',message:'signup attempt',data:{email,redirectTo},timestamp:Date.now(),hypothesisId:'A-B-C-D'})}).catch(()=>{});
-  // #endregion
-
   const { data: adminData, error: createError } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
   })
-
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'actions.ts:signUpWithEmail:afterCreate',message:'admin.createUser result',data:{userId:adminData?.user?.id,errorMsg:createError?.message??null,errorCode:(createError as {code?:string}|null)?.code??null},timestamp:Date.now(),hypothesisId:'A-B-C'})}).catch(()=>{});
-  // #endregion
 
   if (createError) {
     const msg = createError.message.toLowerCase()
@@ -75,35 +67,27 @@ export async function signUpWithEmail(formData: FormData) {
       msg.includes('already') ||
       msg.includes('exists') ||
       msg.includes('registered')
-    // Hypothesis A: "database error" should also be treated as potentially recoverable
-    const isDbTriggerError =
-      msg.includes('database error') ||
-      msg.includes('db error')
 
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'actions.ts:signUpWithEmail:errorBranch',message:'error classification',data:{alreadyExists,isDbTriggerError,fullMsg:createError.message},timestamp:Date.now(),hypothesisId:'A-C'})}).catch(()=>{});
-    // #endregion
-
-    if (!alreadyExists && !isDbTriggerError) {
-      return { error: createError.message }
+    if (!alreadyExists) {
+      // Erreur DB (trigger Supabase) : informer l'user de passer par Google
+      return { error: 'Inscription email indisponible. Utilise "Continuer avec Google" pour créer ton compte.' }
     }
-    // Pour "database error" (trigger) ou "already exists" → on essaie quand même le sign-in
+    // Email déjà enregistré → essaie de se connecter
   }
 
   const userId = adminData?.user?.id
-
   if (userId) {
     await ensureUserProfiles(admin, userId)
   }
 
   // Connecter l'utilisateur
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/228ef050-cfb7-4157-ae07-e20cb469c801',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'actions.ts:signUpWithEmail:afterSignIn',message:'signIn result',data:{signInError:signInError?.message??null},timestamp:Date.now(),hypothesisId:'B-D'})}).catch(()=>{});
-  // #endregion
-
-  if (signInError) return { error: signInError.message }
+  if (signInError) {
+    if (signInError.message.toLowerCase().includes('invalid')) {
+      return { error: 'Compte introuvable. Vérifie ton email et mot de passe, ou utilise Google.' }
+    }
+    return { error: signInError.message }
+  }
 
   redirect(redirectTo)
 }
