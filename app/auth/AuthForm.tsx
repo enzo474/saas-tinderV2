@@ -15,17 +15,23 @@ export function AuthForm() {
   const [isPending, startTransition]      = useTransition()
   const searchParams = useSearchParams()
 
+  const context   = searchParams.get('context')  // 'rizz' ou null
+  const fromFlow  = searchParams.get('from')     // 'test-1' | 'test-2' ou null
+  const isRizz    = context === 'rizz'
+  const redirectTo = isRizz && fromFlow
+    ? `/onboarding-${fromFlow}/reveal`
+    : '/game/accroche'
+
   useEffect(() => {
     const urlError = searchParams.get('error')
     if (urlError) setError(decodeURIComponent(urlError))
-    // Si on arrive depuis l'onboarding avec mode=login
     if (searchParams.get('mode') === 'login') setMode('login')
   }, [searchParams])
 
   const handleGoogleAuth = async () => {
     setGoogleLoading(true)
     setError(null)
-    const result = await signInWithGoogle()
+    const result = await signInWithGoogle(redirectTo)
     if (result?.error) {
       setError(result.error)
       setGoogleLoading(false)
@@ -81,16 +87,44 @@ export function AuthForm() {
         >
           {/* Header */}
           <div className="text-center mb-6">
-            <div className="text-4xl mb-3">{mode === 'signup' ? '🎁' : '👋'}</div>
+            <div className="text-4xl mb-3">
+              {isRizz ? '🔓' : (mode === 'signup' ? '🎁' : '👋')}
+            </div>
             <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
-              {mode === 'signup' ? 'Crée ton compte' : 'Content de te revoir'}
+              {isRizz
+                ? 'DÉBLOQUE TON ACCROCHE'
+                : (mode === 'signup' ? 'Crée ton compte' : 'Content de te revoir')}
             </h1>
-            <p className="text-sm" style={{ color: '#9da3af' }}>
-              {mode === 'signup'
-                ? <>Inscription gratuite · <strong className="text-white">1 accroche offerte</strong></>
-                : 'Connecte-toi pour accéder à tes outils'}
-            </p>
+            {isRizz ? (
+              <p className="text-sm font-semibold" style={{ color: '#9da3af' }}>
+                Connecte-toi pour :
+              </p>
+            ) : (
+              <p className="text-sm" style={{ color: '#9da3af' }}>
+                {mode === 'signup'
+                  ? <>Inscription gratuite · <strong className="text-white">1 accroche offerte</strong></>
+                  : 'Connecte-toi pour accéder à tes outils'}
+              </p>
+            )}
           </div>
+
+          {/* Liste bénéfices spéciale rizz - signup */}
+          {isRizz && (
+            <div className="mb-5 space-y-2">
+              {[
+                'Voir l\'accroche optimisée',
+                '1 analyse gratuite en bonus',
+                'Pas de carte bancaire',
+              ].map((benefit) => (
+                <div key={benefit} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.2)' }}>
+                    <Check className="w-3 h-3" style={{ color: '#22c55e' }} />
+                  </div>
+                  <span className="text-sm font-medium text-white">{benefit}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Erreur / Succès */}
           {error && (
@@ -116,7 +150,7 @@ export function AuthForm() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
               </svg>
             )}
-            {googleLoading ? 'Connexion...' : `Continuer avec Google`}
+            {googleLoading ? 'Connexion...' : (isRizz ? 'Continuer avec Google' : 'Continuer avec Google')}
           </button>
 
           {/* Séparateur */}
@@ -128,6 +162,7 @@ export function AuthForm() {
 
           {/* Formulaire email + mot de passe */}
           <form onSubmit={handleEmailSubmit} className="space-y-3 mb-5">
+            <input type="hidden" name="redirectTo" value={redirectTo} />
             <input
               type="email"
               name="email"
@@ -179,8 +214,8 @@ export function AuthForm() {
             </button>
           </p>
 
-          {/* Bénéfices — signup uniquement */}
-          {mode === 'signup' && (
+          {/* Bénéfices — signup uniquement, masqué en contexte rizz (déjà affiché en haut) */}
+          {mode === 'signup' && !isRizz && (
             <div className="mt-5 pt-5 border-t space-y-2.5" style={{ borderColor: '#1F1F1F' }}>
               {[
                 'Pas de carte bancaire requise',

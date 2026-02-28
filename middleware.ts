@@ -50,7 +50,7 @@ export async function middleware(request: NextRequest) {
   if (
     path === '/crushpicture' ||
     path === '/start' ||
-    path.startsWith('/onboarding') ||
+    (path.startsWith('/onboarding') && !path.startsWith('/onboarding-test-')) ||
     path.startsWith('/ob2') ||
     path.startsWith('/analysis') ||
     path === '/results' ||
@@ -105,6 +105,9 @@ export async function middleware(request: NextRequest) {
     path.startsWith('/api/use-free-analysis') ||
     path.startsWith('/api/save-pseudo') ||
     path.startsWith('/api/tracking/') ||
+    path.startsWith('/api/analyze-rizz') ||
+    path.startsWith('/onboarding-test-1') ||
+    path.startsWith('/onboarding-test-2') ||
     path === '/admin1'
   ) {
     return response

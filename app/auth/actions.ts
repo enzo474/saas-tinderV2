@@ -5,20 +5,22 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 
 export async function signInWithEmail(formData: FormData) {
-  const supabase = await createClient()
-  const email    = formData.get('email') as string
-  const password = formData.get('password') as string
+  const supabase   = await createClient()
+  const email      = formData.get('email') as string
+  const password   = formData.get('password') as string
+  const redirectTo = (formData.get('redirectTo') as string) || '/game/accroche'
 
   const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) return { error: error.message }
 
-  redirect('/game/accroche')
+  redirect(redirectTo)
 }
 
 export async function signUpWithEmail(formData: FormData) {
-  const supabase = await createClient()
-  const email    = formData.get('email') as string
-  const password = formData.get('password') as string
+  const supabase   = await createClient()
+  const email      = formData.get('email') as string
+  const password   = formData.get('password') as string
+  const redirectTo = (formData.get('redirectTo') as string) || '/game/accroche'
 
   const { data, error } = await supabase.auth.signUp({ email, password })
   if (error) return { error: error.message }
@@ -51,16 +53,19 @@ export async function signUpWithEmail(formData: FormData) {
     if (signInError) return { error: signInError.message }
   }
 
-  redirect('/game/accroche')
+  redirect(redirectTo)
 }
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(redirectTo?: string) {
   const supabase = await createClient()
   const origin   = (await headers()).get('origin')
 
+  const nextPath = redirectTo || '/game/accroche'
+  const callbackUrl = `${origin}/auth/callback?next=${encodeURIComponent(nextPath)}`
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${origin}/auth/callback` },
+    options: { redirectTo: callbackUrl },
   })
 
   if (error) return { error: error.message }
