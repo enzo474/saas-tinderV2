@@ -1,12 +1,141 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
-import { analyzeProfileWithVision, generateMessages } from '@/lib/claude/generate-accroche'
+import { analyzeProfileWithVision } from '@/lib/claude/generate-accroche'
 import { createServiceRoleClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-})
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
+
+// ─── Instructions par ton (issues de l'agent admin conv) ─────────────────────
+const TONE_INSTRUCTIONS: Record<string, string> = {
+  Direct: `DIRECT / TRASH ASSUMÉ :
+L'accroche peut être :
+→ PRÉSUPPOSITIONNELLE (sans rapport avec la photo) : question banale qui présuppose une intimité future.
+  Ex de style : "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'es plutôt matin ou soir ?"
+→ AFFIRMATION DIRECTE : statement bold sur QUI elle est, pas sur ce qu'on voit.
+  Ex de style : "T'as l'air d'être exactement le genre de problème que je cherche" / "Tu m'hypnotises" / "Je te veux. Point."
+→ TRASH SUR CE QUI EST VISIBLE (seulement si quelque chose de vraiment saillant).
+  Ex de style : "T'as mis un boxer ou un string sous ta robe ?" / "Ce genre de photo c'est interdit le soir. T'as pas de scrupules toi"
+RÈGLES : 1 phrase MAX. Zéro smiley. JAMAIS "Ce X me dit que tu sais Y".`,
+
+  Drôle: `DRÔLE / ABSURDE :
+Question absurde du quotidien détournée, ou réplique décalée qui crée une surprise.
+L'humour vient du décalage entre la banalité et la présupposition d'intimité.
+Ex de style : "Tu ronfles ?" → "faut que je sache si je ramène des boules Quies" / "Tu dors de quel côté ?" → "pour savoir où je m'installe"
+1-2 lignes max si la chute le justifie. Naturel, pas forcé.`,
+
+  Mystérieux: `MYSTÉRIEUX / INTRIGUANT :
+Affirmation qui laisse une question en suspens. Dit quelque chose sans tout dire. Elle doit vouloir en savoir plus. Jamais d'explication.
+Ex de style : "Garde le mot envie pour plus tard, tu vas le redire" / "J'ai une idée pour que ta vie soit encore plus belle... mais ça attendra qu'on se parle"
+Une seule ligne. Intrigue, pas description.`,
+
+  Compliment: `COMPLIMENT MINIMISANT ET PERCUTANT :
+Jamais "t'es belle" ou "t'es magnifique" — trop vide.
+Le compliment qui étonne vaut 10 compliments classiques.
+Ex de style : "J'admets que t'es agréable à regarder, parfois" / "T'as l'air de créer des dégâts sans le faire exprès" / "T'as dû briser pas mal de concentrations avec cette story"
+1-2 lignes max. Toujours inattendu, jamais banal.`,
+}
+
+// ─── Prompt principal de génération (agent admin adapté pour 1 accroche) ──────
+function buildAccrochePrompt(profileDesc: string, toneInstruction: string): string {
+  return `Tu es Max, le meilleur coach en séduction digitale en France. Tu génères UNE SEULE accroche parfaite pour une story Instagram ou une photo de profil.
+
+═══════════════════════════════════════
+PROFIL ANALYSÉ
+═══════════════════════════════════════
+${profileDesc}
+
+═══════════════════════════════════════
+TON DEMANDÉ POUR CETTE ACCROCHE
+═══════════════════════════════════════
+${toneInstruction}
+
+═══════════════════════════════════════
+FORMULES INTERDITES — NE JAMAIS UTILISER
+═══════════════════════════════════════
+Ces formules sont banies car elles sont vides d'émotion et ne provoquent rien :
+- "Ce [détail] me dit que tu sais exactement X" → INTERDIT
+- "T'as cette façon de [X] qui me dit que..." → INTERDIT
+- "Ce regard/sourire/[détail] me dit que..." → INTERDIT
+- "J'ai envie de découvrir/tester/connaître [quelque chose]" → INTERDIT
+- "Je veux découvrir si tu es aussi X que Y" → INTERDIT
+- "T'as ce genre de [X] qui me donne envie de [Y]" → INTERDIT
+Si tu te retrouves à écrire une de ces formules : STOP. Recommence avec un autre angle.
+
+═══════════════════════════════════════
+CONVERSATIONS D'ENTRAÎNEMENT — STYLE EXACT QUI FONCTIONNE
+═══════════════════════════════════════
+Analyse le STYLE, apprends le REGISTRE — n'utilise pas les mêmes mots.
+
+— CONV A : PRÉSUPPOSITIONNELLE QUOTIDIEN —
+LUI : tu dors de quel côté ?
+ELLE : euh pourquoi ?
+LUI : pour savoir où je m'installe
+ELLE : ptdrr c'est quelle technique ça / mais pas mal j'avoue
+LUI : ok mais du coup t'as pas répondu
+ELLE : à gauche mdr
+LUI : parfait j'arrive / et j'espère y'a un oreiller pour moi
+ELLE : mdrrr le mec est exigent / viens mais t'auras pas d'oreiller
+→ Accroche = question banale qui présuppose une intimité. Zéro rapport avec la photo.
+
+— CONV B : QUESTION QUOTIDIENNE → DATE —
+LUI : tu ronfles ?
+ELLE : hein ? pourquoi tu me demandes ça ?
+LUI : faut que je sache si je ramène des boules Quies
+ELLE : mdr t'abuses. et si c'est toi qui ronfles ?
+LUI : impossible, je dors comme un ange
+LUI : ok on verra ce soir alors
+→ Accroche = question absurde du quotidien. Aucun rapport avec la photo.
+
+— CONV C : TRASH DIRECT SUR LA TENUE —
+LUI : t'as mis un boxer ou un string sous ta robe ?
+ELLE : c'est comme ça que tu dragues ? 😂 j'ai jamais vu ça
+LUI : faut bien tester de nouvelles approches, non ?
+ELLE : mdr continue, je suis curieuse
+LUI : juste un mec qui t'invite à dîner ce soir 19h. ça te va ?
+→ Accroche = trash direct basé sur ce qui est visible. Court, assumé.
+
+— CONV D : AFFIRMATION DIRECTE ULTRA-COURTE —
+LUI : tu m'hypnotises
+ELLE : merci
+LUI : comment t'es parfaite
+LUI : laisse-moi être ta prochaine erreur
+→ Accroche = 3 mots. Tout dans l'assurance, pas dans la description.
+
+— CONV E : JOUTE VERBALE + PIVOT HUMOUR —
+LUI : Tu fais exprès d'avoir l'air innocente alors que tout est calculé, avoue
+ELLE : Arrête, j'ai rien calculé. Si tu es troublé c'est pas ma faute 😊
+LUI : Je suis pas troublé, t'emballe pas
+LUI : Mais j'admets que t'es agréable à regarder parfois.
+ELLE : Toi aussi tu fais le mec ptdr
+LUI : Je fais pas "le mec", je suis juste pas impressionné par deux fossettes et un brushing
+→ Accroche = compliment minimisant + retournement. Jamais flatteur, toujours inattendu.
+
+═══════════════════════════════════════
+LES 3 APPROCHES QUI FONCTIONNENT
+═══════════════════════════════════════
+1. PRÉSUPPOSITIONNELLE (sans rapport avec l'image) : question banale qui présuppose une intimité future.
+2. AFFIRMATION DIRECTE (sur la personne, pas les détails) : statement bold qui dit quelque chose sur QUI elle est.
+3. TRASH/DIRECTE SUR CE QUI EST VISIBLE : seulement si quelque chose de vraiment saillant est visible.
+   ⚠️ Si l'image est neutre → utilise l'approche 1 ou 2.
+
+═══════════════════════════════════════
+PATTERNS CLÉS À APPLIQUER
+═══════════════════════════════════════
+→ Compliment minimisant : "J'admets que t'es agréable à regarder, parfois" — l'adverbe "parfois" vaut plus qu'un superlatif
+→ Présupposition d'intimité : "tu dors de quel côté ?" — jamais la demander, juste la présupposer
+→ Statement ultra-court : "Tu m'hypnotises" / "T'as l'air d'être exactement le genre de problème que je cherche"
+→ Trash contextuel : basé sur ce qui est visible (tenue, pose assumée), jamais sur les détails génériques
+→ Si un miroir est visible : accroche forte possible — "Ce miroir a une sacrée chance de te refléter tous les jours"
+
+RÈGLES ABSOLUES :
+- Pas de "Salut", "Coucou", "Bonjour"
+- Zéro emoji pour Direct et Mystérieux (max 1 pour Drôle et Compliment)
+- OBJETS VISIBLES : GÉNÉRIQUE uniquement. "miroir" pas "miroir hexagonal", "voiture" pas "BMW"
+- Reste naturel, comme si un homme très confiant écrivait spontanément
+
+RÉPONDS UNIQUEMENT avec l'accroche en texte brut, rien d'autre — pas de guillemets, pas d'explication.`
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +144,7 @@ export async function POST(request: NextRequest) {
       user_message: string
       storyImageBase64?: string
       user_answer: 'oui' | 'non'
-      tone?: string               // 'Direct' | 'Drôle' | 'Mystérieux' | 'Compliment'
+      tone?: string
       session_id?: string
     }
 
@@ -23,17 +152,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'user_message requis' }, { status: 400 })
     }
 
-    // ─── 1. Analyser le profil si une image est fournie ──────────────────────
+    // ─── 1. Analyser la story/photo avec Vision ───────────────────────────────
     let profileAnalysis = null
     if (storyImageBase64) {
       try {
         profileAnalysis = await analyzeProfileWithVision(storyImageBase64, 'image/jpeg')
-      } catch {
-        // Si l'analyse échoue, on continue sans image
-      }
+      } catch { /* continue sans image */ }
     }
 
-    // Profil par défaut si pas d'image
     if (!profileAnalysis) {
       profileAnalysis = {
         name: null,
@@ -45,46 +171,66 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ─── 2. Générer l'accroche optimisée via l'agent avec le ton choisi ─────
-    // Si un ton est fourni, l'utiliser ; sinon utiliser CrushMaxxing par défaut
-    const validTones = ['Direct', 'Drôle', 'Mystérieux', 'Compliment', 'CrushMaxxing']
-    const selectedTone = tone && validTones.includes(tone) ? tone : 'CrushMaxxing'
+    const profileDesc = [
+      profileAnalysis.name ? `Prénom : ${profileAnalysis.name}` : null,
+      profileAnalysis.age  ? `Âge : ${profileAnalysis.age}` : null,
+      profileAnalysis.bio  ? `Bio/dernier message : "${profileAnalysis.bio}"` : null,
+      profileAnalysis.interests.length > 0 ? `Infos visibles : ${profileAnalysis.interests.join(', ')}` : null,
+      `Vibe : ${profileAnalysis.vibe}`,
+      `Contexte photo : ${profileAnalysis.photo_context}`,
+    ].filter(Boolean).join('\n')
 
-    const [generatedMessages, evaluation] = await Promise.all([
-      generateMessages(profileAnalysis, 'accroche', [selectedTone]),
+    // ─── 2. Choisir le ton et construire le prompt ────────────────────────────
+    const validTones = ['Direct', 'Drôle', 'Mystérieux', 'Compliment']
+    const selectedTone = tone && validTones.includes(tone) ? tone : 'Direct'
+    const toneInstruction = TONE_INSTRUCTIONS[selectedTone]
 
-      // Évaluer le message de l'user + générer les raisons
+    // ─── 3. Lancer en parallèle : génération accroche + évaluation user_message
+    const [accrocheResp, evalResp] = await Promise.all([
+
+      // Accroche optimisée via l'agent admin adapté
       anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 600,
-        system: `Tu es un expert en séduction et en analyse de messages. Tu vas évaluer l'accroche d'un homme et expliquer pourquoi elle fonctionne ou non, de façon directe, cash, et sans filtre.`,
+        max_tokens: 200,
+        system: buildAccrochePrompt(profileDesc, toneInstruction),
         messages: [
           {
             role: 'user',
-            content: `Un homme a envoyé cette accroche à une fille sur Instagram :
-"${user_message}"
+            content: `Génère l'accroche parfaite pour ce profil avec le ton "${selectedTone}".`,
+          },
+        ],
+      }),
 
-L'homme pensait qu'elle allait ${user_answer === 'oui' ? 'répondre' : 'ignorer'}.
+      // Évaluation du message de l'user
+      anthropic.messages.create({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        system: `Tu es Max, expert en séduction. Tu évalues les accroches de façon directe, cash, sans filtre. Tu connais les principes : zéro filtre, contrôle du cadre, pas de justification.`,
+        messages: [
+          {
+            role: 'user',
+            content: `Un homme a envoyé cette accroche à une fille sur Instagram : "${user_message}"
+Il pensait qu'elle allait ${user_answer === 'oui' ? 'répondre' : 'ignorer'}.
 
-Donne 3 raisons pourquoi cette accroche ne va probablement PAS provoquer de réponse (sois cash, direct, 5-8 mots max par raison).
+Donne 3 raisons courtes (5-8 mots max chacune) pourquoi cette accroche ne va probablement PAS provoquer de réponse. Sois cash et direct.
 
-Réponds UNIQUEMENT en JSON :
-{
-  "raisons_echec": ["raison 1", "raison 2", "raison 3"]
-}`,
+JSON uniquement :
+{"raisons_echec": ["raison 1", "raison 2", "raison 3"]}`,
           },
         ],
       }),
     ])
 
-    // ─── 3. Extraire l'accroche optimisée ────────────────────────────────────
-    const bestMessage = generatedMessages.find(m => m.tone === selectedTone) || generatedMessages[0]
-    const accrocheOptimisee = bestMessage?.content || 'Tu ronfles ?'
+    // ─── 4. Extraire l'accroche optimisée ────────────────────────────────────
+    const accrocheText = accrocheResp.content[0].type === 'text' ? accrocheResp.content[0].text.trim() : ''
+    const accrocheOptimisee = accrocheText
+      .replace(/^["«»]|["«»]$/g, '') // Retirer les guillemets éventuels
+      .trim() || 'Tu ronfles ?'
 
-    // ─── 4. Parser les raisons d'échec ────────────────────────────────────────
+    // ─── 5. Parser les raisons d'échec ───────────────────────────────────────
     let raisonsEchec = ['Trop générique, pas d\'impact', 'Aucune tension ni surprise', 'Elle peut ignorer sans effort']
     try {
-      const evalText = evaluation.content[0].type === 'text' ? evaluation.content[0].text : ''
+      const evalText = evalResp.content[0].type === 'text' ? evalResp.content[0].text : ''
       const jsonMatch = evalText.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0])
@@ -92,21 +238,23 @@ Réponds UNIQUEMENT en JSON :
       }
     } catch { /* fallback */ }
 
-    // ─── 5. Générer les raisons de succès pour l'accroche optimisée ──────────
+    // ─── 6. Générer les raisons de succès pour l'accroche optimisée ──────────
     let raisonsSucces = ['Présuppose une intimité', 'Elle doit répondre pour corriger', 'Court, percutant, inattendu']
     try {
-      const successEval = await anthropic.messages.create({
+      const successResp = await anthropic.messages.create({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 300,
-        system: 'Tu es un expert en séduction. Explique en 3 raisons courtes (5-8 mots max) pourquoi une accroche fonctionne. Réponds uniquement en JSON.',
+        max_tokens: 250,
+        system: `Tu es Max, expert en séduction. Explique en 3 raisons courtes (5-8 mots max chacune) pourquoi une accroche va provoquer une réponse. Sois précis et cash. JSON uniquement.`,
         messages: [
           {
             role: 'user',
-            content: `Accroche : "${accrocheOptimisee}"\n\nPourquoi ça va marcher ?\n\n{"raisons_succes": ["raison 1", "raison 2", "raison 3"]}`,
+            content: `Accroche : "${accrocheOptimisee}" (ton : ${selectedTone})
+Pourquoi ça va marcher ?
+{"raisons_succes": ["raison 1", "raison 2", "raison 3"]}`,
           },
         ],
       })
-      const successText = successEval.content[0].type === 'text' ? successEval.content[0].text : ''
+      const successText = successResp.content[0].type === 'text' ? successResp.content[0].text : ''
       const jsonMatch = successText.match(/\{[\s\S]*\}/)
       if (jsonMatch) {
         const parsed = JSON.parse(jsonMatch[0])
@@ -114,7 +262,7 @@ Réponds UNIQUEMENT en JSON :
       }
     } catch { /* fallback */ }
 
-    // ─── 6. Tracker dans rizz_sessions si pas de session_id ─────────────────
+    // ─── 7. Tracker dans rizz_sessions ───────────────────────────────────────
     let newSessionId = session_id
     if (!session_id) {
       try {
@@ -128,12 +276,7 @@ Réponds UNIQUEMENT en JSON :
 
         const { data } = await supabase
           .from('rizz_sessions')
-          .insert({
-            ip_address: ip,
-            flow_type: flowType,
-            user_message,
-            user_answer,
-          })
+          .insert({ ip_address: ip, flow_type: flowType, user_message, user_answer })
           .select('id')
           .single()
 
@@ -148,11 +291,9 @@ Réponds UNIQUEMENT en JSON :
       raisons_succes: raisonsSucces,
       session_id: newSessionId,
     })
+
   } catch (error) {
     console.error('[analyze-rizz] Error:', error)
-    return NextResponse.json(
-      { error: 'Erreur lors de l\'analyse' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Erreur lors de l\'analyse' }, { status: 500 })
   }
 }
