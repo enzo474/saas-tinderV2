@@ -118,7 +118,7 @@ export function ProfilePageClient({ email, balance, planLabel, hasActiveSub, isA
               <div>
                 <p className="text-sm font-medium text-white">Abonnement</p>
                 <p className="text-xs" style={{ color: '#6b7280' }}>
-                  {planLabel ?? `Gratuit — ${balance} crédits restants`}
+                  {planLabel ?? 'Gratuit'}
                 </p>
               </div>
             </div>

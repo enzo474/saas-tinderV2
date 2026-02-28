@@ -286,16 +286,6 @@ export function MessageGenerator({ messageType: initialType, initialCredits, ini
               : 'Upload la conversation, l\'IA génère des réponses percutantes.'}
           </p>
         </div>
-        {/* Badge visible uniquement pour les abonnés illimités */}
-        {isUnlimited && (
-          <div
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
-          >
-            <Infinity className="w-3.5 h-3.5 text-white" />
-            <span className="font-montserrat font-bold text-white text-xs">Illimité</span>
-          </div>
-        )}
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
