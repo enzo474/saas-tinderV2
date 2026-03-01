@@ -93,6 +93,22 @@ export default async function DashboardAdminPage() {
             >
               📊 Data Analytics
             </a>
+            <a
+              href="/onboarding-test-1"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#16171b] hover:bg-[#1a1b20] border border-[#2a2d36] text-white py-3 px-4 rounded-lg font-inter text-sm transition-colors text-center"
+            >
+              🧪 Onboarding Test 1
+            </a>
+            <a
+              href="/onboarding-test-2"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#16171b] hover:bg-[#1a1b20] border border-[#2a2d36] text-white py-3 px-4 rounded-lg font-inter text-sm transition-colors text-center"
+            >
+              🧪 Onboarding Test 2
+            </a>
           </div>
         </div>
       </div>
