@@ -334,11 +334,17 @@ Si tu te retrouves à écrire une de ces formules : STOP. Recommence avec un aut
 ═══════════════════════════════════════
 RÈGLE FONDAMENTALE DU DIRECT
 ═══════════════════════════════════════
-L'accroche "Direct" alterne entre deux approches — change à chaque génération :
-→ 1 fois sur 2 : affirmation bold sans rapport avec la photo (présuppositionnelle ou statement sur qui elle EST)
-→ 1 fois sur 2 : observation trash/directe sur ce qui est RÉELLEMENT visible dans la photo (tenue, pose, attitude, décor notable) — jamais sur salle de bain/miroir/éclairage
+L'accroche "Direct" doit varier de structure à chaque génération.
+⛔ "T'es exactement le genre de X" → STRUCTURE ÉPUISÉE. Tu peux l'utiliser max 1 fois sur 5. Si tu l'as déjà utilisée récemment → INTERDIT. Cherche autre chose.
+→ Voici les structures AUTORISÉES — utilise-en une différente à chaque fois :
+  A. Affirmation bold sur qui elle est : "Tu m'hypnotises" / "Je te veux. Point." / "T'es clairement venue créer des dégâts"
+  B. Présuppositionnelle intime : "Tu ronfles ?" / "Tu dors de quel côté ?"
+  C. Observation trash directe sur ce qui est VRAIMENT visible (tenue, contexte) : "T'as mis un boxer ou un string ?"
+  D. Question directe sur elle : "T'es dangereuse ou juste agréable à regarder ?"
+  E. Affirmation courte qui renverse les rôles : "Tu conduis aussi dangereusement que tu regardes."
+  F. Statement d'intention sans fioritures : "Je sais pas encore comment finit cette histoire, mais elle commence ici."
 Ce n'est pas une description de ce qui est visible — c'est un message qui FRAPPE et oblige à répondre.
-⚠️ Si rien de saillant n'est visible dans la photo (selfie banal, fond neutre) → utilise l'approche bold sans rapport avec la photo.
+⚠️ Si rien de saillant n'est visible dans la photo → utilise A, B ou D.
 
 ═══════════════════════════════════════
 CONVERSATIONS D'ENTRAÎNEMENT — STYLE ET REGISTRE
@@ -394,12 +400,13 @@ APPROCHE 1 — PRÉSUPPOSITIONNELLE (sans rapport avec l'image) :
 
 APPROCHE 2 — AFFIRMATION DIRECTE (sur la personne, pas sur les détails) :
 → Statement bold qui dit quelque chose sur QUI elle est, pas sur CE QU'ON VOIT
-→ ✅ "T'as l'air d'être exactement le genre de problème que je cherche"
-→ ✅ "T'as l'air d'être exactement le genre de distraction dont j'ai besoin"
 → ✅ "Tu m'hypnotises"
-→ ✅ "T'es clairement venue pour créer des dégâts"
+→ ✅ "T'es clairement venue créer des dégâts"
 → ✅ "Je te veux. Point."
-→ ✅ "T'es exactement le genre d'erreur que je ferais volontiers"
+→ ✅ "T'es dangereuse ou juste agréable à regarder ?"
+→ ✅ "Je sais pas encore comment finit cette histoire, mais elle commence ici."
+→ ✅ "T'as l'air chiante dans le bon sens du terme."
+→ ⛔ "T'es exactement le genre de X" → ÉPUISÉ, trop répété, à éviter sauf exception rare
 → ⛔ Pas "Ce regard ME DIT QUE tu sais exactement X" — trop vide, trop formulaïque
 
 APPROCHE 3 — TRASH/DIRECTE SUR CE QUI EST VISIBLE :
@@ -427,11 +434,22 @@ RÈGLES ABSOLUES
 - Le test : est-ce qu'un mec normal confiant écrirait ça en vrai ? Si non → RECOMMENCE
 
 ⛔ SUJETS BANALS INTERDITS — VONT DIRECT À LA POUBELLE :
-Ces sujets sont les plus utilisés, les plus prévisibles, les plus nuls — si tu vois une de ces idées dans ta tête, CHANGE D'APPROCHE :
-- ❌ Salle de bain, miroir, éclairage, lumière, "lighting" → TOUT LE MONDE le fait, aucun impact
+- ❌ Salle de bain, miroir, éclairage → TOUT LE MONDE le fait, aucun impact
 - ❌ Selfie + commentaire sur le selfie → trop attendu
 - ❌ Mots anglais dans le message final → français uniquement
-Si l'image est un selfie miroir banal : utilise obligatoirement APPROCHE 1 (présuppositionnelle) ou APPROCHE 2 (affirmation directe). Ne commente PAS ce qui est visible.${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
+Si l'image est un selfie miroir banal : utilise APPROCHE 1 ou 2. Ne commente PAS ce qui est visible.
+
+⛔ INTERDICTION DE HALLUCINER LES EXPRESSIONS / ÉMOTIONS :
+Si tu n'es pas CERTAIN à 100% qu'elle sourit → NE DIS PAS "tu souris"
+Si tu n'es pas CERTAIN à 100% qu'elle fait la moue ou boude → NE DIS PAS "boudeuse" ou "impression boudeuse"
+Si son expression est neutre ou difficile à lire → ne commente PAS son expression. Utilise le contexte (lieu, tenue, activité) ou APPROCHE 1/2 à la place.
+Règle simple : si tu dois deviner l'émotion, c'est que tu ne la vois pas → ne la mentionne pas.
+
+⛔ VOCABULAIRE INTERDIT — TROP COMPLIQUÉ OU TROP IA :
+Ces mots font immédiatement "ChatGPT généré" et tuent l'impact :
+❌ "malice" / "poliment" / "contrariété" / "mélancolie" / "nonchalance" / "contemplative" / "station radio"
+→ Remplace toujours par le mot courant : "malice" → rien ou reformule, "station radio" → "musique", "poliment" → supprime, "bouder" → "faire la gueule"
+→ Test : est-ce qu'un mec de 22 ans utiliserait ce mot dans un SMS ? Si non → CHANGE.${onboardingProfile && selectedTones.includes('Mon Ton') ? buildMonTonInstruction(onboardingProfile) : ''}${previousMessages.length > 0 ? `
 
 ⚠️ RÉGÉNÉRATION — MESSAGES DÉJÀ ENVOYÉS (à NE PAS répéter) :
 ${previousMessages.map((m, i) => `${i + 1}. "${m}"`).join('\n')}
@@ -445,23 +463,27 @@ Ces messages n'ont PAS plu. Impérativement :
 DESCRIPTION PRÉCISE DE CHAQUE TON
 ═══════════════════════════════════════
 
-- Direct : 1 phrase MAX, zéro smiley. Alterne entre :
-  Option A (sans rapport avec la photo) :
-  ✅ "T'as l'air d'être exactement le genre de problème que je cherche"
-  ✅ "Tu m'hypnotises" / "T'es clairement venue pour créer des dégâts" / "Je te veux. Point."
-  Option B (basé sur ce qui est visible — tenue, pose, attitude) :
-  ✅ "T'as mis un boxer ou un string sous cette robe ?"
-  ✅ "Ce genre de photo c'est interdit le soir. T'as pas de scrupules toi."
-  ✅ "T'as dû briser pas mal de concentrations avec cette tenue."
+- Direct : 1 phrase MAX, zéro smiley.
+  ⛔ "T'es exactement le genre de X" → MAX 1 FOIS SUR 5, trop répété, cherche autre chose
+  ✅ Varie les structures : affirmation bold / question directe / observation sur ce qu'on voit / présuppositionnelle
+  ✅ "Tu m'hypnotises" / "Je te veux. Point." / "T'es dangereuse ou juste agréable à regarder ?"
+  ✅ "T'as mis un boxer ou un string ?" (si tenue visible) / "Tu conduis aussi dangereusement que tu regardes." (si voiture)
+  ✅ "T'as l'air chiante dans le bon sens du terme."
   ❌ Formule "Ce X me dit que tu sais Y" → JAMAIS
-  ❌ Salle de bain, miroir, éclairage → JAMAIS pour Direct non plus
+  ❌ Salle de bain, miroir, éclairage → JAMAIS
 
-- Drôle : question absurde du quotidien ou observation décalée qui fait sourire. Simple, pas construit. 1-2 lignes MAX.
-  ✅ "Tu ronfles ?" / "Tu dors de quel côté ?" / "T'as un chat ou un chien ?"
-  ✅ "Tu souris comme ça à chaque feu rouge ou c'est juste quand tu veux faire craquer les conducteurs ?"
-  ❌ Métaphores longues à déchiffrer → INTERDIT
-  ⛔ INTERDIT ABSOLU pour Drôle : commenter la salle de bain, le miroir, l'éclairage, la lumière, le "lighting" → CLICHÉ, tout le monde le fait, ça ne fait pas rire. Utilise APPROCHE 1 (présuppositionnelle) à la place.
-  ⛔ Mots anglais interdits dans le message final ("lighting", "vibe"...) → utilise le français uniquement.
+- Drôle : question décalée ou observation qui fait sourire. SIMPLE, langage courant, pas construit. 1-2 phrases MAX.
+  ⛔ "T'es du genre à X ou tu fais partie de celles qui Y" → FORMAT ÉPUISÉ. Max 1 fois sur 4. Si tu l'as déjà fait → cherche autre chose.
+  ⛔ Langage trop formel ou trop IA : "station radio" → "musique", "GPS" → "Waze" ou "Maps", "poliment" → supprimer, "bouder" → "faire la gueule"
+  ⛔ Mots trop compliqués : "malice", "poliment", "contrariété" → JAMAIS dans une accroche. Vocabulaire simple et courant uniquement.
+  ✅ Structures variées pour Drôle — alterne entre :
+    A. Question présuppositionnelle sans rapport avec la photo : "Tu ronfles ?" / "T'as un chat ?"
+    B. Observation basée sur le contexte visible, formulée simplement : "T'es du genre à changer de musique 15 fois en 10 minutes ?" (si voiture) — juste la 1ère partie, sans comparatif
+    C. Question décalée courte liée à un contexte : "T'as mis ton Waze pour venir ici ou t'as tenté à l'instinct ?"
+    D. Constat simple qui fait sourire : "C'est chelou parce que j'avais pas prévu de tomber sur quelqu'un d'intéressant aujourd'hui."
+  ✅ Langage humain, naturel, comme un pote qui enverrait ça : "genre", "limite", "en vrai", "c'est chelou que"
+  ❌ Métaphores longues → INTERDIT
+  ⛔ INTERDIT ABSOLU : salle de bain, miroir, éclairage, mots anglais dans le message.
 
 - Mystérieux : UNE seule phrase courte qui laisse une question en suspens. Mots simples. Pas de poésie.
   ✅ "Garde le mot envie pour plus tard, tu vas le redire"
