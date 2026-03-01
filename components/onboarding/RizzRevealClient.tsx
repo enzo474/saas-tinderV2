@@ -122,7 +122,7 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-bold text-white text-2xl">
-            TON FOOTBALL OPTIMISÉ
+            TON MESSAGE OPTIMISÉ
           </h1>
         </div>
 
@@ -136,7 +136,7 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
         >
           <div className="flex items-center gap-2 mb-3">
             <div className="w-2 h-2 rounded-full" style={{ background: '#22c55e' }} />
-            <span className="text-xs font-bold" style={{ color: '#22c55e' }}>FOOTBALL DÉBLOQUÉ</span>
+            <span className="text-xs font-bold" style={{ color: '#22c55e' }}>MESSAGE DÉBLOQUÉ</span>
           </div>
           <p className="text-white font-bold text-xl leading-relaxed">"{accroche}"</p>
         </div>
@@ -147,7 +147,7 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] mb-3"
           style={{ background: copied ? 'linear-gradient(135deg, #22c55e, #16a34a)' : 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
-          {copied ? 'Copié !' : 'Copier le football'}
+          {copied ? 'Copié !' : 'Copier le message'}
         </button>
 
         {/* Raisons succès */}
@@ -156,7 +156,7 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-xs font-semibold mb-3" style={{ color: '#22c55e' }}>
-            POURQUOI CA VA MARCHER :
+            POURQUOI CA VA FONCTIONNER :
           </p>
           <div className="space-y-2">
             {(data.analysis.raisons_succes || []).map((r, i) => (
@@ -178,9 +178,9 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
             borderColor: 'rgba(230,57,70,0.2)',
           }}
         >
-          <p className="font-bold text-white text-sm mb-1">1 ANALYSE GRATUITE</p>
+          <p className="font-bold text-white text-sm mb-1">1 ANALYSE GRATUITE DISPONIBLE</p>
           <p className="text-xs" style={{ color: '#9da3af' }}>
-            Tu as reçu 1 analyse gratuite dans le dashboard.
+            1 analyse gratuite t'attend dans le dashboard.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export function RizzRevealClient({ userId }: { userId?: string }) {
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98] border"
           style={{ background: '#111111', borderColor: '#2A2A2A' }}
         >
-          Analyser un nouveau profil
+          Analyser un nouveau match
         </button>
 
         <p className="text-center text-xs mt-4" style={{ color: '#6b7280' }}>

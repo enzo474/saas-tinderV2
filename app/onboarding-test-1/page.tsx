@@ -139,13 +139,13 @@ export default function OnboardingTest1() {
         {/* Titre */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            TESTE TON FOOTBALL EN 10S
+            TESTE TON ACCROCHE EN 10S
           </h1>
         </div>
 
         {/* Phrase d'instruction upload */}
         <p className="text-center text-xs mb-3" style={{ color: '#9da3af' }}>
-          Importe le screen d'une story ou du profil de la fille sur qui tu veux tester ton football
+          Importe un screenshot de profil Tinder pour tester ton accroche
         </p>
 
         {/* Zone story — clickable pour upload */}
@@ -202,7 +202,7 @@ export default function OnboardingTest1() {
             ref={inputRef}
             value={message}
             onChange={e => handleMessageChange(e.target.value)}
-            placeholder="Tape ton football ici..."
+            placeholder="Tape ton message ici..."
             rows={3}
             className="w-full px-4 py-3 rounded-xl border text-white text-sm outline-none resize-none transition-colors"
             style={{ background: '#0D0D0D', borderColor: message.trim() ? '#E63946' : '#2A2A2A', color: '#fff' }}
@@ -241,7 +241,7 @@ export default function OnboardingTest1() {
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-white font-semibold text-sm mb-4 text-center">
-            Tu penses qu'elle t'aurait répondu ?
+            Tu penses qu'elle répondrait ?
           </p>
 
           <div className="grid grid-cols-2 gap-3">
@@ -263,7 +263,7 @@ export default function OnboardingTest1() {
 
           {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              {!message.trim() ? 'Tape ton football et choisis un ton' : 'Choisis un ton pour continuer'}
+              {!message.trim() ? 'Tape ton message et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
@@ -272,7 +272,7 @@ export default function OnboardingTest1() {
         <div className="flex items-center justify-center gap-6">
           <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
           <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
-          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Football optimisé généré</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Accroche optimisée générée</span>
         </div>
       </div>
     </div>

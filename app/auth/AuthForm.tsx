@@ -92,7 +92,7 @@ export function AuthForm() {
             </div>
             <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
               {isRizz
-                ? 'DÉBLOQUE TON ACCROCHE'
+                ? 'DÉBLOQUE TON MESSAGE OPTIMISÉ'
                 : (mode === 'signup' ? 'Crée ton compte' : 'Content de te revoir')}
             </h1>
             {isRizz ? (
@@ -114,7 +114,7 @@ export function AuthForm() {
               {[
                 'Voir l\'accroche optimisée',
                 '1 analyse gratuite en bonus',
-                'Pas de carte bancaire',
+                'Pas de carte bancaire requise',
               ].map((benefit) => (
                 <div key={benefit} className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(34,197,94,0.2)' }}>
