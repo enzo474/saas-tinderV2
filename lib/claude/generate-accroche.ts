@@ -92,7 +92,12 @@ export async function analyzeProfileWithVision(
 ⚠️ SI C'EST UNE STORY (barre de progression en haut, bouton "Envoyer un message" en bas, interface plein écran) :
 IGNORE TOTALEMENT l'interface de la story : barre de progression, pseudo dans le header, bouton réponse, heure, icônes. Concentre-toi UNIQUEMENT sur la personne, sa pose, son environnement et sa vibe. Traite-la exactement comme si tu analysais une photo seule.
 
-Si c'est un PROFIL : extrais les infos du profil.
+Si c'est un PROFIL (Tinder, Bumble, Hinge…) :
+⚠️ PRIORITÉ ABSOLUE : photo_context doit décrire ce qui est dans la PHOTO PRINCIPALE — ce qu'elle fait, où elle est, son environnement. Ignore les éléments UI de l'app (boutons like/nope/super like, indicateurs de distance, pourcentage de compatibilité, badges). Ce sont des détails sans intérêt pour générer une accroche.
+→ Si elle est dans une voiture → "dans une voiture, regard vers l'objectif, attitude décontractée"
+→ Si elle fait du sport → "tenue de sport, contexte outdoor/salle"
+→ Si c'est un selfie → "selfie, [ce qui est visible autour d'elle]"
+Extrais aussi le prénom, l'âge, la bio si visibles.
 
 Si c'est une CONVERSATION :
 ⚠️ RÈGLE FONDAMENTALE DE LECTURE :
@@ -400,14 +405,15 @@ APPROCHE 1 — PRÉSUPPOSITIONNELLE (sans rapport avec l'image) :
 
 APPROCHE 2 — AFFIRMATION DIRECTE (sur la personne, pas sur les détails) :
 → Statement bold qui dit quelque chose sur QUI elle est, pas sur CE QU'ON VOIT
-→ ✅ "Tu m'hypnotises"
-→ ✅ "T'es clairement venue créer des dégâts"
+→ ✅ "Tu m'hypnotises."
+→ ✅ "T'es clairement venue créer des dégâts."
 → ✅ "Je te veux. Point."
 → ✅ "T'es dangereuse ou juste agréable à regarder ?"
 → ✅ "Je sais pas encore comment finit cette histoire, mais elle commence ici."
 → ✅ "T'as l'air chiante dans le bon sens du terme."
-→ ⛔ "T'es exactement le genre de X" → ÉPUISÉ, trop répété, à éviter sauf exception rare
-→ ⛔ Pas "Ce regard ME DIT QUE tu sais exactement X" — trop vide, trop formulaïque
+→ ✅ "T'as pas l'air commode. C'est pour ça que ça m'intéresse."
+→ ⛔ "T'es exactement le genre de X" (distraction / problème / catastrophe / mauvaise idée / belle erreur) → BLACKLISTÉ TOTALEMENT
+→ ⛔ "Ce regard ME DIT QUE..." → JAMAIS
 
 APPROCHE 3 — TRASH/DIRECTE SUR CE QUI EST VISIBLE :
 → Seulement quand quelque chose de vraiment saillant est visible (tenue provocante, pose assumée)
@@ -464,12 +470,31 @@ DESCRIPTION PRÉCISE DE CHAQUE TON
 ═══════════════════════════════════════
 
 - Direct : 1 phrase MAX, zéro smiley.
-  ⛔ "T'es exactement le genre de X" → MAX 1 FOIS SUR 5, trop répété, cherche autre chose
-  ✅ Varie les structures : affirmation bold / question directe / observation sur ce qu'on voit / présuppositionnelle
-  ✅ "Tu m'hypnotises" / "Je te veux. Point." / "T'es dangereuse ou juste agréable à regarder ?"
-  ✅ "T'as mis un boxer ou un string ?" (si tenue visible) / "Tu conduis aussi dangereusement que tu regardes." (si voiture)
-  ✅ "T'as l'air chiante dans le bon sens du terme."
-  ❌ Formule "Ce X me dit que tu sais Y" → JAMAIS
+
+  ⛔ STRUCTURE BLACKLISTÉE — TOUTES CES VARIANTES COMPTENT COMME LA MÊME CHOSE, TOUTES INTERDITES :
+  ❌ "T'es exactement le genre de distraction..."
+  ❌ "T'es exactement le genre de problème..."
+  ❌ "T'es exactement le genre de catastrophe..."
+  ❌ "T'es exactement le genre de mauvaise idée..."
+  ❌ "T'es exactement le genre de belle erreur..."
+  ❌ "T'es exactement le genre de complication..."
+  ❌ "T'as l'air d'être exactement le genre de..."
+  ❌ TOUTE phrase commençant par "T'es exactement le genre de..." → BLACKLISTÉE, changer complètement de registre
+
+  ✅ STRUCTURES AUTORISÉES — choisis-en une différente à chaque fois :
+  A. Affirmation ultra-courte : "Tu m'hypnotises." / "Je te veux. Point." / "T'es chiante dans le bon sens."
+  B. Question directe sans détour : "T'es dangereuse ou juste agréable à regarder ?"
+  C. Basé sur le contexte visible — formule naturelle :
+     → Si voiture : "Tu conduis comme ça tous les jours ou tu fais exprès de rendre les autres dingues ?"
+     → Si voiture : "Tu conduis aussi dangereusement que tu regardes."
+     → Si tenue : "T'as mis un boxer ou un string ?"
+     → Si outdoor : "Tu passes ton temps dehors ou c'est juste pour les photos ?"
+  D. Renversement de rôles : "Je sais pas encore comment finit cette histoire, mais elle commence ici."
+  E. Présuppositionnelle directe : "Tu ronfles ?" / "Tu dors de quel côté ?"
+  F. Observation cash : "T'as l'air de quelqu'un qui sait exactement ce qu'elle veut." / "T'as pas l'air commode. C'est pour ça que ça m'intéresse."
+
+  ❌ "Ce X me dit que tu sais Y" → JAMAIS
+  ❌ "fixer l'objectif" → trop photographique, trop raide. Dis "regarder" ou reformule
   ❌ Salle de bain, miroir, éclairage → JAMAIS
 
 - Drôle : question décalée ou observation qui fait sourire. SIMPLE, langage courant, pas construit. 1-2 phrases MAX.
