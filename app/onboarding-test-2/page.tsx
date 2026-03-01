@@ -121,7 +121,7 @@ export default function OnboardingTest2() {
         {/* Titre */}
         <div className="text-center mb-5">
           <h1 className="font-montserrat font-extrabold text-white text-2xl leading-tight">
-            TESTE TON FOOTBALL EN 10S
+            TESTE TON ACCROCHE EN 10S
           </h1>
         </div>
 
@@ -129,7 +129,7 @@ export default function OnboardingTest2() {
 
         {/* 2 photos sélectionnables */}
         <p className="text-center text-xs font-semibold mb-3" style={{ color: '#9da3af' }}>
-          Choisis une fille pour tester ton football :
+          Choisis une fille pour tester ton accroche :
         </p>
         <div className="grid grid-cols-2 gap-3 mb-5">
           {GIRLS.map((girl) => {
@@ -164,7 +164,7 @@ export default function OnboardingTest2() {
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-white font-semibold text-sm mb-3 text-center">
-            Qu'est-ce que tu lui aurais envoyé comme football ?
+            Qu'est-ce que tu lui aurais envoyé comme premier message ?
           </p>
           <textarea
             ref={inputRef}
@@ -233,7 +233,7 @@ export default function OnboardingTest2() {
 
           {!canProceed && (
             <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              {!message.trim() ? 'Tape ton football et choisis un ton' : 'Choisis un ton pour continuer'}
+              {!message.trim() ? 'Tape ton message et choisis un ton' : 'Choisis un ton pour continuer'}
             </p>
           )}
         </div>
@@ -242,7 +242,7 @@ export default function OnboardingTest2() {
         <div className="flex items-center justify-center gap-6">
           <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Analyse IA instantanée</span>
           <span className="text-xs" style={{ color: '#4b5563' }}>·</span>
-          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Football optimisé généré</span>
+          <span className="text-xs font-medium" style={{ color: '#9da3af' }}>Message optimisé généré</span>
         </div>
       </div>
     </div>
