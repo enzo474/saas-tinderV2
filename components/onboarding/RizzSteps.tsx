@@ -4,16 +4,16 @@ import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 
 export interface RizzAnalysis {
-  verdict: string
-  raisons_echec: string[]
+  verdict?: string
+  raisons_echec?: string[]
   accroche_optimisee: string
   raisons_succes: string[]
   session_id?: string
 }
 
 interface RizzLoadingProps {
-  userMessage: string
-  userAnswer: 'oui' | 'non'
+  userMessage?: string
+  userAnswer?: 'oui' | 'non'
   storyImageBase64?: string
   flowType: 'test-1' | 'test-2'
   tone: string
@@ -45,9 +45,9 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
           ...(selectedGirl ? { 'x-selected-girl': selectedGirl } : {}),
         },
         body: JSON.stringify({
-          user_message: userMessage,
+          ...(userMessage ? { user_message: userMessage } : {}),
           storyImageBase64,
-          user_answer: userAnswer,
+          ...(userAnswer ? { user_answer: userAnswer } : {}),
           tone,
           session_id: sessionId,
         }),
@@ -92,7 +92,7 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
             <div className="w-10 h-10 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#E63946', borderTopColor: 'transparent' }} />
           </div>
           <h1 className="font-montserrat font-bold text-white text-2xl mb-2">
-            Analyse de ton message en cours...
+            Génération de ton accroche en cours...
           </h1>
           <p className="text-sm" style={{ color: '#6b7280' }}>
             Ton : <span className="font-semibold" style={{ color: '#E63946' }}>{tone}</span>
@@ -103,13 +103,13 @@ export function RizzLoadingStep({ userMessage, userAnswer, storyImageBase64, flo
           className="rounded-2xl p-6 border text-left space-y-4"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
-          <CheckItem text="Message analysé"                    active={checkStep >= 1} done={checkStep >= 1} />
-          <CheckItem text="Profil analysé"                     active={checkStep >= 2} done={checkStep >= 2} />
-          <CheckItem text="Génération de l'accroche optimale..." active={checkStep >= 2} done={false} pulse />
+          <CheckItem text="Profil analysé"                       active={checkStep >= 1} done={checkStep >= 1} />
+          <CheckItem text="Ton style pris en compte"             active={checkStep >= 2} done={checkStep >= 2} />
+          <CheckItem text="Génération de l'accroche parfaite..." active={checkStep >= 2} done={false} pulse />
         </div>
 
         <p className="text-sm mt-6" style={{ color: '#6b7280' }}>
-          L'IA analyse ton message et génère l'accroche parfaite...
+          L'IA analyse ton profil et génère l'accroche adaptée...
         </p>
 
         {error && (
@@ -149,21 +149,19 @@ function CheckItem({ text, active, done, pulse }: { text: string; active: boolea
 // ─── Step 3 : Résultat flouté ────────────────────────────────────────────────
 
 interface RizzResultBlurredProps {
-  userMessage: string
   analysis: RizzAnalysis
   flowType: 'test-1' | 'test-2'
   sessionId?: string
   onUnlock: () => void
 }
 
-export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, onUnlock }: RizzResultBlurredProps) {
+export function RizzResultBlurred({ analysis, flowType, sessionId, onUnlock }: RizzResultBlurredProps) {
   const router = useRouter()
   const sid = analysis.session_id || sessionId
 
-  // Tracking : vue du résultat flouté
   useEffect(() => {
-    trackEvent(sid, 'saw_result', { verdict: analysis.verdict })
-  }, [sid, analysis.verdict])
+    trackEvent(sid, 'saw_result', {})
+  }, [sid])
 
   const handleUnlock = () => {
     trackEvent(sid, 'clicked_unlock')
@@ -171,7 +169,6 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
       localStorage.setItem('rizz_pending', JSON.stringify({
         analysis,
         flowType,
-        userMessage,
         sessionId: sid,
       }))
     } catch { /* non-bloquant */ }
@@ -190,51 +187,29 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
       />
 
       <div className="relative z-10 w-full max-w-sm">
+        {/* Logo */}
+        <div className="text-center mb-6">
+          <span
+            className="font-montserrat font-extrabold text-xl"
+            style={{
+              background: 'linear-gradient(135deg, #E63946, #FF4757)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            Crushmaxxing
+          </span>
+        </div>
+
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="font-montserrat font-bold text-white text-2xl">
-            ANALYSE TERMINÉE
+            TON ACCROCHE EST PRÊTE
           </h1>
-        </div>
-
-        {/* Message user */}
-        <div
-          className="rounded-2xl p-5 border mb-4"
-          style={{ background: '#111111', borderColor: '#1F1F1F' }}
-        >
-          <p className="text-xs font-semibold mb-2" style={{ color: '#6b7280' }}>TON MESSAGE :</p>
-          <p className="text-white font-medium">"{userMessage}"</p>
-          <div
-            className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 rounded-full text-xs font-bold"
-            style={{ background: 'rgba(230,57,70,0.15)', color: '#E63946', border: '1px solid rgba(230,57,70,0.3)' }}
-          >
-            Elle ne va PAS répondre
-          </div>
-        </div>
-
-        {/* Raisons échec */}
-        <div
-          className="rounded-2xl p-5 border mb-4"
-          style={{ background: '#111111', borderColor: '#1F1F1F' }}
-        >
-          <p className="text-xs font-semibold mb-3" style={{ color: '#E63946' }}>
-            POURQUOI CA NE MARCHERA PAS :
+          <p className="text-sm mt-2" style={{ color: '#6b7280' }}>
+            Crée un compte gratuit pour la déverrouiller
           </p>
-          <div className="space-y-2">
-            {(analysis.raisons_echec || []).map((r, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <span className="text-xs mt-0.5 flex-shrink-0" style={{ color: '#E63946' }}>—</span>
-                <span className="text-sm" style={{ color: '#9da3af' }}>{r}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Séparateur */}
-        <div className="flex items-center gap-3 my-5">
-          <div className="flex-1 h-px" style={{ background: '#2A2A2A' }} />
-          <span className="text-xs font-bold" style={{ color: '#6b7280' }}>MESSAGE OPTIMISÉ</span>
-          <div className="flex-1 h-px" style={{ background: '#2A2A2A' }} />
         </div>
 
         {/* Accroche floutée */}
@@ -242,6 +217,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
           className="rounded-2xl p-5 border mb-4"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
+          <p className="text-xs font-semibold mb-3" style={{ color: '#6b7280' }}>TON ACCROCHE D'EXEMPLE :</p>
           <div
             className="p-4 rounded-xl mb-3"
             style={{
@@ -256,7 +232,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
             </p>
           </div>
           <p className="text-xs text-center" style={{ color: '#6b7280' }}>
-            Cette accroche a beaucoup plus de chances d'obtenir une réponse.
+            Débloque-la pour la copier et l'envoyer directement.
           </p>
         </div>
 
@@ -266,7 +242,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-xs font-semibold mb-3" style={{ color: '#22c55e' }}>
-            POURQUOI CA MARCHE :
+            POURQUOI CA VA MARCHER :
           </p>
           <div className="space-y-2" style={{ filter: 'blur(5px)', userSelect: 'none' }}>
             {(analysis.raisons_succes || ['Raison 1', 'Raison 2', 'Raison 3']).map((r, i) => (
@@ -286,7 +262,7 @@ export function RizzResultBlurred({ userMessage, analysis, flowType, sessionId, 
           className="w-full py-4 rounded-xl font-bold text-white text-base transition-all hover:scale-[1.02] active:scale-[0.98]"
           style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)' }}
         >
-          Voir l'accroche optimisée
+          Voir l'accroche
         </button>
 
         <div className="flex items-center justify-center gap-4 mt-4">

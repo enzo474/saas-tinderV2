@@ -16,21 +16,15 @@ const TONES: { id: Tone; label: string }[] = [
 
 export default function OnboardingTest1() {
   const [step, setStep]               = useState<Step>('input')
-  const [message, setMessage]         = useState('')
   const [selectedTone, setSelectedTone] = useState<Tone | null>(null)
-  const [answer, setAnswer]           = useState<'oui' | 'non' | null>(null)
   const [analysis, setAnalysis]       = useState<RizzAnalysis | null>(null)
   const [storyImage, setStoryImage]   = useState<string | null>(null)
   const [storyPreview, setStoryPreview] = useState<string | null>(null)
   const [sessionId, setSessionId]     = useState<string | null>(null)
-  const inputRef                      = useRef<HTMLTextAreaElement>(null)
   const fileInputRef                  = useRef<HTMLInputElement>(null)
-  const messageStartedRef             = useRef(false)
 
   const { track, getSessionId } = useRizzTracking('test-1')
 
-  // Capture session_id dès qu'il est disponible (le hook le stocke en ref)
-  // On le lit juste avant les actions importantes
   const ensureSessionId = () => {
     const id = getSessionId()
     if (id && !sessionId) setSessionId(id)
@@ -57,25 +51,13 @@ export default function OnboardingTest1() {
     track('tone_selected', { tone })
   }
 
-  const handleMessageChange = (value: string) => {
-    setMessage(value)
-    if (value.trim() && !messageStartedRef.current) {
-      messageStartedRef.current = true
-      // message_started est implicite — on le capturera dans answer_clicked avec la longueur
-    }
-  }
+  const canGenerate = !!selectedTone
 
-  const canProceed = message.trim() && selectedTone
-
-  const handleAnswer = (chosen: 'oui' | 'non') => {
-    if (!canProceed) {
-      if (!message.trim()) inputRef.current?.focus()
-      return
-    }
+  const handleGenerate = () => {
+    if (!canGenerate) return
     const sid = ensureSessionId()
     if (sid) setSessionId(sid)
-    track('answer_clicked', { answer: chosen, message, tone: selectedTone })
-    setAnswer(chosen)
+    track('answer_clicked', { tone: selectedTone })
     setStep('loading')
   }
 
@@ -84,11 +66,9 @@ export default function OnboardingTest1() {
     setStep('result')
   }
 
-  if (step === 'loading' && answer && selectedTone) {
+  if (step === 'loading' && selectedTone) {
     return (
       <RizzLoadingStep
-        userMessage={message}
-        userAnswer={answer}
         storyImageBase64={storyImage || undefined}
         flowType="test-1"
         tone={selectedTone}
@@ -101,7 +81,6 @@ export default function OnboardingTest1() {
   if (step === 'result' && analysis) {
     return (
       <RizzResultBlurred
-        userMessage={message}
         analysis={analysis}
         flowType="test-1"
         sessionId={sessionId ?? undefined}
@@ -143,12 +122,7 @@ export default function OnboardingTest1() {
           </h1>
         </div>
 
-        {/* Phrase d'instruction upload */}
-        <p className="text-center text-xs mb-3" style={{ color: '#9da3af' }}>
-          Importe un screenshot de profil Tinder pour tester ton accroche
-        </p>
-
-        {/* Zone story — clickable pour upload */}
+        {/* Zone upload photo */}
         <div className="flex justify-center mb-5">
           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
           <button
@@ -168,7 +142,7 @@ export default function OnboardingTest1() {
                   className="absolute bottom-2 inset-x-2 text-center text-xs font-bold py-1 rounded-lg"
                   style={{ background: 'rgba(0,0,0,0.6)', color: '#22c55e' }}
                 >
-                  Story ajoutée
+                  Photo ajoutée
                 </div>
               </>
             ) : (
@@ -182,36 +156,17 @@ export default function OnboardingTest1() {
                   </svg>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs font-semibold text-white mb-1">Ajouter une story</p>
-                  <p className="text-xs" style={{ color: '#6b7280' }}>Clique pour uploader</p>
+                  <p className="text-xs font-semibold text-white mb-1">Ajouter une photo</p>
+                  <p className="text-xs" style={{ color: '#6b7280' }}>Story ou profil Tinder</p>
                 </div>
               </div>
             )}
           </button>
         </div>
 
-        {/* Question accroche */}
-        <div
-          className="rounded-2xl p-5 border mb-4"
-          style={{ background: '#111111', borderColor: '#1F1F1F' }}
-        >
-          <p className="text-white font-semibold text-sm mb-3 text-center">
-            Qu'est-ce que tu lui aurais envoyé ?
-          </p>
-          <textarea
-            ref={inputRef}
-            value={message}
-            onChange={e => handleMessageChange(e.target.value)}
-            placeholder="Tape ton message ici..."
-            rows={3}
-            className="w-full px-4 py-3 rounded-xl border text-white text-sm outline-none resize-none transition-colors"
-            style={{ background: '#0D0D0D', borderColor: message.trim() ? '#E63946' : '#2A2A2A', color: '#fff' }}
-          />
-        </div>
-
         {/* Choix du ton */}
         <div
-          className="rounded-2xl p-5 border mb-4"
+          className="rounded-2xl p-5 border mb-5"
           style={{ background: '#111111', borderColor: '#1F1F1F' }}
         >
           <p className="text-white font-semibold text-sm mb-3 text-center">
@@ -235,38 +190,22 @@ export default function OnboardingTest1() {
           </div>
         </div>
 
-        {/* Question Oui/Non */}
-        <div
-          className="rounded-2xl p-5 border mb-5"
-          style={{ background: '#111111', borderColor: '#1F1F1F' }}
+        {/* Bouton CTA */}
+        <button
+          onClick={handleGenerate}
+          disabled={!canGenerate}
+          className="w-full py-4 rounded-xl font-bold text-white text-base transition-all mb-5"
+          style={{
+            background: canGenerate
+              ? 'linear-gradient(135deg, #E63946, #FF4757)'
+              : '#1F1F1F',
+            color: canGenerate ? '#fff' : '#4b5563',
+            cursor: canGenerate ? 'pointer' : 'not-allowed',
+            transform: canGenerate ? undefined : 'none',
+          }}
         >
-          <p className="text-white font-semibold text-sm mb-4 text-center">
-            Tu penses qu'elle répondrait ?
-          </p>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={() => handleAnswer('oui')}
-              className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', opacity: canProceed ? 1 : 0.4 }}
-            >
-              OUI, elle va répondre
-            </button>
-            <button
-              onClick={() => handleAnswer('non')}
-              className="py-3.5 rounded-xl font-bold text-sm text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-              style={{ background: 'linear-gradient(135deg, #E63946, #FF4757)', opacity: canProceed ? 1 : 0.4 }}
-            >
-              NON, elle va ignorer
-            </button>
-          </div>
-
-          {!canProceed && (
-            <p className="text-xs text-center mt-3 font-semibold animate-pulse" style={{ color: '#E63946' }}>
-              {!message.trim() ? 'Tape ton message et choisis un ton' : 'Choisis un ton pour continuer'}
-            </p>
-          )}
-        </div>
+          {canGenerate ? 'GÉNÉRER MON ACCROCHE' : 'Choisis un ton pour continuer'}
+        </button>
 
         {/* Footer */}
         <div className="flex items-center justify-center gap-6">

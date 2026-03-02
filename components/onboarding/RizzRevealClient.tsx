@@ -7,7 +7,7 @@ import type { RizzAnalysis } from './RizzSteps'
 interface RizzPending {
   analysis: RizzAnalysis
   flowType: 'test-1' | 'test-2'
-  userMessage: string
+  userMessage?: string
   sessionId?: string
 }
 

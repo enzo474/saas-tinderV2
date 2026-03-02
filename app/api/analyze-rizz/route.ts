@@ -162,16 +162,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { user_message, storyImageBase64, user_answer, tone, session_id } = body as {
-      user_message: string
+      user_message?: string
       storyImageBase64?: string
-      user_answer: 'oui' | 'non'
+      user_answer?: 'oui' | 'non'
       tone?: string
       session_id?: string
     }
 
-    if (!user_message) {
-      return NextResponse.json({ error: 'user_message requis' }, { status: 400 })
-    }
+    const hasUserMessage = !!(user_message && user_message.trim())
 
     // ─── 1. Analyser la story/photo avec Vision ───────────────────────────────
     let profileAnalysis = null
@@ -206,58 +204,54 @@ export async function POST(request: NextRequest) {
     const selectedTone = tone && validTones.includes(tone) ? tone : 'Direct'
     const toneInstruction = TONE_INSTRUCTIONS[selectedTone]
 
-    // ─── 3. Lancer en parallèle : génération accroche + évaluation user_message
-    const [accrocheResp, evalResp] = await Promise.all([
+    // ─── 3. Génération de l'accroche (+ évaluation du message si fourni) ──────
+    const accrocheResp = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 200,
+      system: buildAccrochePrompt(profileDesc, toneInstruction),
+      messages: [
+        {
+          role: 'user',
+          content: `Génère l'accroche parfaite pour ce profil avec le ton "${selectedTone}".`,
+        },
+      ],
+    })
 
-      // Accroche optimisée via l'agent admin adapté
-      anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 200,
-        system: buildAccrochePrompt(profileDesc, toneInstruction),
-        messages: [
-          {
-            role: 'user',
-            content: `Génère l'accroche parfaite pour ce profil avec le ton "${selectedTone}".`,
-          },
-        ],
-      }),
+    // ─── 4. Extraire l'accroche optimisée ────────────────────────────────────
+    const accrocheText = accrocheResp.content[0].type === 'text' ? accrocheResp.content[0].text.trim() : ''
+    const accrocheOptimisee = accrocheText
+      .replace(/^["«»]|["«»]$/g, '')
+      .trim() || 'Tu ronfles ?'
 
-      // Évaluation du message de l'user
-      anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: `Tu es Max, expert en séduction. Tu évalues les accroches de façon directe, cash, sans filtre. Tu connais les principes : zéro filtre, contrôle du cadre, pas de justification.`,
-        messages: [
-          {
-            role: 'user',
-            content: `Un homme a envoyé cette accroche à une fille sur Instagram : "${user_message}"
+    // ─── 5. Raisons d'échec (seulement si l'user a fourni son message) ─────────
+    let raisonsEchec: string[] = []
+    if (hasUserMessage) {
+      try {
+        const evalResp = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 400,
+          system: `Tu es Max, expert en séduction. Tu évalues les accroches de façon directe, cash, sans filtre. Tu connais les principes : zéro filtre, contrôle du cadre, pas de justification.`,
+          messages: [
+            {
+              role: 'user',
+              content: `Un homme a envoyé cette accroche à une fille sur Instagram : "${user_message}"
 Il pensait qu'elle allait ${user_answer === 'oui' ? 'répondre' : 'ignorer'}.
 
 Donne 3 raisons courtes (5-8 mots max chacune) pourquoi cette accroche ne va probablement PAS provoquer de réponse. Sois cash et direct.
 
 JSON uniquement :
 {"raisons_echec": ["raison 1", "raison 2", "raison 3"]}`,
-          },
-        ],
-      }),
-    ])
-
-    // ─── 4. Extraire l'accroche optimisée ────────────────────────────────────
-    const accrocheText = accrocheResp.content[0].type === 'text' ? accrocheResp.content[0].text.trim() : ''
-    const accrocheOptimisee = accrocheText
-      .replace(/^["«»]|["«»]$/g, '') // Retirer les guillemets éventuels
-      .trim() || 'Tu ronfles ?'
-
-    // ─── 5. Parser les raisons d'échec ───────────────────────────────────────
-    let raisonsEchec = ['Trop générique, pas d\'impact', 'Aucune tension ni surprise', 'Elle peut ignorer sans effort']
-    try {
-      const evalText = evalResp.content[0].type === 'text' ? evalResp.content[0].text : ''
-      const jsonMatch = evalText.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0])
-        if (Array.isArray(parsed.raisons_echec)) raisonsEchec = parsed.raisons_echec
-      }
-    } catch { /* fallback */ }
+            },
+          ],
+        })
+        const evalText = evalResp.content[0].type === 'text' ? evalResp.content[0].text : ''
+        const jsonMatch = evalText.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0])
+          if (Array.isArray(parsed.raisons_echec)) raisonsEchec = parsed.raisons_echec
+        }
+      } catch { /* fallback vide */ }
+    }
 
     // ─── 6. Générer les raisons de succès pour l'accroche optimisée ──────────
     let raisonsSucces = ['Présuppose une intimité', 'Elle doit répondre pour corriger', 'Court, percutant, inattendu']
@@ -295,12 +289,12 @@ Pourquoi ça va marcher ?
         await supabase
           .from('rizz_sessions')
           .update({
-            user_message,
-            user_answer,
+            user_message: user_message ?? null,
+            user_answer: user_answer ?? null,
             selected_tone: selectedTone ?? null,
             has_uploaded_image: !!storyImageBase64,
             selected_girl: selectedGirl ?? null,
-            verdict: 'ne_marche_pas',
+            verdict: hasUserMessage ? 'ne_marche_pas' : null,
             generated_football: accrocheOptimisee ?? null,
           })
           .eq('id', session_id)
@@ -317,12 +311,12 @@ Pourquoi ça va marcher ?
           .insert({
             ip_address: ip,
             flow_type: flowType,
-            user_message,
-            user_answer,
+            user_message: user_message ?? null,
+            user_answer: user_answer ?? null,
             selected_tone: selectedTone ?? null,
             has_uploaded_image: !!storyImageBase64,
             selected_girl: selectedGirl ?? null,
-            verdict: 'ne_marche_pas',
+            verdict: hasUserMessage ? 'ne_marche_pas' : null,
             generated_football: accrocheOptimisee ?? null,
           })
           .select('id')
@@ -333,7 +327,7 @@ Pourquoi ça va marcher ?
     } catch { /* non-bloquant */ }
 
     return NextResponse.json({
-      verdict: 'ne_marche_pas',
+      verdict: hasUserMessage ? 'ne_marche_pas' : '',
       raisons_echec: raisonsEchec,
       accroche_optimisee: accrocheOptimisee,
       raisons_succes: raisonsSucces,
