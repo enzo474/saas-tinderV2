@@ -5,8 +5,9 @@ import ConversationGenerator, { type GeneratedConversation } from './Conversatio
 import ConversationPreview from './ConversationPreview'
 import ExportCarousel from './ExportCarousel'
 import ConversationHistory from './ConversationHistory'
+import ManualConversationEditor from './ManualConversationEditor'
 
-type ActiveView = 'generator' | 'history'
+type ActiveView = 'generator' | 'manual' | 'history'
 
 function toPlainText(conversation: { sender: string; message: string }[]): string {
   return conversation
@@ -61,7 +62,10 @@ export default function AdminConversationsClient() {
         {/* Tabs */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 32 }}>
           <button onClick={() => setActiveView('generator')} style={tabStyle(activeView === 'generator')}>
-            ✨ Générateur
+            ✨ Générateur IA
+          </button>
+          <button onClick={() => setActiveView('manual')} style={tabStyle(activeView === 'manual')}>
+            ✍️ Manuel
           </button>
           <button onClick={() => setActiveView('history')} style={tabStyle(activeView === 'history')}>
             📋 Historique
@@ -189,6 +193,10 @@ export default function AdminConversationsClient() {
               </div>
             )}
           </div>
+        )}
+
+        {activeView === 'manual' && (
+          <ManualConversationEditor />
         )}
 
         {activeView === 'history' && (
