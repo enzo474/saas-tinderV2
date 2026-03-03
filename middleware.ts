@@ -94,20 +94,10 @@ export async function middleware(request: NextRequest) {
         NextResponse.redirect(new URL('/game/accroche', request.url))
       )
     }
-    // Non connecté → A/B test : rewrite interne (URL reste "/" dans le navigateur)
-    let variant = request.cookies.get('ab_test')?.value
-    if (!variant || (variant !== 'test-1' && variant !== 'test-2')) {
-      variant = Math.random() < 0.5 ? 'test-1' : 'test-2'
-    }
+    // Non connecté → onboarding-test-2
     const rewriteRes = NextResponse.rewrite(
-      new URL(`/onboarding-${variant}`, request.url)
+      new URL('/onboarding-test-2', request.url)
     )
-    rewriteRes.cookies.set('ab_test', variant, {
-      maxAge: 60 * 60 * 24 * 30,
-      httpOnly: false,
-      sameSite: 'lax',
-      path: '/',
-    })
     return copyCookiesToResponse(response, rewriteRes)
   }
 
