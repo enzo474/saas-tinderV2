@@ -164,7 +164,7 @@ export default function LandingPage() {
             {[
               { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
               { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
-              { quote: "Enfin un outil qui marche vraiment", author: 'Alex' },
+              { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
             ].map((card, i) => (
               <div
                 key={i}
