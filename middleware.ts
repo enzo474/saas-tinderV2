@@ -85,7 +85,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/game', request.url))
   }
 
-  // ── Page d'accueil : A/B testing ou dashboard selon auth ──────────────────
+  // ── Page d'accueil : landing page ou dashboard selon auth ────────────────
   if (path === '/') {
     if (user) {
       // Utilisateur déjà connecté → dashboard direct
@@ -94,11 +94,8 @@ export async function middleware(request: NextRequest) {
         NextResponse.redirect(new URL('/game/accroche', request.url))
       )
     }
-    // Non connecté → onboarding-test-2
-    const rewriteRes = NextResponse.rewrite(
-      new URL('/onboarding-test-2', request.url)
-    )
-    return copyCookiesToResponse(response, rewriteRes)
+    // Non connecté → landing page (rendu normal de app/page.tsx)
+    return response
   }
 
   // ── Routes publiques (pas d'auth requise) ──────────────────────────────────
