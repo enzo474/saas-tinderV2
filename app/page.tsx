@@ -159,8 +159,8 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Testimonials */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          {/* Testimonials — carrousel sur mobile, grille sur desktop */}
+          <div className="hidden sm:grid sm:grid-cols-3 gap-4 mb-8">
             {[
               { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
               { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
@@ -183,14 +183,42 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Trust badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {/* Testimonials carrousel mobile */}
+          <div className="sm:hidden overflow-hidden mb-8">
+            <div className="landing-testimonials-track flex gap-4" style={{ width: 'max-content' }}>
+              {[
+                { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
+                { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
+                { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
+                { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
+                { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
+                { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
+              ].map((card, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 flex flex-col p-5 rounded-2xl border"
+                  style={{ width: '260px', background: '#111111', borderColor: '#1F1F1F' }}
+                >
+                  <div className="text-3xl font-bold mb-3" style={{ color: '#E63946', lineHeight: 1 }}>"</div>
+                  <p className="font-bold text-sm text-white flex-1 mb-4">{card.quote}</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(230,57,70,0.15)', color: '#E63946' }}>
+                      {card.author[0]}
+                    </div>
+                    <span className="text-xs font-semibold" style={{ color: '#9da3af' }}>{card.author}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trust badges — carrousel sur mobile, grille sur desktop */}
+          <div className="hidden sm:grid sm:grid-cols-3 gap-3">
             {[
               '✓ Sans carte bancaire',
               '✓ Données sécurisées',
               '✓ Essai gratuit',
               '✓ +1 500 utilisateurs satisfaits',
-              '✓ 4.9/5 de satisfaction',
               '✓ Accroches personnalisées',
             ].map((badge) => (
               <div
@@ -202,6 +230,33 @@ export default function LandingPage() {
                 <span>{badge.slice(2)}</span>
               </div>
             ))}
+          </div>
+
+          {/* Trust badges carrousel mobile */}
+          <div className="sm:hidden overflow-hidden">
+            <div className="landing-badges-track flex gap-3" style={{ width: 'max-content' }}>
+              {[
+                '✓ Sans carte bancaire',
+                '✓ Données sécurisées',
+                '✓ Essai gratuit',
+                '✓ +1 500 utilisateurs satisfaits',
+                '✓ Accroches personnalisées',
+                '✓ Sans carte bancaire',
+                '✓ Données sécurisées',
+                '✓ Essai gratuit',
+                '✓ +1 500 utilisateurs satisfaits',
+                '✓ Accroches personnalisées',
+              ].map((badge, i) => (
+                <div
+                  key={i}
+                  className="flex-shrink-0 flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold"
+                  style={{ background: '#0F0F0F', borderColor: '#1F1F1F', color: '#9da3af', whiteSpace: 'nowrap' }}
+                >
+                  <span style={{ color: '#E63946' }}>{badge.slice(0, 1)}</span>
+                  <span>{badge.slice(2)}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -326,6 +381,12 @@ export default function LandingPage() {
         }
         .landing-scroll-track {
           animation: landing-scroll 22s linear infinite;
+        }
+        .landing-testimonials-track {
+          animation: landing-scroll 18s linear infinite;
+        }
+        .landing-badges-track {
+          animation: landing-scroll 14s linear infinite;
         }
       `}</style>
     </div>
