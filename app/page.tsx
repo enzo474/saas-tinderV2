@@ -104,7 +104,7 @@ export default function LandingPage() {
             boxShadow: '0 0 50px rgba(230,57,70,0.25)',
           }}
         >
-          🎯 Commencer Mon Évaluation Gratuite →
+          🎯 Tester une accroche gratuite →
         </button>
 
         {/* Trust */}
@@ -253,7 +253,7 @@ export default function LandingPage() {
                 boxShadow: '0 0 40px rgba(230,57,70,0.2)',
               }}
             >
-              🚀 Faire le Quiz Gratuit Maintenant →
+              🚀 Essayer gratuitement →
             </button>
             <div className="flex items-center justify-center gap-3 text-xs" style={{ color: '#6b7280' }}>
               <span>🔒 100% Privé</span>
