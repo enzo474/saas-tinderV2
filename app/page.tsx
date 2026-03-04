@@ -104,7 +104,7 @@ export default function LandingPage() {
             boxShadow: '0 0 50px rgba(230,57,70,0.25)',
           }}
         >
-          🎯 Tester une accroche gratuite →
+          Tester une accroche gratuite →
         </button>
 
         {/* Trust */}
@@ -164,7 +164,7 @@ export default function LandingPage() {
             {[
               { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
               { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
-              { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
+              { quote: "j'ai géré ma première 10/10 grâce à cette app", author: 'Alex' },
             ].map((card, i) => (
               <div
                 key={i}
@@ -189,10 +189,10 @@ export default function LandingPage() {
               {[
                 { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
                 { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
-                { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
+                { quote: "j'ai géré ma première 10/10 grâce à cette app", author: 'Alex' },
                 { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
                 { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
-                { quote: "j'ai géré ma première 10/10 grâce à cette app 😂", author: 'Alex' },
+                { quote: "j'ai géré ma première 10/10 grâce à cette app", author: 'Alex' },
               ].map((card, i) => (
                 <div
                   key={i}
@@ -268,7 +268,7 @@ export default function LandingPage() {
             className="flex items-center gap-3 p-4 rounded-2xl border"
             style={{ background: '#111111', borderColor: '#1F1F1F' }}
           >
-            <div className="text-lg flex-shrink-0">⭐⭐⭐⭐⭐</div>
+            <div className="text-lg flex-shrink-0" style={{ color: '#E63946', letterSpacing: '2px' }}>★★★★★</div>
             <p className="text-sm" style={{ color: '#9da3af', lineHeight: '1.5' }}>
               <span className="font-bold text-white">Plus de 1 500 utilisateurs</span> ont obtenu plus de réponses sur les applis de rencontres
             </p>
@@ -308,14 +308,14 @@ export default function LandingPage() {
                 boxShadow: '0 0 40px rgba(230,57,70,0.2)',
               }}
             >
-              🚀 Essayer gratuitement →
+              Essayer gratuitement →
             </button>
             <div className="flex items-center justify-center gap-3 text-xs" style={{ color: '#6b7280' }}>
-              <span>🔒 100% Privé</span>
+              <span>100% Privé</span>
               <span>·</span>
-              <span>⏱ Quiz 2 Min</span>
+              <span>Quiz 2 Min</span>
               <span>·</span>
-              <span>✓ Toutes les Applis</span>
+              <span>Toutes les Applis</span>
             </div>
           </div>
         </div>
