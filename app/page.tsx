@@ -60,14 +60,13 @@ export default function LandingPage() {
           style={{ borderColor: '#2A2A2A', background: '#111111', overflow: 'hidden' }}
         >
           {[
-            { value: '1M+', label: 'UTILISATEURS' },
-            { value: '#1', label: 'APPLI ACCROCHE IA' },
+            { value: '+1 500', label: 'UTILISATEURS' },
             { value: '4.9★', label: 'SATISFACTION' },
           ].map((stat, i) => (
             <div
               key={i}
               className="flex flex-col items-center justify-center px-5 py-3"
-              style={{ borderRight: i < 2 ? '1px solid #2A2A2A' : 'none' }}
+              style={{ borderRight: i < 1 ? '1px solid #2A2A2A' : 'none' }}
             >
               <span className="font-extrabold text-sm text-white">{stat.value}</span>
               <span className="text-xs" style={{ color: '#6b7280' }}>{stat.label}</span>
@@ -92,7 +91,7 @@ export default function LandingPage() {
 
         {/* Subtitle */}
         <p className="text-base max-w-sm mb-8" style={{ color: '#9da3af', lineHeight: '1.75' }}>
-          Des techniques basées sur la science pour maîtriser les dynamiques sociales et créer de vraies connexions
+          L&apos;IA qui génère des accroches personnalisées basées sur son profil pour obtenir plus de réponses
         </p>
 
         {/* CTA */}
@@ -134,7 +133,7 @@ export default function LandingPage() {
 
           {/* Title */}
           <h2 className="font-extrabold text-2xl sm:text-3xl text-center mb-10">
-            Plébiscité par les{' '}
+            Recommandé par les{' '}
             <span
               style={{
                 background: 'linear-gradient(135deg, #E63946, #FF8FAB)',
@@ -150,7 +149,7 @@ export default function LandingPage() {
           {/* Scrolling logos */}
           <div className="overflow-hidden mb-10">
             <div className="landing-scroll-track flex gap-12 whitespace-nowrap">
-              {['TIME', 'Forbes', 'a16z', 'WSJ', 'Le Monde', 'Konbini', 'Vice', 'TIME', 'Forbes', 'a16z', 'WSJ', 'Le Monde', 'Konbini', 'Vice'].map(
+              {['TikTok', 'Instagram', 'Le Monde', 'Konbini', 'TikTok', 'Instagram', 'Le Monde', 'Konbini'].map(
                 (logo, i) => (
                   <span key={i} className="font-extrabold text-xl inline-block" style={{ color: '#3A3A3A' }}>
                     {logo}
@@ -160,12 +159,12 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Press cards */}
+          {/* Testimonials */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[
-              { quote: 'Meilleures Innovations 2024', source: 'TIME' },
-              { quote: '5e Appli de Rencontres la Plus Téléchargée', source: 'FORBES' },
-              { quote: 'Top 100 Applis IA Génératives', source: 'A16Z' },
+              { quote: "Ça change la vie pour les messages Tinder, j'ai beaucoup plus de réponses qu'avant", author: 'Lucas' },
+              { quote: "Simple et efficace, ça fonctionne bien, j'en suis content", author: 'Thomas' },
+              { quote: "Enfin un outil qui marche vraiment", author: 'Alex' },
             ].map((card, i) => (
               <div
                 key={i}
@@ -174,30 +173,35 @@ export default function LandingPage() {
               >
                 <div className="text-3xl font-bold mb-3" style={{ color: '#E63946', lineHeight: 1 }}>"</div>
                 <p className="font-bold text-sm text-white flex-1 mb-4">{card.quote}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold" style={{ color: '#6b7280' }}>{card.source}</span>
-                  <span className="text-xs" style={{ color: '#6b7280' }}>↗</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(230,57,70,0.15)', color: '#E63946' }}>
+                    {card.author[0]}
+                  </div>
+                  <span className="text-xs font-semibold" style={{ color: '#9da3af' }}>{card.author}</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Also featured */}
-          <div className="text-center">
-            <p className="text-xs font-semibold tracking-widest mb-3" style={{ color: '#4b5563' }}>
-              ÉGALEMENT DANS
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {['Le Parisien', 'Vice France', 'Konbini', 'Slate', '20 Minutes'].map((media) => (
-                <span
-                  key={media}
-                  className="text-xs px-3 py-1.5 rounded-full border font-medium"
-                  style={{ borderColor: '#2A2A2A', color: '#9da3af', background: '#111111' }}
-                >
-                  {media}
-                </span>
-              ))}
-            </div>
+          {/* Trust badges */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              '✓ Sans carte bancaire',
+              '✓ Données sécurisées',
+              '✓ Essai gratuit',
+              '✓ +1 500 utilisateurs satisfaits',
+              '✓ 4.9/5 de satisfaction',
+              '✓ Accroches personnalisées',
+            ].map((badge) => (
+              <div
+                key={badge}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold"
+                style={{ background: '#0F0F0F', borderColor: '#1F1F1F', color: '#9da3af' }}
+              >
+                <span style={{ color: '#E63946' }}>{badge.slice(0, 1)}</span>
+                <span>{badge.slice(2)}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -211,7 +215,7 @@ export default function LandingPage() {
           >
             <div className="text-lg flex-shrink-0">⭐⭐⭐⭐⭐</div>
             <p className="text-sm" style={{ color: '#9da3af', lineHeight: '1.5' }}>
-              <span className="font-bold text-white">10+ millions d&apos;utilisateurs</span> ont amélioré leur jeu sur les applis
+              <span className="font-bold text-white">Plus de 1 500 utilisateurs</span> ont obtenu plus de réponses sur les applis de rencontres
             </p>
           </div>
         </div>
@@ -238,7 +242,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-sm mb-6" style={{ color: '#9da3af', lineHeight: '1.75' }}>
-              Rejoins plus de 10 millions d&apos;utilisateurs qui ont déjà découvert leur superpouvoir sur les applis de rencontres
+              Rejoins plus de 1 500 utilisateurs qui ont déjà découvert leur superpouvoir sur les applis de rencontres
             </p>
             <button
               onClick={handleCTA}
